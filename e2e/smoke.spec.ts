@@ -260,7 +260,8 @@ test("scroll-revealed content becomes visible once scrolled into view", async ({
 
 // QA_AND_PERFORMANCE.md §4 failure tests. WebGL off and WebGL context-lost
 // now have a 3D layer to fail and live in e2e/webgl.spec.ts. "AI key removed"
-// is still not applicable — no AI assistant (Phase 10) exists to fail.
+// now has an assistant to fail too — see e2e/ask-the-lab.spec.ts's offline-state
+// test (no key IS the state of this repo's test environment, not a simulation).
 // "Images 404" has nothing to test against either:
 // every media array in /data is still empty (no photo or project media has
 // been supplied), so the site currently renders zero <img> elements.

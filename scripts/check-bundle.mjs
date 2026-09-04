@@ -22,7 +22,7 @@ const BUDGET_WARN_KB = 160;
 const BUDGET_FAIL_KB = 200;
 
 const SECRET_PATTERN =
-  /\b(sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}|xox[baprs]-[A-Za-z0-9-]{10,})\b/;
+  /\b(sk-[A-Za-z0-9_-]{20,}|gsk_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,}|xox[baprs]-[A-Za-z0-9-]{10,})\b/;
 
 if (!existsSync(MANIFEST)) {
   console.error("✖ .next/app-build-manifest.json not found — run `next build` first.");

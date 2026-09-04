@@ -3,6 +3,7 @@ import { site } from "@/data/site";
 import { Fill, filled } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { AskTheLabStatic } from "@/components/ai/AskTheLabStatic";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -68,6 +69,8 @@ export default function ContactPage() {
             </li>
           ))}
         </ul>
+
+        <AskTheLabStatic />
       </div>
     </section>
   );

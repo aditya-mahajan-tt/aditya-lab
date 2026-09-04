@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "shot": "node scripts/screenshots.mjs",
     "verify": "node scripts/verify.mjs",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "ai:generate-canned-answers": "node scripts/generate-canned-answers.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

@@ -6,6 +6,7 @@ import { useLabStore } from "@/lib/store";
 import { useHideOnScroll } from "@/lib/utils/useHideOnScroll";
 import { NavOverlay } from "@/components/navigation/NavOverlay";
 import { CommandPalette } from "@/components/navigation/CommandPalette";
+import { AskTheLab } from "@/components/ai/AskTheLab";
 
 /**
  * PLAN.md Phase 3. Wordmark, MENU (the full-screen overlay in NavOverlay)
@@ -57,6 +58,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <AskTheLab />
           <NavOverlay />
           <CommandPalette />
         </div>

@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useLabStore } from "@/lib/store";
 import { useBodyScrollLock } from "@/lib/utils/useBodyScrollLock";
-import { searchCommands, type CommandItem } from "@/lib/search";
+import { searchCommands, ASK_THE_LAB_COMMAND_HREF, type CommandItem } from "@/lib/search";
 import { cn } from "@/lib/utils/cn";
 import { useMagnetic } from "@/lib/utils/useMagnetic";
 import { analytics } from "@/lib/analytics/events";
@@ -20,6 +20,7 @@ import { analytics } from "@/lib/analytics/events";
 export function CommandPalette() {
   const open = useLabStore((s) => s.commandPaletteOpen);
   const setOpen = useLabStore((s) => s.setCommandPaletteOpen);
+  const setAiOpen = useLabStore((s) => s.setAiOpen);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
@@ -96,6 +97,11 @@ export function CommandPalette() {
   function go(item: CommandItem) {
     analytics.commandPaletteSelect(item.href);
     setOpen(false);
+    if (item.href === ASK_THE_LAB_COMMAND_HREF) {
+      setAiOpen(true);
+      analytics.askLabOpen("palette");
+      return;
+    }
     router.push(item.href);
   }
 

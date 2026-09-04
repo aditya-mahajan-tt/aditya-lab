@@ -48,14 +48,27 @@ export const useLabStore = create<LabState>()(
       bootComplete: false,
 
       setActiveSection: (id) => set({ activeSection: id }),
-      // The menu overlay and the command palette are mutually exclusive —
-      // two full-screen overlays with competing focus traps must never both
-      // be open at once.
+      // The menu overlay, the command palette and Ask the Lab are mutually
+      // exclusive — competing full-screen overlays with their own focus
+      // traps must never be open at once.
       setCommandPaletteOpen: (open) =>
-        set((s) => ({ commandPaletteOpen: open, menuOpen: open ? false : s.menuOpen })),
+        set((s) => ({
+          commandPaletteOpen: open,
+          menuOpen: open ? false : s.menuOpen,
+          aiOpen: open ? false : s.aiOpen,
+        })),
       setMenuOpen: (open) =>
-        set((s) => ({ menuOpen: open, commandPaletteOpen: open ? false : s.commandPaletteOpen })),
-      setAiOpen: (open) => set({ aiOpen: open }),
+        set((s) => ({
+          menuOpen: open,
+          commandPaletteOpen: open ? false : s.commandPaletteOpen,
+          aiOpen: open ? false : s.aiOpen,
+        })),
+      setAiOpen: (open) =>
+        set((s) => ({
+          aiOpen: open,
+          menuOpen: open ? false : s.menuOpen,
+          commandPaletteOpen: open ? false : s.commandPaletteOpen,
+        })),
       toggleBuildMode: () => set((s) => ({ buildMode: !s.buildMode })),
       setSoundEnabled: (on) => set({ soundEnabled: on }),
       setQuality: (q) => set({ quality: q }),

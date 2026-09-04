@@ -2,7 +2,10 @@ import { navigation } from "@/data/navigation";
 import { getAllProjects, getAllExperiments } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
-export type CommandGroup = "Navigate" | "Work" | "Experiments";
+export type CommandGroup = "Navigate" | "Work" | "Experiments" | "AI";
+
+/** Sentinel href CommandPalette special-cases to open Ask the Lab instead of navigating. */
+export const ASK_THE_LAB_COMMAND_HREF = "#ask-the-lab";
 
 export type CommandItem = {
   id: string;
@@ -24,6 +27,14 @@ function buildIndex(): CommandItem[] {
     href: item.href,
   }));
 
+  const askTheLab: CommandItem = {
+    id: "ask-the-lab",
+    group: "AI",
+    label: "Ask the Lab",
+    detail: "Ask a question about Aditya",
+    href: ASK_THE_LAB_COMMAND_HREF,
+  };
+
   const projects: CommandItem[] = getAllProjects().map((p) => ({
     id: `project-${p.slug}`,
     group: "Work",
@@ -40,7 +51,7 @@ function buildIndex(): CommandItem[] {
     href: `/experiments/${e.slug}`,
   }));
 
-  return [...routes, ...projects, ...experiments];
+  return [askTheLab, ...routes, ...projects, ...experiments];
 }
 
 /** Built once per module load — the corpus is static build-time content. */
