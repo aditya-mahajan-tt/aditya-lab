@@ -38,6 +38,28 @@ test("Ask the Lab opens from the header, is keyboard operable, and closes back t
   await expect(trigger).toBeFocused();
 });
 
+test("the custom cursor bails out while Ask the Lab is open, restoring a real pointer", async ({
+  page,
+}) => {
+  // AskTheLab is a native <dialog>/showModal(), which paints in the browser's
+  // top layer — always above CustomCursor's fixed-position dot, regardless of
+  // z-index. If CustomCursor doesn't also treat aiOpen as an overlay, it hides
+  // the real OS cursor (`cursor: none` via .custom-cursor-active) but its own
+  // replacement is invisible behind the dialog: no pointer at all.
+  await page.goto("/");
+  await page.mouse.move(200, 200);
+  await page.mouse.move(210, 205); // wakes the custom cursor, same as a real visitor moving the mouse
+
+  await page.getByRole("button", { name: "Open Ask the Lab" }).click();
+  const dialog = page.locator('dialog[aria-label="Ask the Lab"]');
+  await expect(dialog).toBeVisible();
+
+  await expect(page.locator("html")).not.toHaveClass(/custom-cursor-active/);
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+});
+
 test("a suggested question answers instantly with no network call", async ({ page }) => {
   await page.goto("/");
 
