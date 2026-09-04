@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { thinking } from "@/data/thinking";
 import { Fill } from "@/components/ui/Placeholder";
+import { ThinkingFramework } from "@/components/thinking/ThinkingFramework";
 
 export const metadata: Metadata = {
   title: "Thinking",
@@ -17,7 +18,11 @@ export default function ThinkingPage() {
           <Fill value={thinking.intro} as="p" />
         </div>
 
-        {/* Phase 11 replaces this ordered list with an animated SVG framework diagram. */}
+        <div className="mt-16">
+          <ThinkingFramework steps={thinking.steps} />
+        </div>
+
+        {/* Phase 11 replaces this with an animated, interactive version. */}
         <ol className="mt-16 divide-y divide-border border-y border-border">
           {thinking.steps.map((step, i) => (
             <li key={step.label} className="flex flex-col gap-3 py-8 md:flex-row md:gap-10">

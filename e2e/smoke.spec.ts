@@ -161,6 +161,21 @@ test("command palette closes on Escape and returns focus to its trigger", async 
   await expect(trigger).toBeFocused();
 });
 
+test("the work archive filters by category and the full list works with JavaScript disabled", async ({ page }) => {
+  await page.goto("/work");
+  const items = page.locator('ul li a[href^="/work/"]');
+  const totalCount = await items.count();
+  expect(totalCount).toBeGreaterThan(0);
+
+  await page.getByRole("button", { name: "Strategy" }).click();
+  const filteredCount = await items.count();
+  expect(filteredCount).toBeGreaterThan(0);
+  expect(filteredCount).toBeLessThan(totalCount);
+
+  await page.getByRole("button", { name: "All" }).click();
+  await expect(items).toHaveCount(totalCount);
+});
+
 test("content and navigation still render with JavaScript disabled", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
@@ -177,6 +192,10 @@ test("content and navigation still render with JavaScript disabled", async ({ br
   await expect(workLink).toBeVisible();
   await workLink.click();
   await expect(page).toHaveURL(/\/work$/);
+
+  // The archive's default (unfiltered) state is server-rendered — the full
+  // list of projects is there and reachable with no JS to run the filter.
+  await expect(page.locator('ul li a[href^="/work/"]').first()).toBeVisible();
 
   await context.close();
 });
