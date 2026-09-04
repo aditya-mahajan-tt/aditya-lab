@@ -21,3 +21,5 @@ next-env.d.ts
 # 3D source files — export optimised .glb into public/models instead
 *.blend
 *.blend1
+.vercel
+.env*
