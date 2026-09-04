@@ -12,45 +12,49 @@
 
 Dark, precise, high-contrast, generous whitespace, monospace used as *instrumentation* rather than decoration. Light comes from the content, not from neon. One accent colour, used sparingly enough that it always means something.
 
-**Avoid:** neon-on-black cyberpunk, glassmorphism everywhere, purple-blue AI gradients, sci-fi corridors, drop shadows on dark backgrounds, more than one accent hue.
+**Avoid:** neon-on-black cyberpunk, glassmorphism everywhere, purple-blue AI gradients, sci-fi corridors, drop shadows on dark backgrounds, more than one general-purpose accent hue (status and focus colours are signals, not accents — see §2).
 
 ---
 
 ## 2. Colour
 
-Near-black rather than pure black (pure black on OLED plus high-contrast white causes smearing and eye strain). One cyan-leaning accent, one warm signal colour for status.
+Near-black rather than pure black (pure black on OLED plus high-contrast white causes smearing and eye strain). Green is not decoration — it is a **signal**: it appears when something activates, connects, succeeds, is selected, is online, or is interactive. Everything else stays a dark neutral. Target distribution: roughly 85% dark neutrals, 10% off-white/muted text, ~5% signal colours combined — if a section is tinted green, that is a bug, not a style.
 
 ```css
 :root {
-  /* Surfaces — darkest to lightest */
-  --color-bg:            #08090A;
-  --color-surface:       #0E1012;
-  --color-surface-raised:#15181B;
-  --color-border:        #23272B;
-  --color-border-strong: #363B41;
+  /* Surfaces — VOID / GRAPHITE / STEEL */
+  --color-bg:            #070809;   /* VOID */
+  --color-surface:       #111416;   /* GRAPHITE */
+  --color-surface-raised:#1B1F21;
+  --color-border:        #252A2C;   /* STEEL */
+  --color-border-strong: #3B4145;   /*  1.94:1 on --color-bg */
 
   /* Text */
-  --color-text:          #F2F4F5;   /* 17.1:1 on --color-bg */
-  --color-text-muted:    #9AA3AB;   /*  7.2:1 — body secondary */
-  --color-text-faint:    #757E88;   /*  4.8:1 — chrome only, never body copy */
+  --color-text:          #E9ECEB;   /* OFF WHITE — 16.86:1 on --color-bg */
+  --color-text-muted:    #98A09E;   /*  7.50:1 — body secondary (lightened
+                                        from the reference's #858D8B, which
+                                        only hits 5.90:1, to hold this
+                                        project's 7:1 body-text floor) */
+  --color-text-faint:    #7C837E;   /*  5.16:1 — chrome only, never body copy */
 
-  /* Accent — used for one thing at a time */
-  --color-accent:        #4DE3D0;
-  --color-accent-dim:    #2C9E90;
-  --color-accent-glow:   rgba(77, 227, 208, 0.14);
+  /* Accent — the one signal colour, used for one thing at a time */
+  --color-accent:        #B6FF4A;   /* SIGNAL GREEN — 16.60:1 on --color-bg */
+  --color-accent-dim:    #77BD0F;   /*  8.66:1 on --color-bg */
+  --color-accent-glow:   rgba(182, 255, 74, 0.14);
 
-  /* Status */
-  --color-live:          #4ADE80;
-  --color-building:      #FBBF24;
-  --color-failed:        #F87171;
-  --color-archived:      #757E88;
+  /* Status — "live" shares the accent's meaning (it IS "online") */
+  --color-live:          #B6FF4A;   /* = --color-accent */
+  --color-building:      #FFB547;   /* SIGNAL AMBER — 11.41:1 on --color-bg */
+  --color-failed:        #FF5C5C;   /* SIGNAL RED — 6.62:1 on --color-bg */
+  --color-archived:      #7C837E;   /* = --color-text-faint */
 
-  /* Focus — must be visible against every surface */
-  --color-focus:         #7DD3FC;
+  /* Focus — a deliberately different hue from the accent, so a focus ring
+     never reads as "this is the brand colour" */
+  --color-focus:         #5DE8FF;   /* SIGNAL CYAN — 13.79:1 on --color-bg */
 }
 ```
 
-**Contrast rules:** body text ≥ 7:1. All text ≥ 4.5:1. UI borders and icons ≥ 3:1. `--color-text-faint` is for labels and chrome only — never a sentence a visitor needs to read. Status colour is never the *only* signal: always pair with the text label.
+**Contrast rules:** body text ≥ 7:1. All text ≥ 4.5:1. UI borders and icons ≥ 3:1 where the element's job is to be read, not merely to hint at structure — the hairline section dividers in this design are intentionally subtler than that (≈1.3–1.9:1, unchanged from V1), relying on whitespace and layout rather than a stark line. `--color-text-faint` is for labels and chrome only — never a sentence a visitor needs to read. Status colour is never the *only* signal: always pair with the text label.
 
 A light theme is **out of scope for V1.** Do not build one speculatively.
 

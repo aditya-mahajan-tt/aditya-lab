@@ -16,18 +16,18 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "#08090A",
-          color: "#F2F4F5",
+          background: "#070809",
+          color: "#E9ECEB",
           fontFamily: "monospace",
         }}
       >
-        <div style={{ display: "flex", fontSize: 28, letterSpacing: 8, color: "#4DE3D0" }}>
+        <div style={{ display: "flex", fontSize: 28, letterSpacing: 8, color: "#B6FF4A" }}>
           ADITYA LAB
         </div>
         <div style={{ display: "flex", marginTop: 28, fontSize: 56, letterSpacing: 2 }}>
           AI × PRODUCT × BUSINESS
         </div>
-        <div style={{ display: "flex", marginTop: 40, fontSize: 22, letterSpacing: 6, color: "#9AA3AB" }}>
+        <div style={{ display: "flex", marginTop: 40, fontSize: 22, letterSpacing: 6, color: "#98A09E" }}>
           BUILD · EXPERIMENT · ITERATE
         </div>
       </div>

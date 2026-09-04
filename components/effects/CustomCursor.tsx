@@ -27,7 +27,13 @@ const LABELS: Record<Exclude<CursorState, "default">, string> = {
 export function CustomCursor() {
   const menuOpen = useLabStore((s) => s.menuOpen);
   const commandPaletteOpen = useLabStore((s) => s.commandPaletteOpen);
-  const overlayOpen = menuOpen || commandPaletteOpen;
+  const aiOpen = useLabStore((s) => s.aiOpen);
+  // Ask the Lab is also a native <dialog>/showModal() — same top-layer
+  // reasoning as the command palette (see CommandPalette.tsx's comment):
+  // this fixed-position cursor can never paint above it, so it must bail
+  // out entirely and let the real OS cursor back in, or the visitor gets
+  // no visible pointer at all inside the dialog.
+  const overlayOpen = menuOpen || commandPaletteOpen || aiOpen;
 
   const [eligible, setEligible] = useState(false);
   const [state, setState] = useState<CursorState>("default");
