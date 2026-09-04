@@ -1,20 +1,24 @@
 import { test, expect } from "@playwright/test";
+import { CANNED_ANSWERS } from "@/lib/ai/canned-answers.generated";
 
 /**
- * PLAN.md Phase 10 / AI_SPEC.md §9 acceptance criteria that are testable
- * without a live AI_PROVIDER_API_KEY (none is configured for this test
- * run — see CLAUDE.md §8, that's Aditya's to supply). What IS covered:
- * the dialog's accessibility mechanics, the six suggested questions
- * answering instantly with zero API calls, every entry point, the no-JS
- * static fallback, and the honest offline state when no key is present.
+ * PLAN.md Phase 10 / AI_SPEC.md §9 acceptance criteria. Covers: the
+ * dialog's accessibility mechanics, the six suggested questions answering
+ * instantly with zero API calls (against whatever canned-answers.generated.ts
+ * currently holds, real or refusal — imported rather than hardcoded, so
+ * this never goes stale when the file is regenerated), every entry point,
+ * the no-JS static fallback, and the offline state on a real API failure.
  *
- * Deliberately NOT covered here: exhausting the rate limiter or spend cap.
- * Both are in-memory, module-scoped state (lib/ai/rate-limit.ts,
- * lib/ai/spend-cap.ts) shared by every worker hitting the one dev server
- * this suite runs against — a test that deliberately trips the limit would
- * permanently rate-limit every other test's /api/ask calls for the rest of
- * the run. That logic is simple enough to read confidently; it isn't
- * simple to test here without a dedicated, isolated server per test.
+ * Deliberately NOT covered here: exhausting the rate limiter or spend cap,
+ * or asserting the live model's answers are grounded (that's guardrails.ts's
+ * job at request time, verified manually against the live API — see the
+ * Phase 10 checkpoint report, not something to re-derive in an e2e test
+ * that would otherwise need a real AI_PROVIDER_API_KEY to run at all). Both
+ * rate-limit/spend-cap are in-memory, module-scoped state
+ * (lib/ai/rate-limit.ts, lib/ai/spend-cap.ts) shared by every worker
+ * hitting the one dev server this suite runs against — a test that
+ * deliberately trips the limit would permanently rate-limit every other
+ * test's /api/ask calls for the rest of the run.
  */
 
 test("Ask the Lab opens from the header, is keyboard operable, and closes back to its trigger", async ({
@@ -48,10 +52,7 @@ test("a suggested question answers instantly with no network call", async ({ pag
   await dialog.getByRole("button", { name: "What has he built?" }).click();
 
   await expect(dialog.getByText("What has he built?")).toBeVisible();
-  // Today the honest answer to every suggested question is the refusal
-  // string — see canned-answers.generated.ts's header comment — which is
-  // itself proof the response came from the static map, not a fabrication.
-  await expect(dialog.getByText("I don't have that in Aditya's portfolio.")).toBeVisible();
+  await expect(dialog.getByText(CANNED_ANSWERS["What has he built?"])).toBeVisible();
   expect(askCalled).toBe(false);
 });
 
@@ -69,7 +70,12 @@ test("the command palette can open Ask the Lab", async ({ page }) => {
   await expect(page.locator('dialog[aria-label="Ask the Lab"]')).toBeVisible();
 });
 
-test("a free-form question shows the honest offline state when no AI key is configured", async ({ page }) => {
+test("a free-form question shows the honest offline state on API failure", async ({ page }) => {
+  // Mocked at the network level rather than relying on no AI_PROVIDER_API_KEY
+  // being configured in the test environment — a real key is now wired up
+  // (see AI_SPEC.md §7's "API error / timeout" row, not "no key present").
+  await page.route("**/api/ask", (route) => route.fulfill({ json: { status: "offline" } }));
+
   await page.goto("/");
   await page.getByRole("button", { name: "Open Ask the Lab" }).click();
   const dialog = page.locator('dialog[aria-label="Ask the Lab"]');
@@ -95,7 +101,7 @@ test("Ask the Lab still answers the six suggested questions with JavaScript disa
 
   // Native <details>/<summary> — opens and reveals its answer with zero JS.
   await item.locator("summary").click();
-  await expect(item.getByText("I don't have that in Aditya's portfolio.")).toBeVisible();
+  await expect(item.getByText(CANNED_ANSWERS["What has he built?"])).toBeVisible();
 
   await context.close();
 });

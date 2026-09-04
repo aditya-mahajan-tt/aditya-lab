@@ -25,6 +25,15 @@ export async function callGroq(messages: ChatMessage[]): Promise<GroqResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+  // Groq's openai/gpt-oss-* models are reasoning models: their hidden
+  // "thinking" tokens count against max_tokens alongside the visible
+  // answer, and against a prompt as long as ours (eight system-prompt
+  // rules plus the knowledge block) that reasoning alone can consume the
+  // entire budget, coming back with content: "". reasoning_effort: "low"
+  // caps that overhead — confirmed against the live API before shipping,
+  // not guessed. Harmless to omit for non-reasoning model families.
+  const isReasoningModel = model.startsWith("openai/gpt-oss");
+
   try {
     const response = await fetch(GROQ_ENDPOINT, {
       method: "POST",
@@ -38,6 +47,7 @@ export async function callGroq(messages: ChatMessage[]): Promise<GroqResult> {
         temperature: Number(process.env.AI_TEMPERATURE ?? 0.3),
         max_tokens: Number(process.env.AI_MAX_OUTPUT_TOKENS ?? 200),
         stream: false,
+        ...(isReasoningModel ? { reasoning_effort: "low" } : {}),
       }),
       signal: controller.signal,
     });
