@@ -5,6 +5,12 @@
  * Claude Code cannot see the screen. After running this, READ the PNGs with
  * the Read tool before claiming anything about how the site looks.
  * See CLAUDE.md §5.
+ *
+ * KNOWN ARTIFACT: fullPage screenshots are stitched while Chromium scrolls, so
+ * the sticky header can leave a ghost band near the top that looks like a
+ * duplicated element. It is not in the DOM. Before "fixing" anything you see
+ * only in a fullPage shot, re-check with a viewport-sized screenshot or by
+ * querying the DOM.
  */
 import { chromium } from "@playwright/test";
 import { mkdirSync, rmSync } from "node:fs";
