@@ -35,6 +35,8 @@ const ROUTES = [
   ["home", "/"],
   ["work", "/work"],
   ["work-detail", "/work/gostops-gtm"],
+  ["work-kensara", "/work/kensara-ai-gtm"],
+  ["work-adda", "/work/adda-d2c"],
   ["systems", "/systems"],
   ["experiments", "/experiments"],
   ["thinking", "/thinking"],

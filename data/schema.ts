@@ -178,6 +178,19 @@ export const AboutSchema = z.object({
   photo: MediaSchema.optional(),
 });
 
+/* ------------------------------------------------------------ experience */
+
+export const ExperienceEntrySchema = z.object({
+  id: z.string(),
+  company: z.string(),
+  role: z.string(),
+  location: z.string().optional(),
+  start: z.string(), // "YYYY-MM"
+  end: z.string().optional(), // omit for "Present"
+  bullets: z.array(Fillable).min(1),
+  tools: z.array(z.string()).default([]),
+});
+
 /* ----------------------------------------------------------------- site */
 
 export const SiteSchema = z.object({
@@ -206,12 +219,15 @@ export const SystemDiagramSchema = z.object({
   nodes: z.array(SystemNodeSchema).min(2),
   /** The real project this diagram is grounded in, if its case study is ready to link to. */
   relatedProjectSlug: z.string().optional(),
+  /** A generic link, for when the grounding isn't a /work case study (e.g. an /about experience entry). */
+  relatedLink: LinkSchema.optional(),
 });
 
 /* ---------------------------------------------------------------- types */
 
 export type Media = z.infer<typeof MediaSchema>;
 export type SystemDiagram = z.infer<typeof SystemDiagramSchema>;
+export type ExperienceEntry = z.infer<typeof ExperienceEntrySchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type Experiment = z.infer<typeof ExperimentSchema>;
 export type SkillGroup = z.infer<typeof SkillGroupSchema>;

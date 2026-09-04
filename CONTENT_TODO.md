@@ -6,7 +6,7 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**34 missing, 25 unreviewed drafts.**
+**45 missing, 25 unreviewed drafts.**
 
 ## data/about.ts
 
@@ -20,6 +20,20 @@
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 52
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 57
 
+## data/experience.ts
+
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 21
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 22
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 23
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 24
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 25
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 26
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 38
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 39
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 40
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 41
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 53
+
 ## data/experiments.ts
 
 - [ ] `[EXPERIMENT_001_TITLE_REQUIRED]` — line 13
@@ -32,42 +46,42 @@
 ## data/projects.ts
 
 - [ ] `[X_REQUIRED]` — line 8
-- [ ] `[PROJECT_001_SUMMARY_REQUIRED]` — line 33
-- [ ] `[PROJECT_001_CONTEXT_REQUIRED]` — line 35
-- [ ] `[PROJECT_001_PROBLEM_REQUIRED]` — line 36
-- [ ] `[PROJECT_001_ROLE_REQUIRED]` — line 37
-- [ ] `[PROJECT_001_THINKING_REQUIRED]` — line 38
-- [ ] `[PROJECT_001_APPROACH_REQUIRED]` — line 39
-- [ ] `[PROJECT_001_EXECUTION_REQUIRED]` — line 40
-- [ ] `[PROJECT_001_LEARNING_1_REQUIRED]` — line 42
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 70
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 73
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 76
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 79
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 82
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 85
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 88
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 91
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 92
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 93
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 94
-- [ ] `[PROJECT_003_TITLE_REQUIRED]` — line 103
-- [ ] `[PROJECT_003_SUMMARY_REQUIRED]` — line 110
-- [ ] `[PROJECT_003_CONTEXT_REQUIRED]` — line 111
-- [ ] `[PROJECT_003_PROBLEM_REQUIRED]` — line 112
-- [ ] `[PROJECT_003_ROLE_REQUIRED]` — line 113
-- [ ] `[PROJECT_003_THINKING_REQUIRED]` — line 114
-- [ ] `[PROJECT_003_APPROACH_REQUIRED]` — line 115
-- [ ] `[PROJECT_003_EXECUTION_REQUIRED]` — line 116
-- [ ] `[PROJECT_003_LEARNING_1_REQUIRED]` — line 117
+- [ ] `[PROJECT_001_SUMMARY_REQUIRED]` — line 35
+- [ ] `[PROJECT_001_CONTEXT_REQUIRED]` — line 37
+- [ ] `[PROJECT_001_PROBLEM_REQUIRED]` — line 38
+- [ ] `[PROJECT_001_ROLE_REQUIRED]` — line 39
+- [ ] `[PROJECT_001_THINKING_REQUIRED]` — line 40
+- [ ] `[PROJECT_001_APPROACH_REQUIRED]` — line 41
+- [ ] `[PROJECT_001_EXECUTION_REQUIRED]` — line 42
+- [ ] `[PROJECT_001_LEARNING_1_REQUIRED]` — line 44
+- [ ] `[PROJECT_002_CONTEXT_REQUIRED]` — line 74
+- [ ] `[PROJECT_002_PROBLEM_REQUIRED]` — line 75
+- [ ] `[PROJECT_002_THINKING_REQUIRED]` — line 77
+- [ ] `[PROJECT_002_APPROACH_REQUIRED]` — line 78
+- [ ] `[PROJECT_002_EXECUTION_REQUIRED]` — line 79
+- [ ] `[PROJECT_002_LEARNING_1_REQUIRED]` — line 81
+- [ ] `[PROJECT_003_CONTEXT_REQUIRED]` — line 101
+- [ ] `[PROJECT_003_PROBLEM_REQUIRED]` — line 102
+- [ ] `[PROJECT_003_THINKING_REQUIRED]` — line 104
+- [ ] `[PROJECT_003_APPROACH_REQUIRED]` — line 105
+- [ ] `[PROJECT_003_LEARNING_1_REQUIRED]` — line 109
+- [ ] `[PROJECT_004_TITLE_REQUIRED]` — line 123
+- [ ] `[PROJECT_004_SUMMARY_REQUIRED]` — line 130
+- [ ] `[PROJECT_004_CONTEXT_REQUIRED]` — line 131
+- [ ] `[PROJECT_004_PROBLEM_REQUIRED]` — line 132
+- [ ] `[PROJECT_004_ROLE_REQUIRED]` — line 133
+- [ ] `[PROJECT_004_THINKING_REQUIRED]` — line 134
+- [ ] `[PROJECT_004_APPROACH_REQUIRED]` — line 135
+- [ ] `[PROJECT_004_EXECUTION_REQUIRED]` — line 136
+- [ ] `[PROJECT_004_LEARNING_1_REQUIRED]` — line 137
 
 ## data/skills.ts
 
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 18
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 29
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 40
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 51
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 62
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 31
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 42
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 57
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 68
 
 ## data/thinking.ts
 

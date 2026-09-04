@@ -21,6 +21,8 @@ const raw = [
       { name: "Research", depth: "comfortable" },
       { name: "Segmentation", depth: "comfortable" },
       { name: "Problem framing", depth: "comfortable" },
+      { name: "SQL", depth: "comfortable" },
+      { name: "Power BI", depth: "comfortable" },
     ],
   },
   {
@@ -43,6 +45,10 @@ const raw = [
       { name: "APIs", depth: "comfortable" },
       { name: "Webhooks", depth: "comfortable" },
       { name: "Workflows", depth: "comfortable" },
+      { name: "Python", depth: "comfortable" },
+      { name: "Databricks", depth: "comfortable" },
+      { name: "Snowflake", depth: "comfortable" },
+      { name: "Smartsheet", depth: "working knowledge" },
     ],
   },
   {

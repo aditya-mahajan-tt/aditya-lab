@@ -37,6 +37,7 @@ export function SystemDiagramCard({
   const { minX, minY, width, height } = boundingViewBox(positions, NODE_W, NODE_H);
   const activeNode = active !== null ? diagram.nodes[active] : undefined;
   const relatedProject = diagram.relatedProjectSlug ? getProject(diagram.relatedProjectSlug) : undefined;
+  const related = diagram.relatedLink ?? (relatedProject ? { label: relatedProject.title, url: `/work/${relatedProject.slug}` } : undefined);
 
   return (
     <div>
@@ -143,12 +144,13 @@ export function SystemDiagramCard({
         ))}
       </ol>
 
-      {relatedProject && (
+      {related && (
         <Link
-          href={`/work/${relatedProject.slug}`}
+          href={related.url}
           className="label mt-6 inline-flex min-h-11 items-center gap-2 text-accent transition-colors duration-[var(--duration-fast)] hover:text-accent-dim"
         >
-          SEE THE CASE STUDY: <Fill value={relatedProject.title} /> →
+          {relatedProject ? "SEE THE CASE STUDY: " : "SEE MORE: "}
+          <Fill value={related.label} /> →
         </Link>
       )}
     </div>

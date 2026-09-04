@@ -1,8 +1,19 @@
 import type { Metadata } from "next";
 import { about } from "@/data/about";
 import { skillGroups } from "@/data/skills";
+import { experience } from "@/data/experience";
 import { Fill } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";
+
+/** "2025-07" -> "JUL 2025". No end date reads as "PRESENT". */
+function formatRange(start: string, end?: string): string {
+  const fmt = (ym: string) => {
+    const [y, m] = ym.split("-");
+    const month = new Date(Number(y), Number(m) - 1).toLocaleString("en-US", { month: "short" });
+    return `${month.toUpperCase()} ${y}`;
+  };
+  return `${fmt(start)} — ${end ? fmt(end) : "PRESENT"}`;
+}
 
 export const metadata: Metadata = {
   title: "About",
@@ -42,6 +53,49 @@ export default function AboutPage() {
             <Fill value={about.shortBio} as="p" />
             <Fill value={about.longBio} as="p" />
           </RevealText>
+        </div>
+      </section>
+
+      <section className="section border-t border-border" aria-labelledby="experience-heading">
+        <div className="container-lab">
+          <RevealText>
+            <p className="label mb-4">EXPERIENCE</p>
+            <h2 id="experience-heading" className="text-[length:var(--text-2xl)]">
+              Where the work happened
+            </h2>
+          </RevealText>
+
+          <ol className="mt-12 divide-y divide-border border-y border-border">
+            {experience.map((job) => (
+              <li key={job.id} id={`experience-${job.id}`} className="scroll-mt-24">
+                <RevealText className="py-8">
+                  <div className="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
+                    <div>
+                      <h3 className="font-mono text-sm uppercase tracking-widest text-text">
+                        {job.company}
+                      </h3>
+                      <p className="mt-1 text-text-muted">{job.role}</p>
+                    </div>
+                    <p className="label shrink-0">
+                      {formatRange(job.start, job.end)}
+                      {job.location ? ` · ${job.location}` : ""}
+                    </p>
+                  </div>
+                  <ul className="prose-lab mt-6 space-y-3 text-text-muted">
+                    {job.bullets.map((bullet, i) => (
+                      <li key={i} className="flex gap-4">
+                        <span className="text-accent">—</span>
+                        <Fill value={bullet} />
+                      </li>
+                    ))}
+                  </ul>
+                  {job.tools.length > 0 && (
+                    <p className="label mt-6">{job.tools.join(" · ")}</p>
+                  )}
+                </RevealText>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

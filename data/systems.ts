@@ -22,7 +22,9 @@ const raw = [
       { label: "DECISION", detail: "Planning and execution overhead — the real bottleneck — gets automated." },
       { label: "OUTPUT", detail: "A team that runs on the system instead of around it." },
     ],
-    relatedProjectSlug: "turbotork-data-integration",
+    // Turbotork is work experience, not a /work case study (see
+    // data/experience.ts) — links to its section on /about instead.
+    relatedLink: { label: "Turbotork", url: "/about#experience-turbotork" },
   },
   {
     id: "strategy-wall",
