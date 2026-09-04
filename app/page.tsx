@@ -1,103 +1,109 @@
 import Link from "next/link";
 import { about } from "@/data/about";
+import { thinking } from "@/data/thinking";
 import { getFeaturedProjects } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
+import { Hero } from "@/components/hero/Hero";
+import { BootSequence } from "@/components/hero/BootSequence";
 
 /**
- * PHASE 1/2 homepage — content-first, zero motion, zero 3D.
- * Phase 5 adds the boot sequence and staged hero reveal.
- * Phase 9 adds the 3D core BEHIND this content, never in front of it.
+ * PLAN.md Phase 5. The homepage stands alone: hero, then a compressed
+ * version of the whole site (work, thinking, about, contact) below the
+ * fold — a visitor never has to leave "/" to get the gist of everything.
  */
 export default function HomePage() {
   const featured = getFeaturedProjects();
 
   return (
     <>
-      <section className="section" aria-labelledby="hero-heading">
-        <div className="container-lab">
-          <p className="label mb-6">SYSTEM STATUS: ONLINE</p>
+      <BootSequence />
+      <Hero />
 
-          <h1
-            id="hero-heading"
-            className="max-w-[18ch] text-[length:var(--text-4xl)] leading-[var(--leading-tight)]"
-          >
-            {about.heroHeadline}
-          </h1>
+      <div id="lab">
+        <section className="section border-t border-border" aria-labelledby="work-heading">
+          <div className="container-lab">
+            <p className="label mb-4">01 — WORK</p>
+            <h2 id="work-heading" className="text-[length:var(--text-2xl)]">
+              Selected projects
+            </h2>
 
-          <p className="mt-6 max-w-[46ch] text-[length:var(--text-lg)] text-text-muted">
-            {about.heroSubline}
-          </p>
+            <ul className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((project) => (
+                <li key={project.slug} className="bg-surface">
+                  <Link
+                    href={`/work/${project.slug}`}
+                    className="group flex h-full flex-col justify-between gap-8 p-6 transition-colors hover:bg-surface-raised"
+                  >
+                    <div>
+                      <p className="label">PROJECT_{project.id}</p>
+                      <h3 className="mt-3 text-[length:var(--text-xl)]">
+                        <Fill value={project.title} />
+                      </h3>
+                      {project.subtitle && (
+                        <p className="mt-1 text-sm text-text-muted">{project.subtitle}</p>
+                      )}
+                      <p className="mt-4 text-sm text-text-muted">
+                        <Fill value={project.summary} />
+                      </p>
+                    </div>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              href="/work"
-              className="rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-200 hover:bg-accent hover:text-bg"
-            >
-              Explore Work
-            </Link>
-            <Link
-              href="/about"
-              className="rounded-sm border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-200 hover:border-border-strong hover:text-text"
-            >
-              Who is Aditya
+                    <div className="flex items-center justify-between">
+                      <span className="label">{project.status}</span>
+                      <span className="font-mono text-xs uppercase tracking-widest text-accent">
+                        Explore →
+                      </span>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="section border-t border-border" aria-labelledby="thinking-heading">
+          <div className="container-lab">
+            <p className="label mb-4">02 — THINKING</p>
+            <h2 id="thinking-heading" className="text-[length:var(--text-2xl)]">
+              {thinking.heading}
+            </h2>
+            <p className="prose-lab mt-4 text-text-muted">
+              <Fill value={thinking.intro} />
+            </p>
+            <Link href="/thinking" className="mt-6 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline">
+              See the framework →
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="section border-t border-border" aria-labelledby="work-heading">
-        <div className="container-lab">
-          <p className="label mb-4">01 — WORK</p>
-          <h2 id="work-heading" className="text-[length:var(--text-2xl)]">
-            Selected projects
-          </h2>
+        <section className="section border-t border-border" aria-labelledby="about-heading">
+          <div className="container-lab">
+            <p className="label mb-4">03 — ABOUT</p>
+            <h2 id="about-heading" className="text-[length:var(--text-2xl)]">
+              Who is Aditya
+            </h2>
+            <p className="prose-lab mt-4 text-text-muted">
+              <Fill value={about.shortBio} />
+            </p>
+            <Link href="/about" className="mt-6 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline">
+              Full background →
+            </Link>
+          </div>
+        </section>
 
-          <ul className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((project) => (
-              <li key={project.slug} className="bg-surface">
-                <Link
-                  href={`/work/${project.slug}`}
-                  className="group flex h-full flex-col justify-between gap-8 p-6 transition-colors hover:bg-surface-raised"
-                >
-                  <div>
-                    <p className="label">PROJECT_{project.id}</p>
-                    <h3 className="mt-3 text-[length:var(--text-xl)]">
-                      <Fill value={project.title} />
-                    </h3>
-                    {project.subtitle && (
-                      <p className="mt-1 text-sm text-text-muted">{project.subtitle}</p>
-                    )}
-                    <p className="mt-4 text-sm text-text-muted">
-                      <Fill value={project.summary} />
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="label">{project.status}</span>
-                    <span className="font-mono text-xs uppercase tracking-widest text-accent">
-                      Explore →
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="section border-t border-border" aria-labelledby="contact-heading">
-        <div className="container-lab">
-          <h2 id="contact-heading" className="text-[length:var(--text-3xl)]">
-            Let&rsquo;s build something.
-          </h2>
-          <Link
-            href="/contact"
-            className="mt-8 inline-block rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-200 hover:bg-accent hover:text-bg"
-          >
-            Start a conversation
-          </Link>
-        </div>
-      </section>
+        <section className="section border-t border-border" aria-labelledby="contact-heading">
+          <div className="container-lab">
+            <h2 id="contact-heading" className="text-[length:var(--text-3xl)]">
+              Let&rsquo;s build something.
+            </h2>
+            <Link
+              href="/contact"
+              className="mt-8 inline-block rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
+            >
+              Start a conversation
+            </Link>
+          </div>
+        </section>
+      </div>
     </>
   );
 }

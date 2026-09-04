@@ -182,6 +182,56 @@ p {
 }
 
 /* ============================================================================
+   HERO — PLAN.md Phase 5.
+   ========================================================================= */
+
+/* Staged reveal for hero elements below the headline (the headline itself
+   stays immediately visible — it's the LCP candidate, and animating its
+   opacity in would push LCP back toward the animation's own duration). */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero-reveal {
+  animation: hero-rise var(--duration-cinema) var(--ease-out-lab) both;
+}
+
+/* The core fallback's rotation/pulse are ambient and continuous, not a UI
+   state transition, so they intentionally sit outside the duration/easing
+   tokens in DESIGN_SYSTEM.md §5 (those govern transitions, not idle loops).
+   Both are frozen by the prefers-reduced-motion rule below regardless. */
+@keyframes core-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes core-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+.core-rotate {
+  animation: core-rotate 48s linear infinite;
+  transform-origin: 200px 200px;
+}
+.core-pulse {
+  animation: core-pulse 3.6s ease-in-out infinite;
+  transform-origin: 200px 200px;
+}
+
+/* ============================================================================
    REDUCED MOTION — content is never lost, only movement.
    ========================================================================= */
 
@@ -198,5 +248,12 @@ p {
     transition-duration: var(--duration-fast) !important;
     transition-property: opacity, color, background-color, border-color !important;
     scroll-behavior: auto !important;
+  }
+
+  /* The blanket rule above neutralises animation-duration but not
+     animation-delay — without this, staggered hero elements would still
+     visibly pop in one after another over ~450ms. */
+  .hero-reveal {
+    animation-delay: 0ms !important;
   }
 }
