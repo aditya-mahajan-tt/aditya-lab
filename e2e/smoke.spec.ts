@@ -82,14 +82,83 @@ test("skip link is the first focusable element and reaches main", async ({ page 
   expect(focused).toBe("#main");
 });
 
-test("primary navigation is fully keyboard reachable", async ({ page }) => {
+test("every route is reachable from the menu overlay using only the keyboard", async ({ page }) => {
   await page.goto("/");
-  const links = page.locator("header nav a");
+
+  await page.locator("header summary").focus();
+  await page.keyboard.press("Enter");
+
+  const panel = page.locator('nav[aria-label="Full site"]');
+  await expect(panel).toBeVisible();
+
+  const links = panel.locator("a");
   const count = await links.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
     await expect(links.nth(i)).toBeVisible();
   }
+
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  await expect(page.locator("header summary")).toBeFocused();
+});
+
+test("no focus escapes the open menu overlay", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("header summary").click();
+
+  const panel = page.locator('nav[aria-label="Full site"]');
+  await expect(panel).toBeVisible();
+  // The trap attaches on a React effect one tick after the native <details>
+  // toggle — wait for its auto-focus so the Tab loop below can't race ahead
+  // of it (a real keypress never could; a scripted one occasionally can).
+  await expect(panel.locator("a").first()).toBeFocused();
+
+  const linkCount = await panel.locator("a").count();
+  for (let i = 0; i < linkCount + 2; i++) {
+    await page.keyboard.press("Tab");
+  }
+
+  const focusStayedInside = await page.evaluate(() => {
+    const el = document.querySelector('nav[aria-label="Full site"]');
+    return el?.contains(document.activeElement) ?? false;
+  });
+  expect(focusStayedInside).toBe(true);
+});
+
+test("command palette opens with the keyboard shortcut, searches, and navigates", async ({ page }) => {
+  await page.goto("/");
+  // Wait for hydration — the global ⌘K listener only exists after React
+  // attaches, same as it would for a real visitor.
+  await page.getByRole("button", { name: "Open command palette" }).focus();
+
+  await page.keyboard.press("Control+k");
+  const dialog = page.locator('dialog[aria-label="Command palette"]');
+  await expect(dialog).toBeVisible();
+
+  const input = dialog.getByRole("combobox");
+  await expect(input).toBeFocused();
+
+  await input.fill("work");
+  await expect(dialog.getByRole("option").first()).toBeVisible();
+
+  await page.keyboard.press("Enter");
+  await expect(dialog).toBeHidden();
+  await expect(page).toHaveURL(/\/work$/);
+});
+
+test("command palette closes on Escape and returns focus to its trigger", async ({ page }) => {
+  await page.goto("/");
+  const trigger = page.getByRole("button", { name: "Open command palette" });
+  await trigger.focus();
+
+  await page.keyboard.press("Control+k");
+  const dialog = page.locator('dialog[aria-label="Command palette"]');
+  await expect(dialog).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
 });
 
 test("content and navigation still render with JavaScript disabled", async ({ browser }) => {
@@ -97,6 +166,17 @@ test("content and navigation still render with JavaScript disabled", async ({ br
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.locator("h1")).toBeVisible();
+
+  // The wordmark link works with no JS at all.
   await expect(page.locator("header nav a").first()).toBeVisible();
+
+  // The menu overlay is a native <details>/<summary> disclosure: it opens,
+  // and every route it reveals is a real, working link, with zero JS.
+  await page.locator("header summary").click();
+  const workLink = page.locator('header nav a[href="/work"]');
+  await expect(workLink).toBeVisible();
+  await workLink.click();
+  await expect(page).toHaveURL(/\/work$/);
+
   await context.close();
 });

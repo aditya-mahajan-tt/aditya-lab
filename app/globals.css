@@ -22,6 +22,7 @@
   /* --- Accent --- */
   --color-accent: #4de3d0;
   --color-accent-dim: #2c9e90;
+  --color-accent-glow: rgba(77, 227, 208, 0.14);
 
   /* --- Status --- */
   --color-live: #4ade80;
