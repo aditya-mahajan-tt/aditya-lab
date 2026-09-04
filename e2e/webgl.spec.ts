@@ -129,6 +129,42 @@ test("a lost context swaps back to the DOM core and says so", async ({ page }) =
   expect(pageErrors, "losing the context threw").toEqual([]);
 });
 
+test("the 3D core survives pointer interaction and scrolling", async ({ page }) => {
+  const problems = captureProblems(page);
+  await forceQuality(page, "high");
+  await page.goto("/");
+
+  await page.locator(CORE).scrollIntoViewIfNeeded();
+  const canvas = page.locator("canvas");
+  await expect(canvas).toHaveCount(1, { timeout: 15_000 });
+  await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "true", { timeout: 15_000 });
+
+  // Hover, then click to toggle expansion, then again to collapse. The
+  // object owns no content, so there is nothing to assert about state —
+  // what matters is that raycasting and the frame loop survive it.
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("the canvas has no layout box");
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+
+  await page.mouse.move(cx, cy);
+  await page.waitForTimeout(300);
+  await page.mouse.click(cx, cy);
+  await page.waitForTimeout(600);
+  await page.mouse.click(cx, cy);
+
+  // Scroll-linked dolly: the camera reacts, native scroll stays native.
+  const before = await page.evaluate(() => window.scrollY);
+  await page.mouse.wheel(0, 600);
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.scrollY), "the 3D layer must not hijack scroll").toBeGreaterThan(
+    before,
+  );
+
+  await expect(canvas).toHaveCount(1);
+  expect(problems, "interacting with the 3D core produced console errors").toEqual([]);
+});
+
 test("the quality control is keyboard-operable and persists", async ({ page }) => {
   // Driven from /about: the control is global chrome, and this keeps the
   // test off the one route where changing it would mount a renderer.

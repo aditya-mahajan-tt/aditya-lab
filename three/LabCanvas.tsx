@@ -29,6 +29,7 @@ type Props = {
 export default function LabCanvas({ tier: initialTier, onReady, onFailure, onTierChange }: Props) {
   const [tier, setTier] = useState<Exclude<QualityTier, "low">>(initialTier);
   const [visible, setVisible] = useState(true);
+  const [hovered, setHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -84,7 +85,15 @@ export default function LabCanvas({ tier: initialTier, onReady, onFailure, onTie
   );
 
   return (
-    <div ref={containerRef} className="h-full w-full" aria-hidden="true">
+    // data-cursor is applied only while the object is actually under the
+    // pointer, so the INTERACT pill marks the parts that respond rather than
+    // the whole rectangle (DESIGN_SYSTEM.md §8).
+    <div
+      ref={containerRef}
+      className="h-full w-full"
+      aria-hidden="true"
+      data-cursor={hovered ? "interact" : undefined}
+    >
       <Canvas
         frameloop={visible ? "always" : "never"}
         dpr={dprFor(tier)}
@@ -103,7 +112,13 @@ export default function LabCanvas({ tier: initialTier, onReady, onFailure, onTie
           gl.domElement.addEventListener("webglcontextlost", handleContextLost);
         }}
       >
-        <Scene tier={tier} onReady={onReady} onDowngrade={handleDowngrade} onGiveUp={onFailure} />
+        <Scene
+          tier={tier}
+          onReady={onReady}
+          onDowngrade={handleDowngrade}
+          onGiveUp={onFailure}
+          onHoverChange={setHovered}
+        />
       </Canvas>
     </div>
   );

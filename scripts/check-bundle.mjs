@@ -74,27 +74,43 @@ for (const rel of initial) {
 }
 if (!threeInInitial) console.log("✔ 3D isolation — Three.js is not in the homepage's initial bundle");
 
-/* --- 3. lazy 3D chunk budget --------------------------------------------- */
-const THREE_MARKER = /WebGLRenderer|THREE\.REVISION|@react-three\/fiber/;
+/* --- 3. lazy chunk budget (currently: the 3D layer) ----------------------- */
+/**
+ * Measured structurally — every client chunk that is not in ANY route's
+ * initial set, minus Next's own infrastructure — rather than by grepping
+ * for Three.js identifiers. @react-three/postprocessing minifies to nothing
+ * recognisable (69 KB of it was invisible to a marker-based scan), and a
+ * budget check that silently under-reports is worse than no check at all.
+ *
+ * This deliberately over-counts slightly: it also picks up the lazily loaded
+ * GSAP plugins (~21 KB). Over-estimating a budget is the safe direction.
+ */
 const CHUNK_WARN_KB = 500;
 const CHUNK_FAIL_KB = 700;
 
-const initialSet = new Set(initial.map((rel) => join(NEXT, rel)));
-const threeChunks = allJs.filter((f) => !initialSet.has(f) && THREE_MARKER.test(readFileSync(f, "utf8")));
+/** Next's own runtime, not application code and never lazy in practice. */
+const INFRASTRUCTURE = /(^|\/)(framework|main|main-app|polyfills|webpack)-|\/pages\/|_(build|ssg)Manifest\.js$/;
 
-if (threeChunks.length === 0) {
-  console.log("✔ 3D chunk — none emitted yet (nothing imports three)");
+const initialAnyRoute = new Set();
+for (const chunks of Object.values(manifest.pages ?? {})) {
+  for (const file of chunks) initialAnyRoute.add(join(NEXT, file));
+}
+
+const lazyChunks = allJs.filter((f) => !initialAnyRoute.has(f) && !INFRASTRUCTURE.test(f));
+
+if (lazyChunks.length === 0) {
+  console.log("✔ lazy chunks — none emitted yet");
 } else {
-  const chunkBytes = threeChunks.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0);
+  const chunkBytes = lazyChunks.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0);
   const chunkKb = Math.round(chunkBytes / 1024);
 
   if (chunkKb > CHUNK_FAIL_KB) {
-    console.error(`✖ 3D chunk ${chunkKb} KB gzip exceeds the ${CHUNK_FAIL_KB} KB hard budget.`);
+    console.error(`✖ Lazy chunks ${chunkKb} KB gzip exceed the ${CHUNK_FAIL_KB} KB hard budget.`);
     failed = true;
   } else if (chunkKb > CHUNK_WARN_KB) {
-    console.warn(`⚠ 3D chunk ${chunkKb} KB gzip is over the ${CHUNK_WARN_KB} KB target.`);
+    console.warn(`⚠ Lazy chunks ${chunkKb} KB gzip are over the ${CHUNK_WARN_KB} KB target.`);
   } else {
-    console.log(`✔ 3D chunk — ${chunkKb} KB gzip across ${threeChunks.length} lazy chunks (target ${CHUNK_WARN_KB} KB)`);
+    console.log(`✔ lazy chunks (3D + deferred plugins) — ${chunkKb} KB gzip across ${lazyChunks.length} chunks (target ${CHUNK_WARN_KB} KB)`);
   }
 }
 

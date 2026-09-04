@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { FallbackReason, QualityTier } from "@/lib/quality";
+import { Bloom } from "@/three/effects/Bloom";
 import { Core } from "@/three/objects/Core";
 import { CameraController } from "@/three/systems/CameraController";
 import { PerformanceManager } from "@/three/systems/PerformanceManager";
@@ -14,6 +15,8 @@ type Props = {
   onReady: () => void;
   onDowngrade: (tier: QualityTier) => void;
   onGiveUp: (reason: FallbackReason) => void;
+  /** True while the pointer is over something the object responds to. */
+  onHoverChange: (hovered: boolean) => void;
 };
 
 /**
@@ -40,15 +43,16 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
 }
 
 /** Composition root for the 3D layer. Holds no content of its own. */
-export function Scene({ tier, onReady, onDowngrade, onGiveUp }: Props) {
+export function Scene({ tier, onReady, onDowngrade, onGiveUp, onHoverChange }: Props) {
   return (
     <>
       <Environment />
       <Lighting />
       <CameraController />
       <PerformanceManager tier={tier} onDowngrade={onDowngrade} onGiveUp={onGiveUp} />
-      <Core tier={tier} />
+      <Core tier={tier} onHoverChange={onHoverChange} />
       <FirstFrame onReady={onReady} />
+      {tier === "high" && <Bloom />}
     </>
   );
 }
