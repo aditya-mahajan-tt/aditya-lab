@@ -7,6 +7,7 @@ import { RevealText } from "@/components/effects/RevealText";
 export const metadata: Metadata = {
   title: "About",
   description: "Who Aditya is, how he got here, and what he can actually do.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

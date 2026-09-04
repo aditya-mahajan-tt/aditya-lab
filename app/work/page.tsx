@@ -5,6 +5,7 @@ import { ProjectArchive } from "@/components/projects/ProjectArchive";
 export const metadata: Metadata = {
   title: "Work",
   description: "Case studies across strategy, product, AI and automation.",
+  alternates: { canonical: "/work" },
 };
 
 export default function WorkPage() {

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { site } from "@/data/site";
 import { SkipLink } from "@/components/layout/SkipLink";
@@ -7,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CustomCursor } from "@/components/effects/CustomCursor";
 import { PageTransition } from "@/components/effects/PageTransition";
+import { PersonJsonLd } from "@/components/seo/PersonJsonLd";
 
 /**
  * Fonts are self-hosted variable woff2 (DESIGN_SYSTEM.md §3): two files, all
@@ -38,6 +40,7 @@ export const metadata: Metadata = {
   },
   description: site.description,
   authors: [{ name: site.author }],
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: site.name,
@@ -62,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
       <body>
+        <PersonJsonLd />
         <SkipLink />
         <CustomCursor />
         <Header />
@@ -69,6 +73,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        {/* The tracking script only actually exists once deployed on Vercel — anywhere
+            else (local `next start`, CI, this repo's own e2e/verify) "auto" mode still
+            tries to fetch it and 404s, which the smoke suite correctly treats as a real
+            console error. `VERCEL` is set automatically only on Vercel's own builds. */}
+        <Analytics mode={process.env.VERCEL ? "production" : "development"} />
       </body>
     </html>
   );

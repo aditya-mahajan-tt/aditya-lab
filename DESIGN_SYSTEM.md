@@ -32,7 +32,7 @@ Near-black rather than pure black (pure black on OLED plus high-contrast white c
   /* Text */
   --color-text:          #F2F4F5;   /* 17.1:1 on --color-bg */
   --color-text-muted:    #9AA3AB;   /*  7.2:1 — body secondary */
-  --color-text-faint:    #6B747C;   /*  4.6:1 — chrome only, never body copy */
+  --color-text-faint:    #757E88;   /*  4.8:1 — chrome only, never body copy */
 
   /* Accent — used for one thing at a time */
   --color-accent:        #4DE3D0;
@@ -43,7 +43,7 @@ Near-black rather than pure black (pure black on OLED plus high-contrast white c
   --color-live:          #4ADE80;
   --color-building:      #FBBF24;
   --color-failed:        #F87171;
-  --color-archived:      #6B747C;
+  --color-archived:      #757E88;
 
   /* Focus — must be visible against every surface */
   --color-focus:         #7DD3FC;

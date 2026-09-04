@@ -16,6 +16,12 @@
 | `three`, `@react-three/fiber`, `@react-three/drei` | 3D (Release 2+, lazy chunk only) |
 | `@react-three/postprocessing` | One bloom pass, Release 2+ |
 | `@playwright/test` | Verification harness |
+| `@vercel/analytics` | Phase 7 — privacy-respecting analytics, zero-config on Vercel, no cookie banner |
+| `@axe-core/playwright` (dev) | Phase 7 — automated accessibility scanning per QA_AND_PERFORMANCE.md §5 |
+
+**Not yet added, blocked on an external account (CONTENT_INTAKE.md §J):**
+
+- **Sentry (`@sentry/nextjs`)** — error monitoring. Wiring it now would be inert without a DSN; add once Aditya supplies a Sentry account (J4).
 
 **Deliberately excluded:**
 

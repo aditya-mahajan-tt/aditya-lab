@@ -15,7 +15,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const experiment = getExperiment(slug);
   if (!experiment) return {};
-  return { title: experiment.title, description: experiment.summary };
+  return {
+    title: experiment.title,
+    description: experiment.summary,
+    alternates: { canonical: `/experiments/${experiment.slug}` },
+  };
 }
 
 export default async function ExperimentPage({ params }: Params) {

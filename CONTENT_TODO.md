@@ -6,7 +6,7 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**36 missing, 25 unreviewed drafts.**
+**34 missing, 25 unreviewed drafts.**
 
 ## data/about.ts
 
@@ -60,11 +60,6 @@
 - [ ] `[PROJECT_003_APPROACH_REQUIRED]` — line 115
 - [ ] `[PROJECT_003_EXECUTION_REQUIRED]` — line 116
 - [ ] `[PROJECT_003_LEARNING_1_REQUIRED]` — line 117
-
-## data/site.ts
-
-- [ ] `[RESUME_PATH_REQUIRED]` — line 20
-- [ ] `[LINKEDIN_URL_REQUIRED]` — line 23
 
 ## data/skills.ts
 

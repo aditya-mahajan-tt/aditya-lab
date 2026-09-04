@@ -15,12 +15,9 @@ export const site = SiteSchema.parse({
   // From the resume he supplied directly — CONTENT_INTAKE.md suggests considering an alias
   // instead of a program email that expires with the degree; flag if you'd rather swap it.
   email: "aditya.mahajan2027@mastersunion.org",
-  // Still needed: the actual PDF file. I only received its extracted text, not the file
-  // itself — drop it in /public and set this path once you do.
-  resumePath: "[RESUME_PATH_REQUIRED]",
+  resumePath: "/Aditya-Mahajan-Resume.pdf",
   social: [
-    // The resume's PDF text only exposed "LinkedIn" as a link label, not the underlying URL.
-    { label: "LinkedIn", url: "[LINKEDIN_URL_REQUIRED]" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/aditya-mahajan-29a7b9169/" },
     { label: "GitHub", url: "https://github.com/aditya-mahajan-tt" },
   ],
 });

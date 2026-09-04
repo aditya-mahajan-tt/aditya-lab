@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Project } from "@/data/schema";
 import { Fill } from "@/components/ui/Placeholder";
 import { useMagnetic } from "@/lib/utils/useMagnetic";
+import { analytics } from "@/lib/analytics/events";
 
 /** The row-list project card CTA — one of the four magnetic elements sitewide (PLAN.md Phase 6). */
 export function ProjectArchiveRow({ project }: { project: Project }) {
@@ -14,6 +15,7 @@ export function ProjectArchiveRow({ project }: { project: Project }) {
       ref={triggerRef}
       href={`/work/${project.slug}`}
       data-cursor="view"
+      onClick={() => analytics.projectOpen(project.slug)}
       className="group flex flex-col gap-4 py-8 transition-colors hover:bg-surface md:flex-row md:items-baseline md:gap-10"
     >
       <span className="label md:w-28 md:shrink-0">PROJECT_{project.id}</span>

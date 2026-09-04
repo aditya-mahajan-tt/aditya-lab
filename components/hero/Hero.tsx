@@ -1,14 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { about } from "@/data/about";
 import { CoreFallback } from "@/components/hero/CoreFallback";
 import { ScrambleText } from "@/components/effects/ScrambleText";
 import { MagneticLink } from "@/components/effects/MagneticButton";
+import { analytics } from "@/lib/analytics/events";
 
 /**
  * PLAN.md Phase 5/6. The headline is immediately visible (it's the LCP
  * candidate); the subline, CTAs and core visual stage in after it via the
  * `.hero-reveal` keyframes in globals.css. "Enter the Lab" is one of the
- * four magnetic elements sitewide (Phase 6).
+ * four magnetic elements sitewide (Phase 6). Client component specifically
+ * so the CTAs can fire hero_cta_click (QA_AND_PERFORMANCE.md §8) — a
+ * Server Component can't pass an onClick to a Client Component child.
  */
 export function Hero() {
   return (
@@ -37,6 +42,7 @@ export function Hero() {
             <MagneticLink
               href="#lab"
               data-cursor="interact"
+              onClick={() => analytics.heroCtaClick("enter_lab")}
               className="rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
             >
               Enter the Lab
@@ -44,6 +50,7 @@ export function Hero() {
             <Link
               href="/work"
               data-cursor="interact"
+              onClick={() => analytics.heroCtaClick("explore_work")}
               className="rounded-sm border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
             >
               Explore Work

@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/data/site";
 import { Fill, filled } from "@/components/ui/Placeholder";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 export const metadata: Metadata = {
   title: "Resume",
   description: "Download Aditya Mahajan's resume.",
+  alternates: { canonical: "/resume" },
 };
 
 /**
@@ -23,13 +25,14 @@ export default function ResumePage() {
 
         {ready ? (
           <>
-            <Link
+            <TrackedLink
               href={site.resumePath}
               download
+              event="resume_click"
               className="mt-8 inline-block rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-200 hover:bg-accent hover:text-bg"
             >
               Download PDF ↓
-            </Link>
+            </TrackedLink>
 
             <object
               data={site.resumePath}

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 /**
  * The smoke suite is the mechanical half of the Definition of Done
@@ -66,6 +67,26 @@ for (const route of ROUTES) {
         previous = Math.max(previous, level);
       }
     });
+
+    test("has no automated accessibility violations (axe, WCAG 2.1 AA)", async ({ page }) => {
+      await page.goto(route);
+      // Settle every GSAP scroll reveal first (same reasoning as
+      // scripts/screenshots.mjs): scanning mid-tween catches RevealText
+      // content at e.g. 13% opacity and axe correctly, but misleadingly,
+      // flags that as a contrast violation. once:true means this persists.
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(400);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(100);
+
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      const summary = results.violations.map(
+        (v) => `${v.id} (${v.impact}): ${v.nodes.length} node(s) — ${v.help}`,
+      );
+      expect(summary, `${route} has axe violations`).toEqual([]);
+    });
   });
 }
 
@@ -90,6 +111,9 @@ test("every route is reachable from the menu overlay using only the keyboard", a
 
   const panel = page.locator('nav[aria-label="Full site"]');
   await expect(panel).toBeVisible();
+  // Wait for the focus trap to actually attach (same race as the "no focus
+  // escapes" test below) before driving it further.
+  await expect(panel.locator("a").first()).toBeFocused();
 
   const links = panel.locator("a");
   const count = await links.count();
@@ -232,4 +256,38 @@ test("scroll-revealed content becomes visible once scrolled into view", async ({
 
   await heading.scrollIntoViewIfNeeded();
   await expect(revealParent).toHaveCSS("opacity", "1", { timeout: 5000 });
+});
+
+// QA_AND_PERFORMANCE.md §4 failure tests. WebGL off/context-lost and "AI key
+// removed" aren't applicable yet — no 3D layer (Phase 8) or AI assistant
+// (Phase 10) exist to fail. "Images 404" has nothing to test against either:
+// every media array in /data is still empty (no photo or project media has
+// been supplied), so the site currently renders zero <img> elements.
+
+test("content still loads and is usable on a throttled slow connection", async ({ page, context }) => {
+  const client = await context.newCDPSession(page);
+  await client.send("Network.enable");
+  await client.send("Network.emulateNetworkConditions", {
+    offline: false,
+    latency: 400,
+    downloadThroughput: (500 * 1024) / 8, // ~500kbps, roughly "Slow 3G"
+    uploadThroughput: (500 * 1024) / 8,
+  });
+
+  const response = await page.goto("/");
+  expect(response?.status()).toBe(200);
+  await expect(page.locator("h1")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Explore Work" })).toBeVisible();
+});
+
+test("page remains usable at 200% browser zoom", async ({ page }) => {
+  await page.goto("/about");
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = "2";
+  });
+  await expect(page.locator("h1")).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 1,
+  );
+  expect(overflow, "200% zoom overflows horizontally").toBe(false);
 });

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getAllExperiments } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { StatusChip } from "@/components/experiments/StatusChip";
 import { RevealText } from "@/components/effects/RevealText";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 export const metadata: Metadata = {
   title: "Experiments",
   description: "Things being built, tested, broken and learned from.",
+  alternates: { canonical: "/experiments" },
 };
 
 export default function ExperimentsPage() {
@@ -28,9 +29,11 @@ export default function ExperimentsPage() {
         <ul className="mt-14 grid gap-px border border-border bg-border md:grid-cols-2">
           {experiments.map((experiment) => (
             <li key={experiment.slug} className="bg-surface">
-              <Link
+              <TrackedLink
                 href={`/experiments/${experiment.slug}`}
                 data-cursor="view"
+                event="experiment_open"
+                eventProps={{ slug: experiment.slug }}
                 className="flex h-full flex-col gap-6 p-6 transition-colors hover:bg-surface-raised"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -45,7 +48,7 @@ export default function ExperimentsPage() {
                     <Fill value={experiment.summary} />
                   </p>
                 </div>
-              </Link>
+              </TrackedLink>
             </li>
           ))}
         </ul>

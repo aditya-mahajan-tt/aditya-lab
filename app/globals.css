@@ -17,7 +17,7 @@
   /* --- Text --- */
   --color-text: #f2f4f5;
   --color-text-muted: #9aa3ab;
-  --color-text-faint: #6b747c;
+  --color-text-faint: #757e88; /* 4.8:1 on --color-bg — was #6b747c (4.18:1, fails WCAG AA) */
 
   /* --- Accent --- */
   --color-accent: #4de3d0;
@@ -28,7 +28,7 @@
   --color-live: #4ade80;
   --color-building: #fbbf24;
   --color-failed: #f87171;
-  --color-archived: #6b747c;
+  --color-archived: #757e88;
 
   /* --- Focus --- */
   --color-focus: #7dd3fc;
