@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAllProjects, getProject, getProjectNeighbours } from "@/data/queries";
 import { Fill, filled } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";
+import { ProcessDiagram } from "@/components/systems/ProcessDiagram";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -80,9 +81,12 @@ export default async function ProjectPage({ params }: Params) {
       {project.process && project.process.length > 0 && (
         <section className="border-t border-border py-12" aria-label="Process">
           <div className="container-lab">
-            <p className="label mb-6">PROCESS</p>
-            {/* Phase 11 replaces this with the animated ProcessDiagram component. */}
-            <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs uppercase tracking-widest">
+            <RevealText>
+              <p className="label mb-6">PROCESS</p>
+              <ProcessDiagram steps={project.process} />
+            </RevealText>
+            {/* Real accessible content: works with the diagram hidden below `md`, with JS off, and for screen readers. */}
+            <ol className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs uppercase tracking-widest md:sr-only">
               {project.process.map((step, i) => (
                 <li key={step.label} className="flex items-center gap-3">
                   <span className="text-text">{step.label}</span>

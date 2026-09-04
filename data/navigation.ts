@@ -8,6 +8,7 @@ export type NavItem = {
 export const navigation: NavItem[] = [
   { label: "LAB", href: "/", description: "The homepage experience" },
   { label: "WORK", href: "/work", description: "Case studies and projects" },
+  { label: "SYSTEMS", href: "/systems", description: "Interactive diagrams of how the work actually runs" },
   { label: "EXPERIMENTS", href: "/experiments", description: "Things being built and broken" },
   { label: "THINKING", href: "/thinking", description: "How Aditya approaches problems" },
   { label: "ABOUT", href: "/about", description: "Background and capabilities" },

@@ -192,9 +192,26 @@ export const SiteSchema = z.object({
   social: z.array(LinkSchema),
 });
 
+/* -------------------------------------------------------------- systems */
+
+export const SystemNodeSchema = z.object({
+  label: z.string(),
+  detail: z.string().optional(),
+});
+
+export const SystemDiagramSchema = z.object({
+  id: z.string(),
+  title: Fillable,
+  description: Fillable,
+  nodes: z.array(SystemNodeSchema).min(2),
+  /** The real project this diagram is grounded in, if its case study is ready to link to. */
+  relatedProjectSlug: z.string().optional(),
+});
+
 /* ---------------------------------------------------------------- types */
 
 export type Media = z.infer<typeof MediaSchema>;
+export type SystemDiagram = z.infer<typeof SystemDiagramSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type Experiment = z.infer<typeof ExperimentSchema>;
 export type SkillGroup = z.infer<typeof SkillGroupSchema>;

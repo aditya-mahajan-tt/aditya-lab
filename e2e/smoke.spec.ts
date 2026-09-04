@@ -10,6 +10,7 @@ const ROUTES = [
   "/",
   "/work",
   "/work/gostops-gtm",
+  "/systems",
   "/experiments",
   "/thinking",
   "/about",
