@@ -137,7 +137,13 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
       // Kept deliberately low: past roughly 2.0 the octahedron stops reading
       // as a faceted machine part and becomes the glowing orb PLAN.md Phase
       // 9 explicitly rules out.
-      material.emissiveIntensity = 1.1 + Math.sin(t * 1.6) * 0.35 + e * 0.45;
+      const pulse = Math.sin(t * 1.6);
+      material.emissiveIntensity = 1.1 + pulse * 0.45 + e * 0.45;
+      // A size pulse in lockstep with the emissive one is a lot more
+      // legible than intensity alone, especially at the hero's small
+      // canvas size — the eye catches "growing" far more readily than
+      // "brightening" on a shape this small.
+      coreRef.current.scale.setScalar(1 + pulse * 0.06 + e * 0.08);
       coreRef.current.rotation.y += step * (0.2 + e * 0.5);
     }
   });
@@ -167,10 +173,10 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
       <group ref={rotationRef}>
         <group ref={ringScaleRef}>
           <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.metal}>
-            <torusGeometry args={[1.9, 0.013, 3, segments]} />
+            <torusGeometry args={[1.9, 0.02, 3, segments]} />
           </mesh>
           <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.metal}>
-            <torusGeometry args={[1.5, 0.009, 3, Math.round(segments * 0.75)]} />
+            <torusGeometry args={[1.5, 0.015, 3, Math.round(segments * 0.75)]} />
           </mesh>
 
           {modules.map((module, i) => (
@@ -194,21 +200,24 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
 
       <group ref={meridianRef}>
         <mesh material={materials.metal}>
-          <torusGeometry args={[1.72, 0.009, 3, segments]} />
+          <torusGeometry args={[1.72, 0.015, 3, segments]} />
         </mesh>
       </group>
 
       <group ref={tiltRef} rotation={[0.95, 0, 0.4]}>
         <mesh material={materials.metal}>
-          <torusGeometry args={[1.62, 0.007, 3, Math.round(segments * 0.75)]} />
+          <torusGeometry args={[1.62, 0.012, 3, Math.round(segments * 0.75)]} />
         </mesh>
       </group>
 
       {/* Structural frame. A detail-0 octahedron's wireframe is exactly its
-          twelve edges — no EdgesGeometry, no second geometry to dispose. */}
+          twelve edges — no EdgesGeometry, no second geometry to dispose.
+          borderStrong + higher opacity than the original border/0.45: at
+          hero size a 1px wireframe line in near-black-on-black was reading
+          as absent rather than subtle. */}
       <mesh ref={frameRef}>
         <octahedronGeometry args={[1.34, 0]} />
-        <meshBasicMaterial color={tokens.border} wireframe transparent opacity={0.45} />
+        <meshBasicMaterial color={tokens.borderStrong} wireframe transparent opacity={0.65} toneMapped={false} />
       </mesh>
 
       {/* The shell is a housing, not a gem: it has to stay small enough that

@@ -4,7 +4,13 @@ import { useEffect, useRef } from "react";
 import { gsap } from "@/animations/gsap";
 import { prefersReducedMotion } from "@/animations/tokens";
 
-const DEFAULT_STRENGTH = 0.35;
+const DEFAULT_STRENGTH = 0.18;
+/** Displacement never exceeds this many px, however wide the trigger is —
+ * without a cap a full-width card CTA would fly the label a distance that
+ * reads as broken tracking rather than a magnetic nudge. */
+const MAX_OFFSET = 14;
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /**
  * Magnetic pointer-follow (PLAN.md Phase 6) — desktop `pointer: fine` only,
@@ -34,8 +40,8 @@ export function useMagnetic<T extends HTMLElement = HTMLElement, U extends HTMLE
       const rect = trigger!.getBoundingClientRect();
       const relX = e.clientX - (rect.left + rect.width / 2);
       const relY = e.clientY - (rect.top + rect.height / 2);
-      xTo(relX * strength);
-      yTo(relY * strength);
+      xTo(clamp(relX * strength, -MAX_OFFSET, MAX_OFFSET));
+      yTo(clamp(relY * strength, -MAX_OFFSET, MAX_OFFSET));
     }
 
     function handleLeave() {

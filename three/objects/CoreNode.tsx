@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { BufferGeometry, Color, Float32BufferAttribute, LineBasicMaterial, MathUtils, Mesh, Line } from "three";
+import { Color, Group, MathUtils, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from "three";
 import { createMetalMaterial } from "@/three/materials/MetalMaterial";
 import type { LabTokens } from "@/three/materials/tokens";
 
@@ -16,8 +16,13 @@ import type { LabTokens } from "@/three/materials/tokens";
  * needs a DOM equivalent beyond the one CoreFallback already draws
  * (CLAUDE.md §3.5).
  *
- * The connector is a unit-length line scaled to the node's current radius,
- * so pushing the node outward on expansion costs no buffer rewrites.
+ * The connector is a real cylinder, not a `Line` — WebGL caps line width at
+ * ~1 physical pixel on almost every driver regardless of `linewidth`, which
+ * made the original connector nearly invisible against the background. A
+ * thin mesh renders at its actual width on every GPU. It is oriented once
+ * via a quaternion from the connector's rest axis (+Y) to `direction`, then
+ * stretched along its own local Y each frame to reach the node's radius —
+ * same zero-buffer-rewrite trick the old Line used, just on a mesh.
  */
 
 const REST_RADIUS = 1.05;
@@ -41,19 +46,18 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
   const [hovered, setHovered] = useState(false);
 
   const material = useMemo(() => createMetalMaterial(tokens), [tokens]);
-  const lineMaterial = useMemo(
-    () => new LineBasicMaterial({ color: new Color(tokens.border), transparent: true, opacity: 0.55 }),
+  const connectorMaterial = useMemo(
+    () => new MeshBasicMaterial({ color: new Color(tokens.borderStrong), transparent: true, opacity: 0.85, toneMapped: false }),
     [tokens],
   );
 
-  const lineGeometry = useMemo(() => {
-    const geometry = new BufferGeometry();
-    geometry.setAttribute(
-      "position",
-      new Float32BufferAttribute([0, 0, 0, direction[0], direction[1], direction[2]], 3),
-    );
-    return geometry;
-  }, [direction]);
+  // Aligns the connector's rest axis (+Y) to `direction` once — direction
+  // never changes for a given node, so this is a one-time quaternion, not a
+  // per-frame computation.
+  const orientation = useMemo(
+    () => new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), new Vector3(...direction)),
+    [direction],
+  );
 
   useEffect(() => {
     // Emissive is animated per-node, so each node owns its material and has
@@ -62,19 +66,15 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
     material.emissiveIntensity = 0;
     return () => {
       material.dispose();
-      lineMaterial.dispose();
-      lineGeometry.dispose();
+      connectorMaterial.dispose();
     };
-  }, [material, lineMaterial, lineGeometry, tokens]);
+  }, [material, connectorMaterial, tokens]);
 
   const meshRef = useRef<Mesh>(null);
+  const connectorGroupRef = useRef<Group>(null);
+  const connectorRef = useRef<Mesh>(null);
 
-  // Built once and mutated in the frame loop. `<line>` as an intrinsic
-  // collides with the SVG element type in TSX, so this is a plain object
-  // handed to <primitive>.
-  const line = useMemo(() => new Line(lineGeometry, lineMaterial), [lineGeometry, lineMaterial]);
-
-  const restColor = useMemo(() => new Color(tokens.border), [tokens]);
+  const restColor = useMemo(() => new Color(tokens.borderStrong), [tokens]);
   const activeColor = useMemo(() => new Color(tokens.accentDim), [tokens]);
 
   useFrame((_, delta) => {
@@ -89,7 +89,12 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
       meshRef.current.scale.setScalar(scale);
     }
 
-    line.scale.setScalar(radius);
+    if (connectorRef.current) {
+      // Cylinder is centered on its local origin, so a length of `radius`
+      // running from the core out to the node sits at the midpoint.
+      connectorRef.current.position.y = radius / 2;
+      connectorRef.current.scale.y = radius;
+    }
 
     // Expansion lights every node, hover lights one. Without this the click
     // only moves things a few percent, which is not a legible response —
@@ -99,8 +104,8 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
     material.emissiveIntensity = MathUtils.damp(material.emissiveIntensity, target, DAMPING, step);
 
     const lit = Math.min(material.emissiveIntensity / HOVER_EMISSIVE, 1);
-    lineMaterial.color.lerpColors(restColor, activeColor, lit);
-    lineMaterial.opacity = 0.55 + lit * 0.35;
+    connectorMaterial.color.lerpColors(restColor, activeColor, lit);
+    connectorMaterial.opacity = 0.85 + lit * 0.15;
   });
 
   function setHover(next: boolean) {
@@ -110,7 +115,11 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
 
   return (
     <>
-      <primitive object={line} />
+      <group ref={connectorGroupRef} quaternion={orientation}>
+        <mesh ref={connectorRef} material={connectorMaterial}>
+          <cylinderGeometry args={[0.014, 0.014, 1, 6]} />
+        </mesh>
+      </group>
 
       <mesh
         ref={meshRef}
