@@ -9,14 +9,14 @@
  */
 
 const FALLBACK = {
-  bg: "#08090a",
-  surface: "#0e1012",
-  surfaceRaised: "#15181b",
-  border: "#23272b",
-  borderStrong: "#363b41",
-  text: "#f2f4f5",
-  accent: "#4de3d0",
-  accentDim: "#2c9e90",
+  bg: "#070809",
+  surface: "#111416",
+  surfaceRaised: "#1b1f21",
+  border: "#252a2c",
+  borderStrong: "#3b4145",
+  text: "#e9eceb",
+  accent: "#b6ff4a",
+  accentDim: "#77bd0f",
 } as const;
 
 export type LabTokens = { -readonly [K in keyof typeof FALLBACK]: string };
