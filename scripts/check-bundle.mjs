@@ -4,6 +4,8 @@
  *   1. Three.js never appears in the homepage's initial bundle.
  *   2. No API-key-shaped string appears in any client bundle.
  *
+ * The lazy 3D chunk gets its own budget (§1: < 500 KB gzip, fail at 700 KB).
+ *
  * "Initial JS" = the exact set of chunks the homepage loads on first paint,
  * read from .next/app-build-manifest.json (this is what Next reports as
  * "First Load JS"), measured gzipped.
@@ -72,7 +74,31 @@ for (const rel of initial) {
 }
 if (!threeInInitial) console.log("✔ 3D isolation — Three.js is not in the homepage's initial bundle");
 
-/* --- 3. initial JS budget ------------------------------------------------ */
+/* --- 3. lazy 3D chunk budget --------------------------------------------- */
+const THREE_MARKER = /WebGLRenderer|THREE\.REVISION|@react-three\/fiber/;
+const CHUNK_WARN_KB = 500;
+const CHUNK_FAIL_KB = 700;
+
+const initialSet = new Set(initial.map((rel) => join(NEXT, rel)));
+const threeChunks = allJs.filter((f) => !initialSet.has(f) && THREE_MARKER.test(readFileSync(f, "utf8")));
+
+if (threeChunks.length === 0) {
+  console.log("✔ 3D chunk — none emitted yet (nothing imports three)");
+} else {
+  const chunkBytes = threeChunks.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0);
+  const chunkKb = Math.round(chunkBytes / 1024);
+
+  if (chunkKb > CHUNK_FAIL_KB) {
+    console.error(`✖ 3D chunk ${chunkKb} KB gzip exceeds the ${CHUNK_FAIL_KB} KB hard budget.`);
+    failed = true;
+  } else if (chunkKb > CHUNK_WARN_KB) {
+    console.warn(`⚠ 3D chunk ${chunkKb} KB gzip is over the ${CHUNK_WARN_KB} KB target.`);
+  } else {
+    console.log(`✔ 3D chunk — ${chunkKb} KB gzip across ${threeChunks.length} lazy chunks (target ${CHUNK_WARN_KB} KB)`);
+  }
+}
+
+/* --- 4. initial JS budget ------------------------------------------------ */
 const bytes = initial.reduce((sum, rel) => {
   const full = join(NEXT, rel);
   return existsSync(full) ? sum + gzipSync(readFileSync(full)).length : sum;

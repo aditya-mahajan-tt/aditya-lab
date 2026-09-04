@@ -7,17 +7,25 @@ const NODE_RING_RADIUS = 100;
  * confirmed available and the quality tier allows it; this is what every
  * other visitor sees, always. Rings, square nodes and straight connectors,
  * deliberately not a glowing sphere (PLAN.md Phase 9's "avoid" list —
- * same object, same rule, just without WebGL). Ambient rotation/pulse
+ * same object, same rule, just without WebGL).
+ *
+ * `suppressed` is set once the 3D core is drawing real frames on top of it
+ * (components/hero/CoreStage): this fades out and its animations park, but
+ * it stays in the document on purpose — the 3D canvas is `aria-hidden`, so
+ * this remains the object's accessible representation.
+ *
+ * Ambient rotation/pulse
  * animation lives in globals.css and is frozen by the sitewide
  * prefers-reduced-motion rule.
  */
-export function CoreFallback() {
+export function CoreFallback({ suppressed = false }: { suppressed?: boolean }) {
   return (
     <svg
       viewBox="0 0 400 400"
       role="img"
       aria-label="An animated composition of rings and connected nodes around a pulsing core — the site's computational core, in its non-3D form."
-      className="mx-auto w-full max-w-[420px]"
+      className="core-dom mx-auto w-full max-w-[420px]"
+      data-suppressed={suppressed}
     >
       <line x1="200" y1="20" x2="200" y2="380" stroke="var(--color-border)" strokeWidth="1" opacity="0.4" />
       <line x1="20" y1="200" x2="380" y2="200" stroke="var(--color-border)" strokeWidth="1" opacity="0.4" />

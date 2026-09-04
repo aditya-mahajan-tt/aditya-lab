@@ -242,6 +242,21 @@ html.custom-cursor-active * {
   transform-origin: 200px 200px;
 }
 
+/* Handover to the 3D core (PLAN.md Phase 8). The DOM core is faded rather
+   than removed — the WebGL canvas above it is aria-hidden, so this SVG stays
+   in the accessibility tree as the object's real description. Parking the
+   ambient loops means an invisible element costs no frames. */
+.core-dom {
+  transition: opacity var(--duration-slow) var(--ease-out-lab);
+}
+.core-dom[data-suppressed="true"] {
+  opacity: 0;
+}
+.core-dom[data-suppressed="true"] .core-rotate,
+.core-dom[data-suppressed="true"] .core-pulse {
+  animation-play-state: paused;
+}
+
 /* ============================================================================
    REDUCED MOTION — content is never lost, only movement.
    ========================================================================= */

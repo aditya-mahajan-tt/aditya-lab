@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { about } from "@/data/about";
-import { CoreFallback } from "@/components/hero/CoreFallback";
+import { CoreStage } from "@/components/hero/CoreStage";
 import { ScrambleText } from "@/components/effects/ScrambleText";
 import { MagneticLink } from "@/components/effects/MagneticButton";
 import { analytics } from "@/lib/analytics/events";
@@ -59,7 +59,7 @@ export function Hero() {
         </div>
 
         <div className="hero-reveal" style={{ animationDelay: "450ms" }}>
-          <CoreFallback />
+          <CoreStage />
         </div>
       </div>
     </section>

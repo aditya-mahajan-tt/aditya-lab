@@ -79,10 +79,10 @@ aditya-lab/
 │
 ├── three/                      # Release 2+. Nothing here is imported synchronously.
 │   ├── LabCanvas.tsx           # the only dynamic-import entry point
-│   ├── scene/                  # Scene, Camera, Lighting, Environment
+│   ├── scene/                  # Scene, Lighting, Environment
 │   ├── objects/                # Core, Workstation, NeuralCore, AutomationEngine, ...
 │   ├── systems/                # ParticleSystem, CameraController, PerformanceManager, Interaction
-│   ├── materials/              # CoreMaterial, GlassMaterial, MetalMaterial
+│   ├── materials/              # CoreMaterial, GlassMaterial, MetalMaterial, tokens
 │   └── effects/                # Bloom (only)
 │
 ├── animations/
@@ -107,6 +107,7 @@ aditya-lab/
 ├── lib/
 │   ├── ai/                     # prompt builder, guardrails, rate limiter, cache
 │   ├── analytics/              # typed event helpers
+│   ├── quality.ts              # WebGL/GPU/battery detection + tier resolution
 │   ├── store.ts                # zustand global state
 │   └── utils/                  # cn, formatting, media queries, hooks
 │
@@ -124,6 +125,10 @@ aditya-lab/
 ```
 
 **Rule:** a component file contains structure and behaviour. Copy lives in `/data`. If you are typing a sentence of prose inside a `.tsx` file, you are in the wrong file.
+
+**Why `lib/quality.ts` is not in `three/`:** it is the module that decides *whether* to download the Three.js chunk, so it must ship in the initial bundle and therefore must not import Three.js. `three/systems/PerformanceManager` is its counterpart on the far side of the dynamic import, handling runtime adaptation once the renderer exists.
+
+**Why `scene/` has no `Camera.tsx`:** the camera is declared on `<Canvas>` and driven by `three/systems/CameraController`. A third file holding neither the definition nor the behaviour would just be indirection.
 
 ---
 

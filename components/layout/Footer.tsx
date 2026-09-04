@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { site } from "@/data/site";
 import { filled } from "@/components/ui/Placeholder";
+import { QualityControl } from "@/components/ui/QualityControl";
 
 export function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="container-lab flex flex-col gap-4 py-10 md:flex-row md:items-center md:justify-between">
-        <p className="label">ADITYA LAB — BUILD · EXPERIMENT · ITERATE</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+          <p className="label">ADITYA LAB — BUILD · EXPERIMENT · ITERATE</p>
+          <QualityControl />
+        </div>
 
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
           {site.social.filter((s) => filled(s.url)).map((s) => (
