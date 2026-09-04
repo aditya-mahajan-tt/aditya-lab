@@ -1,0 +1,23 @@
+node_modules
+.next
+out
+build
+.DS_Store
+*.pem
+
+.env
+.env.local
+.env*.local
+
+.screenshots
+test-results
+playwright-report
+blob-report
+.playwright
+
+*.tsbuildinfo
+next-env.d.ts
+
+# 3D source files — export optimised .glb into public/models instead
+*.blend
+*.blend1
