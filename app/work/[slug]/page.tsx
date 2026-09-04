@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllProjects, getProject, getProjectNeighbours } from "@/data/queries";
 import { Fill, filled } from "@/components/ui/Placeholder";
+import { RevealText } from "@/components/effects/RevealText";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -40,33 +41,35 @@ export default async function ProjectPage({ params }: Params) {
     <article>
       <header className="section">
         <div className="container-lab">
-          <p className="label mb-4">PROJECT_{project.id} · {project.year}</p>
-          <h1 className="text-[length:var(--text-3xl)]">
-            <Fill value={project.title} />
-          </h1>
-          {project.subtitle && (
-            <p className="mt-2 text-[length:var(--text-lg)] text-text-muted">{project.subtitle}</p>
-          )}
-          <p className="prose-lab mt-8 text-[length:var(--text-lg)]">
-            <Fill value={project.summary} />
-          </p>
-
-          <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-4">
-            <div>
-              <dt className="label">Status</dt>
-              <dd className="mt-1 font-mono text-sm">{project.status}</dd>
-            </div>
-            <div>
-              <dt className="label">Categories</dt>
-              <dd className="mt-1 font-mono text-sm">{project.category.join(" / ")}</dd>
-            </div>
-            {project.tools.length > 0 && (
-              <div>
-                <dt className="label">Tools</dt>
-                <dd className="mt-1 font-mono text-sm">{project.tools.join(" · ")}</dd>
-              </div>
+          <RevealText>
+            <p className="label mb-4">PROJECT_{project.id} · {project.year}</p>
+            <h1 className="text-[length:var(--text-3xl)]">
+              <Fill value={project.title} />
+            </h1>
+            {project.subtitle && (
+              <p className="mt-2 text-[length:var(--text-lg)] text-text-muted">{project.subtitle}</p>
             )}
-          </dl>
+            <p className="prose-lab mt-8 text-[length:var(--text-lg)]">
+              <Fill value={project.summary} />
+            </p>
+
+            <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-4">
+              <div>
+                <dt className="label">Status</dt>
+                <dd className="mt-1 font-mono text-sm">{project.status}</dd>
+              </div>
+              <div>
+                <dt className="label">Categories</dt>
+                <dd className="mt-1 font-mono text-sm">{project.category.join(" / ")}</dd>
+              </div>
+              {project.tools.length > 0 && (
+                <div>
+                  <dt className="label">Tools</dt>
+                  <dd className="mt-1 font-mono text-sm">{project.tools.join(" · ")}</dd>
+                </div>
+              )}
+            </dl>
+          </RevealText>
         </div>
       </header>
 
@@ -92,15 +95,17 @@ export default async function ProjectPage({ params }: Params) {
         .map((section) => (
           <section key={section.n} className="border-t border-border py-14" aria-labelledby={`s-${section.n}`}>
             <div className="container-lab">
-              <p className="label mb-4">
-                {section.n} — {section.label}
-              </p>
-              <h2 id={`s-${section.n}`} className="sr-only">
-                {section.label}
-              </h2>
-              <div className="prose-lab text-[length:var(--text-lg)] text-text-muted">
-                <Fill value={section.body!} as="p" />
-              </div>
+              <RevealText>
+                <p className="label mb-4">
+                  {section.n} — {section.label}
+                </p>
+                <h2 id={`s-${section.n}`} className="sr-only">
+                  {section.label}
+                </h2>
+                <div className="prose-lab text-[length:var(--text-lg)] text-text-muted">
+                  <Fill value={section.body!} as="p" />
+                </div>
+              </RevealText>
             </div>
           </section>
         ))}
@@ -108,18 +113,20 @@ export default async function ProjectPage({ params }: Params) {
       {project.learnings.length > 0 && (
         <section className="border-t border-border py-14" aria-labelledby="s-08">
           <div className="container-lab">
-            <p className="label mb-4">08 — LEARNING</p>
-            <h2 id="s-08" className="sr-only">
-              Learning
-            </h2>
-            <ul className="prose-lab space-y-4 text-[length:var(--text-lg)] text-text-muted">
-              {project.learnings.map((l, i) => (
-                <li key={i} className="flex gap-4">
-                  <span className="text-accent">—</span>
-                  <Fill value={l} />
-                </li>
-              ))}
-            </ul>
+            <RevealText>
+              <p className="label mb-4">08 — LEARNING</p>
+              <h2 id="s-08" className="sr-only">
+                Learning
+              </h2>
+              <ul className="prose-lab space-y-4 text-[length:var(--text-lg)] text-text-muted">
+                {project.learnings.map((l, i) => (
+                  <li key={i} className="flex gap-4">
+                    <span className="text-accent">—</span>
+                    <Fill value={l} />
+                  </li>
+                ))}
+              </ul>
+            </RevealText>
           </div>
         </section>
       )}
@@ -135,6 +142,7 @@ export default async function ProjectPage({ params }: Params) {
                   <li key={l.url}>
                     <Link
                       href={l.url}
+                      data-cursor="open"
                       className="rounded-sm border border-border px-4 py-2 font-mono text-xs uppercase tracking-widest text-text-muted hover:border-accent hover:text-accent"
                     >
                       {l.label} ↗

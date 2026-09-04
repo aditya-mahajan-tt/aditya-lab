@@ -5,6 +5,8 @@ import { site } from "@/data/site";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CustomCursor } from "@/components/effects/CustomCursor";
+import { PageTransition } from "@/components/effects/PageTransition";
 
 /**
  * Fonts are self-hosted variable woff2 (DESIGN_SYSTEM.md §3): two files, all
@@ -61,8 +63,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
       <body>
         <SkipLink />
+        <CustomCursor />
         <Header />
-        <main id="main">{children}</main>
+        <main id="main">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
       </body>
     </html>

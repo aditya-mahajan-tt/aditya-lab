@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllExperiments, getExperiment } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { StatusChip } from "@/components/experiments/StatusChip";
+import { RevealText } from "@/components/effects/RevealText";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -46,15 +47,17 @@ export default async function ExperimentPage({ params }: Params) {
 
         <div className="mt-14 space-y-12">
           {sections.map((section) => (
-            <section key={section.label} aria-labelledby={`e-${section.label}`}>
-              <p className="label mb-3">{section.label}</p>
-              <h2 id={`e-${section.label}`} className="sr-only">
-                {section.label}
-              </h2>
-              <div className="prose-lab text-[length:var(--text-lg)] text-text-muted">
-                <Fill value={section.body} as="p" />
-              </div>
-            </section>
+            <RevealText key={section.label}>
+              <section aria-labelledby={`e-${section.label}`}>
+                <p className="label mb-3">{section.label}</p>
+                <h2 id={`e-${section.label}`} className="sr-only">
+                  {section.label}
+                </h2>
+                <div className="prose-lab text-[length:var(--text-lg)] text-text-muted">
+                  <Fill value={section.body} as="p" />
+                </div>
+              </section>
+            </RevealText>
           ))}
         </div>
       </div>

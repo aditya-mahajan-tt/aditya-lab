@@ -199,3 +199,37 @@ test("content and navigation still render with JavaScript disabled", async ({ br
 
   await context.close();
 });
+
+test("under prefers-reduced-motion, scroll-revealed content is immediately visible with no transform", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  // A RevealText-wrapped heading well below the fold — under normal motion
+  // this starts at opacity:0 until scrolled into view. Under reduced
+  // motion it must already be fully visible, unscrolled.
+  const heading = page.locator("#about-heading");
+  await expect(heading).toBeVisible();
+  const style = await heading.evaluate((el) => {
+    const parent = el.closest("div");
+    const computed = parent ? getComputedStyle(parent) : null;
+    return { opacity: computed?.opacity, transform: computed?.transform };
+  });
+  expect(style.opacity).toBe("1");
+  expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(style.transform);
+});
+
+test("scroll-revealed content becomes visible once scrolled into view", async ({ page }) => {
+  await page.goto("/");
+  const heading = page.locator("#about-heading");
+  const revealParent = heading.locator("xpath=ancestor::div[1]");
+
+  // Above the fold, before any scroll: still mid-reveal (opacity 0, per
+  // useScrollReveal's initial gsap.set), never mistaken for missing content
+  // since it's already in the DOM and reachable — just not yet faded in.
+  await expect(revealParent).toBeAttached();
+
+  await heading.scrollIntoViewIfNeeded();
+  await expect(revealParent).toHaveCSS("opacity", "1", { timeout: 5000 });
+});

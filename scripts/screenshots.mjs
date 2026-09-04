@@ -7,10 +7,15 @@
  * See CLAUDE.md §5.
  *
  * KNOWN ARTIFACT: fullPage screenshots are stitched while Chromium scrolls, so
- * the sticky header can leave a ghost band near the top that looks like a
- * duplicated element. It is not in the DOM. Before "fixing" anything you see
- * only in a fullPage shot, re-check with a viewport-sized screenshot or by
- * querying the DOM.
+ * a position:fixed element (the sticky header; the Phase 5 boot overlay on
+ * "/") can leave a ghost band that looks like a duplicated or bleeding-through
+ * element. It is not in the DOM. Before "fixing" anything you see only in a
+ * fullPage shot, re-check with a viewport-sized screenshot or by querying the DOM.
+ *
+ * SCROLL REVEALS (Phase 6): a fullPage capture never dispatches real scroll
+ * events, so GSAP ScrollTrigger reveals below the fold would never fire and
+ * whole sections would screenshot as blank. Each route is scrolled to the
+ * bottom and back before capture specifically to trigger them first.
  */
 import { chromium } from "@playwright/test";
 import { mkdirSync, rmSync } from "node:fs";
@@ -85,6 +90,14 @@ for (const [vpName, width, height] of VIEWPORTS) {
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
     );
     if (overflow) problems.push(`horizontal overflow: ${route} @ ${width}px`);
+
+    // Trigger every ScrollTrigger reveal (once:true, so this is permanent
+    // for the rest of this page's life) before capturing, then return to
+    // the top so the fullPage shot still composes naturally.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(400);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(100);
 
     await page.screenshot({ path: join(OUT, `${name}-${vpName}.png`), fullPage: true });
   }

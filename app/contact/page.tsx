@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/data/site";
 import { Fill, filled } from "@/components/ui/Placeholder";
+import { RevealText } from "@/components/effects/RevealText";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -18,22 +19,25 @@ export default function ContactPage() {
   return (
     <section className="section">
       <div className="container-lab">
-        <p className="label mb-6">COMMUNICATION TERMINAL</p>
-        <h1 className="text-[length:var(--text-4xl)] leading-[var(--leading-tight)]">
-          Let&rsquo;s build something.
-        </h1>
+        <RevealText>
+          <p className="label mb-6">COMMUNICATION TERMINAL</p>
+          <h1 className="text-[length:var(--text-4xl)] leading-[var(--leading-tight)]">
+            Let&rsquo;s build something.
+          </h1>
 
-        {!filled(site.email) && (
-          <p className="mt-8">
-            <Fill value={site.email} />
-          </p>
-        )}
+          {!filled(site.email) && (
+            <p className="mt-8">
+              <Fill value={site.email} />
+            </p>
+          )}
+        </RevealText>
 
         <ul className="mt-14 divide-y divide-border border-y border-border">
           {links.map((link) => (
             <li key={link.label}>
               <Link
                 href={link.url}
+                data-cursor={link.url.startsWith("/") ? "interact" : "open"}
                 className="flex items-center justify-between py-6 font-mono text-sm uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
               >
                 {link.label}

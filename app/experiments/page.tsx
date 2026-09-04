@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllExperiments } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { StatusChip } from "@/components/experiments/StatusChip";
+import { RevealText } from "@/components/effects/RevealText";
 
 export const metadata: Metadata = {
   title: "Experiments",
@@ -15,18 +16,21 @@ export default function ExperimentsPage() {
   return (
     <section className="section">
       <div className="container-lab">
-        <p className="label mb-4">EXPERIMENT TABLE</p>
-        <h1 className="text-[length:var(--text-3xl)]">Experiments</h1>
-        <p className="prose-lab mt-6 text-text-muted">
-          Things I&rsquo;m building, testing, breaking and learning from. Some of these failed.
-          Those are the useful ones.
-        </p>
+        <RevealText>
+          <p className="label mb-4">EXPERIMENT TABLE</p>
+          <h1 className="text-[length:var(--text-3xl)]">Experiments</h1>
+          <p className="prose-lab mt-6 text-text-muted">
+            Things I&rsquo;m building, testing, breaking and learning from. Some of these failed.
+            Those are the useful ones.
+          </p>
+        </RevealText>
 
         <ul className="mt-14 grid gap-px border border-border bg-border md:grid-cols-2">
           {experiments.map((experiment) => (
             <li key={experiment.slug} className="bg-surface">
               <Link
                 href={`/experiments/${experiment.slug}`}
+                data-cursor="view"
                 className="flex h-full flex-col gap-6 p-6 transition-colors hover:bg-surface-raised"
               >
                 <div className="flex items-start justify-between gap-4">

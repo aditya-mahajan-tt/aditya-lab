@@ -182,6 +182,17 @@ p {
 }
 
 /* ============================================================================
+   CUSTOM CURSOR — PLAN.md Phase 6 / DESIGN_SYSTEM.md §8. Set only once
+   CustomCursor.tsx has actually positioned itself at least once — never
+   preemptively, and never at all on touch or reduced motion (that logic
+   lives in the component; this class is just the visual effect).
+   ========================================================================= */
+html.custom-cursor-active,
+html.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* ============================================================================
    HERO — PLAN.md Phase 5.
    ========================================================================= */
 

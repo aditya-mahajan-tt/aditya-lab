@@ -6,6 +6,7 @@ import { useLabStore } from "@/lib/store";
 import { useBodyScrollLock } from "@/lib/utils/useBodyScrollLock";
 import { searchCommands, type CommandItem } from "@/lib/search";
 import { cn } from "@/lib/utils/cn";
+import { useMagnetic } from "@/lib/utils/useMagnetic";
 
 /**
  * The command palette (PLAN.md Phase 3). A JS-only enhancement — routes and
@@ -31,6 +32,9 @@ export function CommandPalette() {
 
   const listboxId = useId();
   const optionId = (item: CommandItem) => `${listboxId}-${item.id}`;
+
+  // One of the four magnetic elements sitewide — see PLAN.md Phase 6.
+  const { triggerRef: magneticTriggerRef } = useMagnetic<HTMLButtonElement>();
 
   useBodyScrollLock(open);
 
@@ -109,9 +113,11 @@ export function CommandPalette() {
   return (
     <>
       <button
+        ref={magneticTriggerRef}
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open command palette"
+        data-cursor="interact"
         className="flex h-11 items-center gap-1.5 rounded-sm border border-border px-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
       >
         <span aria-hidden="true">⌘</span>K
