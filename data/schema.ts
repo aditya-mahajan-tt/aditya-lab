@@ -13,6 +13,28 @@ export const PLACEHOLDER_PATTERN = /\[[A-Z0-9_]+_REQUIRED\]/;
 
 export const isPlaceholder = (value: string) => PLACEHOLDER_PATTERN.test(value);
 
+/**
+ * A distinct state from "missing": content Claude Code drafted from
+ * supplied source material (e.g. a resume) rather than Aditya's own words.
+ * Treated with the same seriousness as a missing placeholder — it must
+ * never ship un-reviewed, since it reads as finished but might not be
+ * accurate or in his voice. See scripts/check-placeholders.mjs and
+ * components/ui/Placeholder.tsx.
+ *
+ * Data files must write the marker as a literal inline string — e.g.
+ * `"[AI_DRAFT_REVIEW] Some drafted sentence."` — the same way [X_REQUIRED]
+ * tokens are always written literally, never built via a shared JS
+ * constant. check-placeholders.mjs does a plain-text scan of the source
+ * files, not the values a module evaluates to, so a constant reference
+ * (`DRAFT_MARKER + "..."`) would be invisible to it.
+ */
+export const DRAFT_PATTERN = /^\[AI_DRAFT_REVIEW\]\s*/;
+
+export const isDraft = (value: string) => DRAFT_PATTERN.test(value);
+
+/** Strips the draft marker for consumers that need the plain text (metadata, search, etc). */
+export const stripDraftMarker = (value: string) => value.replace(DRAFT_PATTERN, "");
+
 /* ---------------------------------------------------------------- media */
 
 export const MediaSchema = z.object({
