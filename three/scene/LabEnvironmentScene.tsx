@@ -7,8 +7,9 @@ import { Hub } from "@/three/objects/stations/Hub";
 import { StationMarkers } from "@/three/objects/stations/StationMarkers";
 import { Workstation } from "@/three/objects/stations/Workstation";
 import { FirstFrame } from "@/three/systems/FirstFrame";
-import { OrbitalCameraController, stationAngleDeg } from "@/three/systems/OrbitalCameraController";
+import { OrbitalCameraController } from "@/three/systems/OrbitalCameraController";
 import { PerformanceManager } from "@/three/systems/PerformanceManager";
+import { stationAngleDeg } from "@/lib/stationLayout";
 import { Environment } from "./Environment";
 import { Lighting } from "./Lighting";
 
@@ -67,6 +68,7 @@ export function LabEnvironmentScene({
 
       <group position={layout.positions[workstation.id]} rotation={[0, -((layout.angles[workstation.id] * Math.PI) / 180), 0]}>
         <Workstation
+          label={workstation.label}
           hovered={hoveredId === workstation.id}
           focused={focusedId === workstation.id}
           onHoverChange={(h) => onHoverChange(h ? workstation.id : null)}
@@ -75,7 +77,7 @@ export function LabEnvironmentScene({
       </group>
 
       <StationMarkers
-        items={unbuilt.map((s) => ({ id: s.id, position: layout.positions[s.id] }))}
+        items={unbuilt.map((s) => ({ id: s.id, label: s.label, position: layout.positions[s.id] }))}
         hoveredId={hoveredId}
         focusedId={focusedId}
         onHoverChange={onHoverChange}

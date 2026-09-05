@@ -58,3 +58,36 @@ test("an explicit HIGH mounts a second canvas for the Lab environment", async ({
 
   expect(problems, "the Lab environment produced console errors").toEqual([]);
 });
+
+test("next steps to the following station and spotlights its fallback card", async ({ page }) => {
+  await forceQuality(page, "high");
+  await page.goto("/");
+  await page.locator("#lab-env-heading").scrollIntoViewIfNeeded();
+
+  const next = page.getByRole("button", { name: "Next station" });
+  await expect(next).toBeVisible({ timeout: 15_000 });
+
+  const second = stations.find((s) => s.order === 1)!;
+  await next.click();
+
+  await expect(page.getByRole("link", { name: new RegExp(`Open ${second.label}`, "i") })).toBeVisible();
+
+  const card = page
+    .locator('section[aria-labelledby="lab-env-heading"] li')
+    .filter({ hasText: second.label });
+  await expect(card).toHaveAttribute("data-active", "true");
+});
+
+test("prev is disabled at the first station and re-enables after next", async ({ page }) => {
+  await forceQuality(page, "high");
+  await page.goto("/");
+  await page.locator("#lab-env-heading").scrollIntoViewIfNeeded();
+
+  const prev = page.getByRole("button", { name: "Previous station" });
+  const next = page.getByRole("button", { name: "Next station" });
+  await expect(prev).toBeVisible({ timeout: 15_000 });
+  await expect(prev).toBeDisabled();
+
+  await next.click();
+  await expect(prev).toBeEnabled();
+});

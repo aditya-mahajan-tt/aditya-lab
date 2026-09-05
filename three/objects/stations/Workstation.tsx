@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import { MathUtils, type Mesh, type MeshStandardMaterial } from "three";
 import { createCoreMaterial } from "@/three/materials/CoreMaterial";
 import { createMetalMaterial } from "@/three/materials/MetalMaterial";
@@ -20,13 +21,14 @@ import { readTokens } from "@/three/materials/tokens";
 const HOVER_DAMPING = 6;
 
 type Props = {
+  label: string;
   hovered: boolean;
   focused: boolean;
   onHoverChange: (hovered: boolean) => void;
   onSelect: () => void;
 };
 
-export function Workstation({ hovered, focused, onHoverChange, onSelect }: Props) {
+export function Workstation({ label, hovered, focused, onHoverChange, onSelect }: Props) {
   const tokens = useMemo(readTokens, []);
   const metal = useMemo(() => createMetalMaterial(tokens), [tokens]);
   const screen = useMemo(() => createCoreMaterial(tokens), [tokens]);
@@ -110,6 +112,13 @@ export function Workstation({ hovered, focused, onHoverChange, onSelect }: Props
       <mesh material={metal} position={[0, 0.165, 0.1]} rotation={[-0.05, 0, 0]}>
         <boxGeometry args={[0.24, 0.01, 0.11]} />
       </mesh>
+
+      {/* A persistent name tag, not a hover tooltip — a visitor orbiting past
+          six stations needs to read what each one is without stopping on
+          it first. */}
+      <Html position={[0, 0.58, 0]} center distanceFactor={6} style={{ pointerEvents: "none" }}>
+        <span className={`label whitespace-nowrap ${active ? "text-accent" : ""}`}>{label}</span>
+      </Html>
     </group>
   );
 }

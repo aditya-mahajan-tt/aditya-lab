@@ -19,7 +19,12 @@ export function Hub({ tier }: { tier: Exclude<QualityTier, "low"> }) {
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} material={material}>
+      {/* cylinderGeometry's flat caps already sit perpendicular to Y — no
+          rotation needed to lie flat. (ringGeometry is the opposite: it
+          defaults to the XY plane, so it does need the tilt.) An earlier
+          version rotated both the same way, which stood the disc up on its
+          edge like a wall instead of a pedestal. */}
+      <mesh material={material}>
         <cylinderGeometry args={[0.6, 0.66, 0.05, segments]} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>

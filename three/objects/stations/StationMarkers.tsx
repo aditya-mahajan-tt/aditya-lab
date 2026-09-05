@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import { Color, InstancedMesh, MathUtils, Matrix4 } from "three";
 import type { StationId } from "@/data/stations";
 import { createMetalMaterial } from "@/three/materials/MetalMaterial";
@@ -21,7 +22,7 @@ import { readTokens } from "@/three/materials/tokens";
  */
 const POLE_HEIGHT = 0.4;
 
-type Item = { id: StationId; position: readonly [number, number, number] };
+type Item = { id: StationId; label: string; position: readonly [number, number, number] };
 
 type Props = {
   items: Item[];
@@ -108,6 +109,22 @@ export function StationMarkers({ items, hoveredId, focusedId, onHoverChange, onS
       <instancedMesh ref={capRef} args={[undefined, undefined, items.length]} material={metal}>
         <octahedronGeometry args={[0.05, 0]} />
       </instancedMesh>
+
+      {/* One name tag per placeholder — the pole-and-cap shape alone reads
+          as "something is here," not "what." */}
+      {items.map((item) => (
+        <Html
+          key={item.id}
+          position={[item.position[0], item.position[1] + POLE_HEIGHT + 0.12, item.position[2]]}
+          center
+          distanceFactor={6}
+          style={{ pointerEvents: "none" }}
+        >
+          <span className={`label whitespace-nowrap ${item.id === hoveredId || item.id === focusedId ? "text-accent" : ""}`}>
+            {item.label}
+          </span>
+        </Html>
+      ))}
     </>
   );
 }
