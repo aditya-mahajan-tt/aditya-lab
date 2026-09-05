@@ -191,6 +191,18 @@ export const ExperienceEntrySchema = z.object({
   tools: z.array(z.string()).default([]),
 });
 
+/* ------------------------------------------------------------ education */
+
+export const EducationEntrySchema = z.object({
+  id: z.string(),
+  institution: z.string(),
+  program: z.string(),
+  location: z.string().optional(),
+  start: z.string(), // "YYYY" — the resume gives year-only precision for education
+  end: z.string().optional(), // omit for "Present"
+  note: z.string().optional(), // e.g. a scholarship
+});
+
 /* ----------------------------------------------------------------- site */
 
 export const SiteSchema = z.object({
@@ -244,6 +256,7 @@ export const BuildModeSchema = z.object({
 export type Media = z.infer<typeof MediaSchema>;
 export type SystemDiagram = z.infer<typeof SystemDiagramSchema>;
 export type ExperienceEntry = z.infer<typeof ExperienceEntrySchema>;
+export type EducationEntry = z.infer<typeof EducationEntrySchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type Experiment = z.infer<typeof ExperimentSchema>;
 export type SkillGroup = z.infer<typeof SkillGroupSchema>;
