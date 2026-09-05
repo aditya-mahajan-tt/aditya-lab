@@ -26,6 +26,11 @@ const raw = [
       "[AI_DRAFT_REVIEW] Boosted team productivity by roughly 70% by deploying AI agent workflows across planning and execution.",
     ],
     tools: ["Next.js", "React", "Firebase", "Razorpay", "GSTN", "Twilio", "Exotel"],
+    highlights: [
+      { value: "40+", label: "[AI_DRAFT_REVIEW] clients, ₹30L+ revenue in 5 months" },
+      { value: "$250K", label: "[AI_DRAFT_REVIEW] pre-seed raised via Antler" },
+      { value: "~70%", label: "[AI_DRAFT_REVIEW] productivity lift from AI agent workflows" },
+    ],
   },
   {
     id: "accordion",
@@ -41,6 +46,11 @@ const raw = [
       "[AI_DRAFT_REVIEW] Reduced reporting effort by 60+ hours per month by scaling data infrastructure on Snowflake and Smartsheet.",
     ],
     tools: ["Python", "Databricks", "Snowflake", "Smartsheet", "SQL", "Power BI"],
+    highlights: [
+      { value: "$6.9B", label: "[AI_DRAFT_REVIEW] portfolio, up from $5.6B" },
+      { value: "-8%", label: "[AI_DRAFT_REVIEW] churn reduction via A/B testing" },
+      { value: "30+ hrs", label: "[AI_DRAFT_REVIEW] saved per month automating workflows" },
+    ],
   },
   {
     id: "ultratech",

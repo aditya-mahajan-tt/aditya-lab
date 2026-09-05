@@ -178,6 +178,18 @@ export const AboutSchema = z.object({
   photo: MediaSchema.optional(),
 });
 
+/* --------------------------------------------------------------- shared */
+
+/**
+ * A number pulled out of an entry's own bullets/note for the milestone
+ * timeline's expandable stat panel — restructuring, not new information.
+ * `value` is the number/figure ("40+", "$6.9B"), `label` is what it means.
+ */
+export const HighlightSchema = z.object({
+  value: z.string(),
+  label: Fillable,
+});
+
 /* ------------------------------------------------------------ experience */
 
 export const ExperienceEntrySchema = z.object({
@@ -189,6 +201,7 @@ export const ExperienceEntrySchema = z.object({
   end: z.string().optional(), // omit for "Present"
   bullets: z.array(Fillable).min(1),
   tools: z.array(z.string()).default([]),
+  highlights: z.array(HighlightSchema).default([]),
 });
 
 /* ------------------------------------------------------------ education */
@@ -201,6 +214,7 @@ export const EducationEntrySchema = z.object({
   start: z.string(), // "YYYY" — the resume gives year-only precision for education
   end: z.string().optional(), // omit for "Present"
   note: z.string().optional(), // e.g. a scholarship
+  highlights: z.array(HighlightSchema).default([]),
 });
 
 /* ----------------------------------------------------------------- site */
@@ -255,6 +269,7 @@ export const BuildModeSchema = z.object({
 
 export type Media = z.infer<typeof MediaSchema>;
 export type SystemDiagram = z.infer<typeof SystemDiagramSchema>;
+export type Highlight = z.infer<typeof HighlightSchema>;
 export type ExperienceEntry = z.infer<typeof ExperienceEntrySchema>;
 export type EducationEntry = z.infer<typeof EducationEntrySchema>;
 export type Project = z.infer<typeof ProjectSchema>;

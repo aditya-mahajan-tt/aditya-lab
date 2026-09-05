@@ -245,6 +245,39 @@ html.custom-cursor-active * {
   transform-origin: 200px 200px;
 }
 
+/* The /about identity map's ambient rings — a distinct object from the hero
+   core above, same idle-loop treatment. Frozen by the reduced-motion rule
+   below, same as everything else on the page. */
+@keyframes map-ring-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.map-ring-rotate {
+  animation: map-ring-rotate 140s linear infinite;
+  transform-origin: 300px 300px;
+}
+.map-ring-rotate-reverse {
+  animation: map-ring-rotate 100s linear infinite reverse;
+  transform-origin: 300px 300px;
+}
+@keyframes map-hub-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(182, 255, 74, 0.06),
+      0 0 40px -8px rgba(182, 255, 74, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(182, 255, 74, 0.1),
+      0 0 56px -6px rgba(182, 255, 74, 0.55);
+  }
+}
+.map-hub-pulse {
+  animation: map-hub-pulse 4.5s ease-in-out infinite;
+}
+
 /* Handover to the 3D core (PLAN.md Phase 8). The DOM core is faded rather
    than removed — the WebGL canvas above it is aria-hidden, so this SVG stays
    in the accessibility tree as the object's real description. Parking the

@@ -6,7 +6,7 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**51 missing, 26 unreviewed drafts.**
+**51 missing, 35 unreviewed drafts.**
 
 ## data/about.ts
 
@@ -30,6 +30,12 @@
 - [ ] `[BUILD_MODE_BROKE_3_REQUIRED]` — line 64
 - [ ] `[BUILD_MODE_LEARNED_REQUIRED]` — line 67
 
+## data/education.ts
+
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 20
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 33
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 34
+
 ## data/experience.ts
 
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 21
@@ -38,11 +44,17 @@
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 24
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 25
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 26
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 38
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 39
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 40
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 41
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 53
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 30
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 31
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 32
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 43
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 44
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 45
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 46
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 50
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 51
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 52
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 63
 
 ## data/experiments.ts
 

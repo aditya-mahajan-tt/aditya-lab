@@ -4,8 +4,8 @@ import { skillGroups } from "@/data/skills";
 import type { SkillGroup } from "@/data/schema";
 import { Fill } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";
-import { ProgressionStage } from "@/components/about/ProgressionStage";
-import { Timeline } from "@/components/about/Timeline";
+import { IdentityMap } from "@/components/about/IdentityMap";
+import { MilestoneTimeline } from "@/components/about/MilestoneTimeline";
 import { capabilityIcons } from "@/components/icons/CapabilityIcons";
 
 export const metadata: Metadata = {
@@ -34,22 +34,20 @@ export default function AboutPage() {
           <RevealText>
             <p className="label mb-4">IDENTITY</p>
             <h1 className="text-[length:var(--text-3xl)]">Who is Aditya?</h1>
+            <p className="prose-lab mt-4 max-w-[62ch] text-[length:var(--text-lg)] text-text-muted">
+              <Fill value={about.shortBio} />
+            </p>
           </RevealText>
 
-          <RevealText className="prose-lab mt-8 max-w-[68ch] text-[length:var(--text-2xl)] text-text">
-            <Fill value={about.shortBio} as="p" />
-          </RevealText>
-
-          <RevealText className="mt-14">
+          <RevealText className="mt-10">
             {/*
-              ProgressionFallback (Task 9) renders each stage as an <h3> —
-              without an <h2> between this section's <h1> and those <h3>s,
-              the heading order skips a level. sr-only, since the visual
-              design has no heading here; matches the pattern used for
-              "problems-heading" below.
+              IdentityMap renders each stage as an <h3> — without an <h2>
+              between this section's <h1> and those <h3>s, the heading order
+              skips a level. sr-only, since the visual design has no heading
+              here; matches the pattern used for "problems-heading" below.
             */}
             <h2 className="sr-only">Identity progression</h2>
-            <ProgressionStage />
+            <IdentityMap />
           </RevealText>
 
           <RevealText className="mt-10">
@@ -75,7 +73,7 @@ export default function AboutPage() {
           </RevealText>
 
           <RevealText className="mt-12">
-            <Timeline />
+            <MilestoneTimeline />
           </RevealText>
         </div>
       </section>

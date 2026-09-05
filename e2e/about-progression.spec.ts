@@ -1,123 +1,93 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 /**
- * Coverage for components/about/ProgressionStage (design spec §3.2),
- * mirroring e2e/webgl.spec.ts's helpers and rigor for the site's second
- * WebGL consumer.
+ * Coverage for components/about/IdentityMap and MilestoneTimeline (design
+ * spec revision, 2026-09-05) — a 2D mind map and a real milestone rail,
+ * neither depending on WebGL. Every stage/entry is real, always-visible DOM
+ * content; hover/click interactions are decorative or progressive
+ * enhancements only, never the only route to information.
  */
 
-function captureProblems(page: Page) {
+const STAGE_LABELS = ["CURIOUS", "BUILDER", "MARKETER", "PRODUCT THINKER", "AI EXPLORER", "STILL EXPERIMENTING"];
+
+test("all six identity stages are visible with JavaScript disabled", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/about");
+
+  for (const label of STAGE_LABELS) {
+    await expect(page.getByText(label, { exact: true })).toBeVisible();
+  }
+
+  await context.close();
+});
+
+test("hovering an identity stage lights its connector (desktop only, purely decorative)", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the radial map only renders at md+ widths");
+  await page.goto("/about");
+
+  const node = page.getByTestId("identity-stage-0");
+  const connector = page.getByTestId("identity-connector-0");
+
+  await expect(connector).toHaveAttribute("stroke", "var(--color-border-strong)");
+  await node.hover();
+  await expect(connector).toHaveAttribute("stroke", "var(--color-accent)");
+  await page.mouse.move(0, 0);
+  await expect(connector).toHaveAttribute("stroke", "var(--color-border-strong)");
+});
+
+test("focusing an identity stage with the keyboard lights its connector too", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the radial map only renders at md+ widths");
+  await page.goto("/about");
+
+  const node = page.getByTestId("identity-stage-2");
+  const connector = page.getByTestId("identity-connector-2");
+
+  await node.focus();
+  await expect(connector).toHaveAttribute("stroke", "var(--color-accent)");
+});
+
+test("the identity map produces no console errors while interacted with", async ({ page }) => {
   const problems: string[] = [];
   page.on("console", (msg) => {
     if (msg.type() === "error") problems.push(`console.error: ${msg.text()}`);
   });
   page.on("pageerror", (err) => problems.push(`pageerror: ${err.message}`));
-  return problems;
-}
 
-async function forceQuality(page: Page, quality: string) {
-  await page.addInitScript((value) => {
-    window.localStorage.setItem(
-      "aditya-lab",
-      JSON.stringify({ state: { soundEnabled: false, quality: value }, version: 0 }),
-    );
-  }, quality);
-}
-
-async function disableWebGL(page: Page) {
-  await page.addInitScript(() => {
-    const original = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, id: string, ...rest: unknown[]) {
-      if (id === "webgl" || id === "webgl2" || id === "experimental-webgl") return null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (original as any).call(this, id, ...rest);
-    } as typeof HTMLCanvasElement.prototype.getContext;
-  });
-}
-
-test("with WebGL unavailable, all six progression stages are still present as native <details>", async ({ page }) => {
-  await disableWebGL(page);
   await page.goto("/about");
+  const node = page.getByTestId("identity-stage-1");
+  await node.hover();
+  await node.focus();
+  await page.mouse.move(0, 0);
 
-  await expect(page.locator("canvas")).toHaveCount(0);
-
-  const first = page.locator("details").first();
-  await expect(first).toBeVisible();
-  await first.locator("summary").click();
-  await expect(first).toHaveAttribute("open", "");
+  expect(problems, "the identity map produced console errors").toEqual([]);
 });
 
-test("every progression stage and timeline entry opens with JavaScript disabled", async ({ browser }) => {
+test("every timeline entry's figures are reachable with JavaScript disabled", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/about");
 
-  // 6 progression stages + at least 2 timeline entries (education) — the
-  // exact experience.ts count can grow, so this only asserts a floor.
-  const summaries = page.locator("summary");
-  expect(await summaries.count()).toBeGreaterThanOrEqual(8);
-
-  const firstDetails = page.locator("details").first();
-  await firstDetails.locator("summary").click();
-  await expect(firstDetails).toHaveAttribute("open", "");
+  const first = page.getByTestId("timeline-entry-0");
+  await expect(first.locator("summary")).toBeVisible();
+  await first.locator("summary").click();
+  await expect(first).toHaveAttribute("open", "");
 
   await context.close();
 });
 
-test("an explicit HIGH mounts the progression canvas without breaking the DOM controls", async ({ page }) => {
-  const problems = captureProblems(page);
-  await forceQuality(page, "high");
+test("opening one milestone's panel closes the previously open one (single-accordion coupling)", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the desktop rail enforces one-open-at-a-time; the mobile stack does not");
   await page.goto("/about");
 
-  // Mirrors webgl.spec.ts's CORE stage: the chunk mounts only once the
-  // stage's IntersectionObserver (rootMargin 300px) sees it approach the
-  // viewport, which on a phone-sized screen means after a scroll — the
-  // fallback <ol> is the same element the observer watches before the
-  // canvas exists, since it's the wrapper's only child until then.
-  await page.locator("ol").first().scrollIntoViewIfNeeded();
-
-  const canvas = page.locator("canvas");
-  await expect(canvas).toHaveCount(1, { timeout: 15_000 });
-
-  const box = await canvas.boundingBox();
-  if (!box) throw new Error("the progression canvas has no layout box");
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.waitForTimeout(300);
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await page.waitForTimeout(300);
-
-  // The DOM <details> list is the real control surface and must still work
-  // once the 3D layer is live.
-  const first = page.locator("details").first();
-  await first.locator("summary").click();
-  await expect(first).toHaveAttribute("open", "");
-
-  await expect(canvas).toHaveCount(1);
-  expect(problems, "the progression map produced console errors").toEqual([]);
-});
-
-test("the progression canvas is aria-hidden and never the only route to its content", async ({ page }) => {
-  await forceQuality(page, "high");
-  await page.goto("/about");
-
-  // See the scroll comment above — same lazy-mount gate applies here.
-  await page.locator("ol").first().scrollIntoViewIfNeeded();
-
-  await expect(page.locator("canvas")).toHaveCount(1, { timeout: 15_000 });
-  await expect(
-    page.locator("canvas").locator("xpath=ancestor::*[@aria-hidden='true']").first(),
-  ).toHaveCount(1);
-
-  // The six stage labels are real text in the DOM, not canvas-only content.
-  await expect(page.getByText("CURIOUS", { exact: true })).toBeVisible();
-});
-
-test("opening one progression stage's <details> closes the previously open one (DOM-only accordion coupling)", async ({ page }) => {
-  await page.goto("/about");
-
-  const stages = page.locator("ol").first().locator("details");
-  const first = stages.nth(0);
-  const second = stages.nth(1);
+  const first = page.getByTestId("timeline-entry-0");
+  const second = page.getByTestId("timeline-entry-1");
 
   await first.locator("summary").click();
   await expect(first).toHaveAttribute("open", "");
@@ -127,7 +97,26 @@ test("opening one progression stage's <details> closes the previously open one (
   await expect(first).not.toHaveAttribute("open", "");
 });
 
-test("the /systems -> /about#experience-turbotork deep link (data/systems.ts) resolves to a real element", async ({ page }) => {
+test("clicking a milestone's dot marker also opens its panel", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the dot marker only exists in the desktop rail");
+  await page.goto("/about");
+
+  const entry = page.getByTestId("timeline-entry-3");
+  await expect(entry).not.toHaveAttribute("open", "");
+
+  await page.getByTestId("timeline-dot-3").click();
+  await expect(entry).toHaveAttribute("open", "");
+});
+
+test("an opened milestone panel shows its real highlight figures", async ({ page }) => {
+  await page.goto("/about");
+
+  const turbotork = page.getByTestId("timeline-entry-3");
+  await turbotork.locator("summary").click();
+  await expect(turbotork.getByText("$250K", { exact: true })).toBeVisible();
+});
+
+test("the /systems -> /about#experience-turbotork deep link resolves to a real element", async ({ page }) => {
   await page.goto("/about#experience-turbotork");
   await expect(page.locator("#experience-turbotork")).toHaveCount(1);
 });

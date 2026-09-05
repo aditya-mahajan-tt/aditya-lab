@@ -33,9 +33,7 @@ let failed = false;
 
 /* --- the homepage's initial chunk set ------------------------------------ */
 const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
-const initial = [
-  ...new Set([...(manifest.pages?.["/page"] ?? []), ...(manifest.pages?.["/about/page"] ?? [])]),
-].filter((f) => f.endsWith(".js"));
+const initial = [...new Set(manifest.pages?.["/page"] ?? [])].filter((f) => f.endsWith(".js"));
 
 if (initial.length === 0) {
   console.error("✖ Could not resolve the homepage chunk set from the build manifest.");
@@ -69,12 +67,12 @@ for (const rel of initial) {
   const full = join(NEXT, rel);
   if (!existsSync(full)) continue;
   if (/WebGLRenderer|THREE\.REVISION/.test(readFileSync(full, "utf8"))) {
-    console.error(`✖ Three.js found in an initial chunk (/ or /about): ${rel}`);
+    console.error(`✖ Three.js found in an initial chunk: ${rel}`);
     threeInInitial = true;
     failed = true;
   }
 }
-if (!threeInInitial) console.log("✔ 3D isolation — Three.js is not in the initial bundle of / or /about");
+if (!threeInInitial) console.log("✔ 3D isolation — Three.js is not in the homepage's initial bundle");
 
 /* --- 3. lazy chunk budget (currently: the 3D layer) ----------------------- */
 /**
