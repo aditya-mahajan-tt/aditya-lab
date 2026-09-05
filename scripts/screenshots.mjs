@@ -39,6 +39,7 @@ const ROUTES = [
   ["work-adda", "/work/adda-d2c"],
   ["systems", "/systems"],
   ["experiments", "/experiments"],
+  ["experiments-hidden", "/experiments/hidden"],
   ["thinking", "/thinking"],
   ["about", "/about"],
   ["build", "/build"],

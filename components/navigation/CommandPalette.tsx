@@ -8,6 +8,7 @@ import { searchCommands, ASK_THE_LAB_COMMAND_HREF, type CommandItem } from "@/li
 import { cn } from "@/lib/utils/cn";
 import { useMagnetic } from "@/lib/utils/useMagnetic";
 import { analytics } from "@/lib/analytics/events";
+import { playTone } from "@/lib/sound";
 
 /**
  * The command palette (PLAN.md Phase 3). A JS-only enhancement — routes and
@@ -31,6 +32,17 @@ export function CommandPalette() {
   const [activeIndex, setActiveIndex] = useState(0);
   const results = searchCommands(query);
   const activeItem = results[activeIndex];
+  const soundEnabled = useLabStore((s) => s.soundEnabled);
+
+  // PLAN.md Phase 15 easter egg — a playful dead end, not a real command:
+  // it never appears in `results` or affects keyboard navigation.
+  const isSudo = query.trim().toLowerCase().startsWith("sudo");
+  useEffect(() => {
+    if (!isSudo) return;
+    if (soundEnabled) playTone("denied");
+    analytics.easterEggFound("sudo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once per sudo-query transition, not on every render
+  }, [isSudo]);
 
   const listboxId = useId();
   const optionId = (item: CommandItem) => `${listboxId}-${item.id}`;
@@ -168,6 +180,12 @@ export function CommandPalette() {
             />
           </div>
 
+          {isSudo && (
+            <p className="px-4 pt-3 font-mono text-xs uppercase tracking-widest text-failed" role="status">
+              Permission denied: you already have root. It&rsquo;s my portfolio.
+            </p>
+          )}
+
           <ul id={listboxId} role="listbox" aria-label="Results" className="max-h-80 overflow-y-auto p-2">
             {results.length === 0 && (
               <li className="px-3 py-6 text-center text-sm text-text-faint">No matches.</li>
@@ -197,6 +215,12 @@ export function CommandPalette() {
               </li>
             ))}
           </ul>
+
+          {!query && (
+            <p className="border-t border-border px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-text-faint">
+              This lab has a few secrets. Some respond to typing, some to keys.
+            </p>
+          )}
         </div>
       </dialog>
     </>

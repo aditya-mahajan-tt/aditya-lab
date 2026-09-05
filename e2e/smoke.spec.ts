@@ -14,6 +14,7 @@ const ROUTES = [
   "/work/adda-d2c",
   "/systems",
   "/experiments",
+  "/experiments/hidden",
   "/thinking",
   "/about",
   "/build",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/data/site";
 import { filled } from "@/components/ui/Placeholder";
 import { QualityControl } from "@/components/ui/QualityControl";
+import { SoundControl } from "@/components/ui/SoundControl";
 
 export function Footer() {
   return (
@@ -10,6 +11,7 @@ export function Footer() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
           <p className="label">ADITYA LAB — BUILD · EXPERIMENT · ITERATE</p>
           <QualityControl />
+          <SoundControl />
         </div>
 
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
@@ -33,6 +35,10 @@ export function Footer() {
           </li>
         </ul>
       </div>
+
+      <p className="container-lab pb-6 font-mono text-[10px] uppercase tracking-[var(--tracking-mono)] text-text-muted">
+        You scrolled to the bottom. Curiosity noted — try ⌘K.
+      </p>
     </footer>
   );
 }

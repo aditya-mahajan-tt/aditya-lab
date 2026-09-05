@@ -22,4 +22,24 @@ export function ensureScrollTrigger(): Promise<void> {
   return scrollTriggerReady;
 }
 
+/**
+ * Draggable + InertiaPlugin power the one physics artifact on
+ * /experiments/hidden (PLAN.md Phase 15: "physics only on draggable
+ * artifacts, never global"). Both ship free in `gsap` 3.15+ but are still
+ * dynamically imported, same reasoning as ensureScrollTrigger above — no
+ * route outside that page should pay for this bundle weight.
+ */
+let draggableReady: Promise<typeof import("gsap/Draggable").Draggable> | null = null;
+export function ensureDraggable(): Promise<typeof import("gsap/Draggable").Draggable> {
+  if (!draggableReady) {
+    draggableReady = Promise.all([import("gsap/Draggable"), import("gsap/InertiaPlugin")]).then(
+      ([{ Draggable }, { InertiaPlugin }]) => {
+        gsap.registerPlugin(Draggable, InertiaPlugin);
+        return Draggable;
+      },
+    );
+  }
+  return draggableReady;
+}
+
 export { gsap };

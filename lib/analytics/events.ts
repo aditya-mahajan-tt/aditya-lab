@@ -19,4 +19,5 @@ export const analytics = {
   contactClick: (channel: "email" | "linkedin" | "github") => track("contact_click", { channel }),
   webglFallback: (reason: string) => track("webgl_fallback", { reason }),
   qualityTier: (tier: string) => track("quality_tier", { tier }),
+  easterEggFound: (kind: "konami" | "sudo") => track("easter_egg_found", { kind }),
 };
