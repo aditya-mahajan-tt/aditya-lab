@@ -73,7 +73,11 @@ export function Timeline() {
       {entries.map((entry) => {
         const Icon = timelineIcons[entry.kind === "work" ? "WORK" : "EDUCATION"];
         return (
-          <li key={entry.id}>
+          <li
+            key={entry.id}
+            id={`${entry.kind === "work" ? "experience" : "education"}-${entry.id}`}
+            className="scroll-mt-24"
+          >
             <details className="group">
               <summary className="flex min-h-11 cursor-pointer list-none flex-col gap-2 py-6 marker:hidden md:flex-row md:items-baseline md:justify-between md:gap-10 [&::-webkit-details-marker]:hidden">
                 <span className="flex items-baseline gap-4">

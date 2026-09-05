@@ -111,3 +111,23 @@ test("the progression canvas is aria-hidden and never the only route to its cont
   // The six stage labels are real text in the DOM, not canvas-only content.
   await expect(page.getByText("CURIOUS", { exact: true })).toBeVisible();
 });
+
+test("opening one progression stage's <details> closes the previously open one (DOM-only accordion coupling)", async ({ page }) => {
+  await page.goto("/about");
+
+  const stages = page.locator("ol").first().locator("details");
+  const first = stages.nth(0);
+  const second = stages.nth(1);
+
+  await first.locator("summary").click();
+  await expect(first).toHaveAttribute("open", "");
+
+  await second.locator("summary").click();
+  await expect(second).toHaveAttribute("open", "");
+  await expect(first).not.toHaveAttribute("open", "");
+});
+
+test("the /systems -> /about#experience-turbotork deep link (data/systems.ts) resolves to a real element", async ({ page }) => {
+  await page.goto("/about#experience-turbotork");
+  await expect(page.locator("#experience-turbotork")).toHaveCount(1);
+});

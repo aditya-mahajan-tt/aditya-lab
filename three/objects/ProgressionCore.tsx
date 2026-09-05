@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, type Group, type Mesh, type MeshStandardMaterial } from "three";
+import { about } from "@/data/about";
 import type { QualityTier } from "@/lib/quality";
 import { createCoreMaterial } from "@/three/materials/CoreMaterial";
 import { createGlassMaterial } from "@/three/materials/GlassMaterial";
@@ -18,7 +19,9 @@ import { ProgressionNode } from "./ProgressionNode";
  * Lighter than Core (no meridian/tilt rings) — the selection state does the
  * work Core's expansion animation did there.
  */
-const NODE_ANGLES_DEG = [-90, -30, 30, 90, 150, 210];
+const NODE_ANGLES_DEG = about.progression.map(
+  (_, i) => -90 + (i * 360) / about.progression.length,
+);
 const MODULE_COUNT = 12;
 const MODULE_RING_RADIUS = 1.9;
 const RING_SEGMENTS: Record<Exclude<QualityTier, "low">, number> = { high: 160, medium: 80 };

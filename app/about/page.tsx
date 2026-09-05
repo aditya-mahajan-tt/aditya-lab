@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { about } from "@/data/about";
 import { skillGroups } from "@/data/skills";
+import type { SkillGroup } from "@/data/schema";
 import { Fill } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";
 import { ProgressionStage } from "@/components/about/ProgressionStage";
@@ -13,15 +14,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
-/**
- * data/skills.ts's SkillDepth has two real-world values today (`comfortable`,
- * `working knowledge` — `strong` is unused). Design spec §3.5: map to visual
- * weight, never print the word — an unlabelled self-assessment reads as an
- * unverified claim.
- */
-const depthWeight: Record<string, string> = {
+type SkillDepthValue = SkillGroup["items"][number]["depth"];
+
+/** data/skills.ts's SkillDepth has two real-world values today (`comfortable`,
+ * `working knowledge` — `strong` is unused). Visual weight only, never the
+ * printed word (design spec §3.5) — but see the sr-only span below, since
+ * color alone isn't a valid signal per DESIGN_SYSTEM.md's contrast rules. */
+const depthWeight: Record<SkillDepthValue, string> = {
   comfortable: "text-text",
-  "working knowledge": "text-text-faint",
+  "working knowledge": "text-text-muted",
   strong: "text-text",
 };
 
@@ -47,7 +48,7 @@ export default function AboutPage() {
               design has no heading here; matches the pattern used for
               "problems-heading" below.
             */}
-            <h2 className="sr-only">Career progression</h2>
+            <h2 className="sr-only">Identity progression</h2>
             <ProgressionStage />
           </RevealText>
 
@@ -102,8 +103,9 @@ export default function AboutPage() {
                   </p>
                   <ul className="mt-5 space-y-2">
                     {group.items.map((item) => (
-                      <li key={item.name} className={`text-sm ${depthWeight[item.depth] ?? "text-text-muted"}`}>
+                      <li key={item.name} className={`text-sm ${depthWeight[item.depth]}`}>
                         {item.name}
+                        <span className="sr-only"> — {item.depth}</span>
                       </li>
                     ))}
                   </ul>
