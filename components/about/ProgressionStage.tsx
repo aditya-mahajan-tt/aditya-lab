@@ -81,14 +81,19 @@ export function ProgressionStage() {
     [setWebglAvailable],
   );
 
-  // Read the *latest* activeStage via the functional updater, not the
-  // `index` captured at closure-creation time: ProgressionFallback's own
-  // effect sometimes sets a <details> element's `.open` to false
-  // programmatically (e.g. in response to a 3D node click elsewhere), and
-  // that programmatic write fires a native `toggle` event too — reaching
-  // this handler as a "close" for a stage that isn't the active one
-  // anymore. Comparing against the freshest `current` makes that echoed
-  // event a no-op instead of clobbering the real selection.
+  /**
+   * Uses the functional updater form (`current => ...`) rather than reading
+   * `activeStage` directly. This callback is a useCallback with an empty
+   * dependency array, so it never re-creates — and ProgressionFallback's own
+   * effect sometimes closes a <details> programmatically when `activeStage`
+   * changes elsewhere (e.g. a 3D node click), which fires this same native
+   * `toggle` handler for a stage that isn't actually being deselected by the
+   * user. Reading `current` fresh at update time (never stale, unlike
+   * anything this callback could read from its own closure) is what lets
+   * `current === index` correctly recognise that echo and no-op it — a
+   * naive `setActiveStage(open ? index : null)` has no way to make that
+   * distinction, since it never consults the current value before clearing it.
+   */
   const handleToggle = useCallback((index: number, open: boolean) => {
     setActiveStage((current) => (open ? index : current === index ? null : current));
   }, []);
