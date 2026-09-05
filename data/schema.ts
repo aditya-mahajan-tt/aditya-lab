@@ -223,6 +223,22 @@ export const SystemDiagramSchema = z.object({
   relatedLink: LinkSchema.optional(),
 });
 
+/* -------------------------------------------------------------- build mode */
+
+export const StackCategorySchema = z.object({
+  id: z.enum(["FRONTEND", "MOTION", "3D", "DATA", "INTELLIGENCE", "DEPLOY"]),
+  tools: z.array(z.string()).min(1),
+});
+
+export const BuildModeSchema = z.object({
+  why: Fillable,
+  stack: z.array(StackCategorySchema).min(1),
+  architecture: SystemDiagramSchema,
+  decisions: z.array(z.object({ title: z.string(), body: Fillable })).min(1),
+  whatBroke: z.array(Fillable).min(3),
+  whatLearned: Fillable,
+});
+
 /* ---------------------------------------------------------------- types */
 
 export type Media = z.infer<typeof MediaSchema>;
@@ -235,3 +251,4 @@ export type Thinking = z.infer<typeof ThinkingSchema>;
 export type TimelineEntry = z.infer<typeof TimelineEntrySchema>;
 export type About = z.infer<typeof AboutSchema>;
 export type Site = z.infer<typeof SiteSchema>;
+export type BuildMode = z.infer<typeof BuildModeSchema>;

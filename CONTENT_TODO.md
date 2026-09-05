@@ -6,7 +6,7 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**45 missing, 25 unreviewed drafts.**
+**51 missing, 26 unreviewed drafts.**
 
 ## data/about.ts
 
@@ -19,6 +19,16 @@
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 47
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 52
 - [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 57
+
+## data/build.ts
+
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 7
+- [ ] `[X_REQUIRED]` — line 9
+- [ ] `[BUILD_MODE_WHY_REQUIRED]` — line 12
+- [ ] `[BUILD_MODE_BROKE_1_REQUIRED]` — line 62
+- [ ] `[BUILD_MODE_BROKE_2_REQUIRED]` — line 63
+- [ ] `[BUILD_MODE_BROKE_3_REQUIRED]` — line 64
+- [ ] `[BUILD_MODE_LEARNED_REQUIRED]` — line 67
 
 ## data/experience.ts
 

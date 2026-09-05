@@ -41,6 +41,8 @@ const ROUTES = [
   ["experiments", "/experiments"],
   ["thinking", "/thinking"],
   ["about", "/about"],
+  ["build", "/build"],
+  ["log", "/log"],
   ["contact", "/contact"],
   ["resume", "/resume"],
   ["404", "/this-route-does-not-exist"],

@@ -12,6 +12,8 @@ export const navigation: NavItem[] = [
   { label: "EXPERIMENTS", href: "/experiments", description: "Things being built and broken" },
   { label: "THINKING", href: "/thinking", description: "How Aditya approaches problems" },
   { label: "ABOUT", href: "/about", description: "Background and capabilities" },
+  { label: "BUILD MODE", href: "/build", description: "The stack, architecture and decisions behind this site" },
+  { label: "LAB LOG", href: "/log", description: "A running record of builds, experiments and learning" },
   { label: "CONTACT", href: "/contact", description: "Start a conversation" },
   { label: "RESUME", href: "/resume", description: "Download the resume" },
 ];

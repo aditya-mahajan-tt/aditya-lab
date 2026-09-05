@@ -16,6 +16,8 @@ const ROUTES = [
   "/experiments",
   "/thinking",
   "/about",
+  "/build",
+  "/log",
   "/contact",
   "/resume",
 ];
