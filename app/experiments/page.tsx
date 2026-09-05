@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { getAllExperiments } from "@/data/queries";
-import { Fill } from "@/components/ui/Placeholder";
-import { StatusChip } from "@/components/experiments/StatusChip";
 import { RevealText } from "@/components/effects/RevealText";
-import { TrackedLink } from "@/components/analytics/TrackedLink";
+import { StatusFilter } from "@/components/experiments/StatusFilter";
 
 export const metadata: Metadata = {
   title: "Experiments",
@@ -26,32 +24,7 @@ export default function ExperimentsPage() {
           </p>
         </RevealText>
 
-        <ul className="mt-14 grid gap-px border border-border bg-border md:grid-cols-2">
-          {experiments.map((experiment) => (
-            <li key={experiment.slug} className="bg-surface">
-              <TrackedLink
-                href={`/experiments/${experiment.slug}`}
-                data-cursor="view"
-                event="experiment_open"
-                eventProps={{ slug: experiment.slug }}
-                className="flex h-full flex-col gap-6 p-6 transition-colors hover:bg-surface-raised"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="label">EXPERIMENT_{experiment.id}</span>
-                  <StatusChip status={experiment.status} />
-                </div>
-                <div>
-                  <h2 className="text-[length:var(--text-xl)]">
-                    <Fill value={experiment.title} />
-                  </h2>
-                  <p className="mt-3 text-sm text-text-muted">
-                    <Fill value={experiment.summary} />
-                  </p>
-                </div>
-              </TrackedLink>
-            </li>
-          ))}
-        </ul>
+        <StatusFilter experiments={experiments} />
       </div>
     </section>
   );

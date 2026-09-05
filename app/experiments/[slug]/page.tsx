@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllExperiments, getExperiment } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { StatusChip } from "@/components/experiments/StatusChip";
+import { ExperimentDemo } from "@/components/experiments/ExperimentDemo";
 import { RevealText } from "@/components/effects/RevealText";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -64,6 +65,8 @@ export default async function ExperimentPage({ params }: Params) {
             </RevealText>
           ))}
         </div>
+
+        <ExperimentDemo experiment={experiment} />
       </div>
     </article>
   );
