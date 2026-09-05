@@ -13,6 +13,17 @@ import { test, expect, type Page } from "@playwright/test";
 
 const CORE = "svg.core-dom";
 
+/**
+ * Scoped to the hero's own stage, not the page as a whole — PLAN.md Phase
+ * 13 gave the homepage a second, independently-gated canvas (the Lab
+ * environment, further down the page), so "one canvas on the page" is no
+ * longer the right invariant. These tests are specifically about the
+ * hero's 3D layer, and the hero canvas shares a parent with `CORE`.
+ */
+function heroCanvas(page: Page) {
+  return page.locator(CORE).locator("xpath=..").locator("canvas");
+}
+
 function captureProblems(page: Page) {
   const problems: string[] = [];
   page.on("console", (msg) => {
@@ -95,13 +106,13 @@ test("an explicit HIGH mounts the 3D core and fades the DOM core out", async ({ 
   // The chunk is only fetched once the stage approaches the viewport, which
   // on a phone-sized screen means after a scroll.
   await page.locator(CORE).scrollIntoViewIfNeeded();
-  await expect(page.locator("canvas")).toHaveCount(1, { timeout: 15_000 });
+  await expect(heroCanvas(page)).toHaveCount(1, { timeout: 15_000 });
 
   // The DOM core stays in the document as the accessible representation —
   // it is faded, not removed, and the canvas above it is aria-hidden.
   await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "true", { timeout: 15_000 });
   await expect(page.locator(CORE)).toHaveCount(1);
-  await expect(page.locator("canvas").locator("xpath=ancestor::*[@aria-hidden='true']").first()).toHaveCount(1);
+  await expect(heroCanvas(page).locator("xpath=ancestor::*[@aria-hidden='true']").first()).toHaveCount(1);
 
   expect(problems, "the 3D layer produced console errors").toEqual([]);
 });
@@ -112,17 +123,17 @@ test("a lost context swaps back to the DOM core and says so", async ({ page }) =
 
   await forceQuality(page, "high");
   await page.goto("/");
-  await expect(page.locator("canvas")).toHaveCount(1, { timeout: 15_000 });
+  await expect(heroCanvas(page)).toHaveCount(1, { timeout: 15_000 });
   await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "true", { timeout: 15_000 });
 
-  await page.evaluate(() => {
-    const canvas = document.querySelector("canvas");
+  await page.evaluate((core) => {
+    const canvas = document.querySelector(core)?.parentElement?.querySelector("canvas");
     const gl = canvas?.getContext("webgl2") ?? canvas?.getContext("webgl");
     (gl as WebGLRenderingContext | null)?.getExtension("WEBGL_lose_context")?.loseContext();
-  });
+  }, CORE);
 
   await expect(page.getByText(/3D EXPERIENCE UNAVAILABLE/i)).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator("canvas")).toHaveCount(0);
+  await expect(heroCanvas(page)).toHaveCount(0);
   await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "false");
   await expect(page.locator("h1")).toHaveCount(1);
 
@@ -135,7 +146,7 @@ test("the 3D core survives pointer interaction and scrolling", async ({ page }) 
   await page.goto("/");
 
   await page.locator(CORE).scrollIntoViewIfNeeded();
-  const canvas = page.locator("canvas");
+  const canvas = heroCanvas(page);
   await expect(canvas).toHaveCount(1, { timeout: 15_000 });
   await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "true", { timeout: 15_000 });
 

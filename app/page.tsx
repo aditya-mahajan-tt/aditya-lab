@@ -5,6 +5,7 @@ import { getFeaturedProjects } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { Hero } from "@/components/hero/Hero";
 import { BootSequence } from "@/components/hero/BootSequence";
+import { LabEnvironmentStage } from "@/components/lab/LabEnvironmentStage";
 import { RevealText } from "@/components/effects/RevealText";
 import { MagneticLink } from "@/components/effects/MagneticButton";
 import { ProjectCard } from "@/components/projects/ProjectCard";
@@ -23,6 +24,10 @@ export default function HomePage() {
       <Hero />
 
       <div id="lab">
+        <section className="border-t border-border" aria-labelledby="lab-env-heading">
+          <LabEnvironmentStage />
+        </section>
+
         <section className="section border-t border-border" aria-labelledby="work-heading">
           <div className="container-lab">
             <RevealText>
