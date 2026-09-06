@@ -75,8 +75,8 @@ export function NavOverlay() {
         }}
         className="fixed inset-0 z-[var(--z-overlay)] overflow-y-auto bg-bg/97 backdrop-blur-md"
       >
-        <div className="container-lab flex min-h-full flex-col justify-center py-32">
-          <p className="label mb-10">SYSTEM · NAVIGATE</p>
+        <div className="container-lab flex min-h-full flex-col justify-start py-8 md:justify-center md:py-32">
+          <p className="label mb-6 md:mb-10">SYSTEM · NAVIGATE</p>
 
           <nav aria-label="Full site">
             <ul className="flex flex-col">
@@ -84,12 +84,14 @@ export function NavOverlay() {
                 <li key={item.href} className="border-b border-border first:border-t">
                   <Link
                     href={item.href}
-                    className="flex min-h-11 flex-col justify-center gap-1 py-5 transition-colors duration-[var(--duration-fast)] hover:text-accent md:flex-row md:items-baseline md:justify-between md:gap-10"
+                    className="flex min-h-11 flex-col justify-center gap-1 py-3 transition-colors duration-[var(--duration-fast)] hover:text-accent md:flex-row md:items-baseline md:justify-between md:gap-10 md:py-5"
                   >
-                    <span className="font-mono text-[length:var(--text-2xl)] uppercase tracking-[var(--tracking-mono)] md:text-[length:var(--text-3xl)]">
+                    <span className="font-mono text-[length:var(--text-2xl)] uppercase leading-none tracking-[var(--tracking-mono)] md:text-[length:var(--text-3xl)] md:leading-snug">
                       {item.label}
                     </span>
-                    <span className="text-sm text-text-faint">{item.description}</span>
+                    <span className="line-clamp-1 text-sm leading-snug text-text-faint md:line-clamp-none">
+                      {item.description}
+                    </span>
                   </Link>
                 </li>
               ))}

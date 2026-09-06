@@ -92,3 +92,32 @@ test("MENU carries the same border as its header siblings at 375px", async ({ pa
   expect(menuBorderWidth).not.toBe("0px");
   expect(menuBorderWidth).toBe(askBorderWidth);
 });
+
+test("the mobile menu opens directly into content, without a large empty band above it", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("header summary").click();
+
+  const panel = page.locator('nav[aria-label="Full site"]');
+  await expect(panel).toBeVisible();
+
+  const firstItemTop = await panel.locator("a").first().evaluate((el) => el.getBoundingClientRect().top);
+  expect(firstItemTop, "first nav item starts too far down the viewport").toBeLessThan(180);
+});
+
+test("the full mobile menu is compact enough that CONTACT and RESUME are within a short scroll", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("header summary").click();
+
+  const panel = page.locator('nav[aria-label="Full site"]');
+  await expect(panel).toBeVisible();
+
+  const scrollHeight = await panel.evaluate((el) => el.scrollHeight);
+  // Regression guard against reintroducing per-row bloat: the un-tightened
+  // menu measured well over 1400px of scrollHeight for these ten items;
+  // the tightened version should stay under 950px.
+  expect(scrollHeight, `menu content is ${scrollHeight}px tall`).toBeLessThan(950);
+
+  const resumeLink = panel.getByRole("link", { name: /RESUME/ });
+  await resumeLink.scrollIntoViewIfNeeded();
+  await expect(resumeLink).toBeVisible();
+});
