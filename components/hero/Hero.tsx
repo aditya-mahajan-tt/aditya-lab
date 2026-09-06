@@ -43,7 +43,7 @@ export function Hero() {
               href="#lab"
               data-cursor="interact"
               onClick={() => analytics.heroCtaClick("enter_lab")}
-              className="rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
+              className="inline-flex min-h-11 items-center rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
             >
               Enter the Lab
             </MagneticLink>
@@ -51,7 +51,7 @@ export function Hero() {
               href="/work"
               data-cursor="interact"
               onClick={() => analytics.heroCtaClick("explore_work")}
-              className="rounded-sm border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
+              className="inline-flex min-h-11 items-center rounded-sm border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
             >
               Explore Work
             </Link>

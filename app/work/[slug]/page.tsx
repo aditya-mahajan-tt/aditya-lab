@@ -165,12 +165,12 @@ export default async function ProjectPage({ params }: Params) {
       <nav aria-label="Project navigation" className="border-t border-border py-10">
         <div className="container-lab flex justify-between gap-6">
           {previous && (
-            <Link href={`/work/${previous.slug}`} className="label hover:text-accent">
+            <Link href={`/work/${previous.slug}`} className="label flex min-h-11 items-center hover:text-accent">
               ← Previous
             </Link>
           )}
           {next && (
-            <Link href={`/work/${next.slug}`} className="label ml-auto hover:text-accent">
+            <Link href={`/work/${next.slug}`} className="label ml-auto flex min-h-11 items-center hover:text-accent">
               Next →
             </Link>
           )}

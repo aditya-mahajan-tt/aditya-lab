@@ -52,7 +52,7 @@ export function Header() {
       <nav aria-label="Primary" className="container-lab relative flex items-center justify-between py-3">
         <Link
           href="/"
-          className="font-mono text-xs uppercase tracking-widest text-text transition-colors duration-[var(--duration-fast)] hover:text-accent"
+          className="flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-text transition-colors duration-[var(--duration-fast)] hover:text-accent"
         >
           Aditya Lab
         </Link>

@@ -16,3 +16,53 @@ test("check:placeholders --strict exits non-zero when data has an outstanding to
   // this assertion documents that the guard is armed, not that content is done.
   expect(run.status).not.toBe(0);
 });
+
+test("no interactive element renders under 44px in either dimension at 375px", async ({ page }) => {
+  const routes = ["/", "/work/gostops-gtm", "/resume", "/contact"];
+  const offenders: string[] = [];
+
+  for (const route of routes) {
+    await page.goto(route, { waitUntil: "networkidle" });
+
+    if (route === "/") {
+      await page.getByRole("button", { name: "Open Ask the Lab" }).click();
+      await expect(page.locator('dialog[aria-label="Ask the Lab"]')).toBeVisible();
+    }
+
+    const found = await page.evaluate(() => {
+      const isVisible = (el: Element) => {
+        // Content of a closed native <details> (e.g. NavOverlay's route-link
+        // panel) is not display:none — Chromium implements it via
+        // content-visibility:hidden, so getComputedStyle/getBoundingClientRect
+        // report misleading non-zero-ish dimensions for genuinely
+        // non-hit-testable content. checkVisibility() correctly reports false
+        // for it; fall back to the cruder checks where it's unsupported.
+        const checkable = el as unknown as { checkVisibility?: () => boolean };
+        if (typeof checkable.checkVisibility === "function" && !checkable.checkVisibility()) return false;
+        const style = getComputedStyle(el);
+        if (style.display === "none" || style.visibility === "hidden" || style.opacity === "0") return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      };
+      const bad: string[] = [];
+      for (const el of document.querySelectorAll("a, button, [role=button]")) {
+        if (!isVisible(el)) continue;
+        // sr-only elements (skip link, visually-hidden form controls paired
+        // with a visible label) are intentionally smaller than 44px until
+        // focused — not a tap-target defect.
+        if (getComputedStyle(el).position === "absolute" && el.className.toString().includes("sr-only")) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.height < 44 || rect.width < 44) {
+          bad.push(`${el.tagName.toLowerCase()} "${(el.textContent || "").trim().slice(0, 30)}" ${Math.round(rect.width)}x${Math.round(rect.height)}`);
+        }
+      }
+      return bad;
+    });
+
+    for (const f of found) offenders.push(`${route}: ${f}`);
+
+    if (route === "/") await page.keyboard.press("Escape");
+  }
+
+  expect(offenders, offenders.join("\n")).toEqual([]);
+});

@@ -19,7 +19,7 @@ export function Footer() {
             <li key={s.label}>
               <Link
                 href={s.url}
-                className="font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
+                className="flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
               >
                 {s.label}
               </Link>
@@ -28,7 +28,7 @@ export function Footer() {
           <li>
             <Link
               href="/contact"
-              className="font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
+              className="flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
             >
               Contact
             </Link>

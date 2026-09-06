@@ -29,7 +29,7 @@ export default function ResumePage() {
               href={site.resumePath}
               download
               event="resume_click"
-              className="mt-8 inline-block rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-200 hover:bg-accent hover:text-bg"
+              className="mt-8 inline-flex min-h-11 items-center rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-200 hover:bg-accent hover:text-bg"
             >
               Download PDF ↓
             </TrackedLink>
@@ -42,7 +42,7 @@ export default function ResumePage() {
             >
               <p className="p-6 text-text-muted">
                 Your browser can&rsquo;t display the PDF inline.{" "}
-                <Link href={site.resumePath} className="text-accent underline">
+                <Link href={site.resumePath} className="inline-flex min-h-11 items-center text-accent underline">
                   Download it instead
                 </Link>
                 .

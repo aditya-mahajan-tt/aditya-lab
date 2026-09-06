@@ -84,7 +84,7 @@ export function AskTheLab() {
               onClick={() => dialogRef.current?.close()}
               aria-label="Close Ask the Lab"
               data-cursor="interact"
-              className="flex h-8 w-8 items-center justify-center text-text-faint transition-colors duration-[var(--duration-fast)] hover:text-text"
+              className="flex h-11 w-11 items-center justify-center text-text-faint transition-colors duration-[var(--duration-fast)] hover:text-text"
             >
               ✕
             </button>

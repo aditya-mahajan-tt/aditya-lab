@@ -60,7 +60,7 @@ export default function HomePage() {
               <Link
                 href="/thinking"
                 data-cursor="interact"
-                className="mt-6 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline"
+                className="mt-6 inline-flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-accent hover:underline"
               >
                 See the framework →
               </Link>
@@ -81,7 +81,7 @@ export default function HomePage() {
               <Link
                 href="/about"
                 data-cursor="interact"
-                className="mt-6 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline"
+                className="mt-6 inline-flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-accent hover:underline"
               >
                 Full background →
               </Link>
@@ -98,7 +98,7 @@ export default function HomePage() {
               <MagneticLink
                 href="/contact"
                 data-cursor="interact"
-                className="mt-8 inline-block rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
+                className="mt-8 inline-flex min-h-11 items-center rounded-sm border border-accent px-6 py-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
               >
                 Start a conversation
               </MagneticLink>
