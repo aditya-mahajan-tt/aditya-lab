@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { layoutSerpentine, edgePoints, boundingViewBox } from "./diagramLayout";
+import { layoutSerpentine, layoutVertical, edgePoints, boundingViewBox } from "./diagramLayout";
 
 const NODE_W = 170;
 const NODE_H = 56;
 const LAYOUT = { nodeW: NODE_W, nodeH: NODE_H, maxCols: 6, colSpacing: 210, rowSpacing: 130 };
+const MOBILE_ROW_SPACING = 96;
 
 type Step = { label: string; detail?: string };
 
@@ -25,10 +26,13 @@ export function ProcessDiagram({ steps }: { steps: Step[] }) {
 
   const positions = layoutSerpentine(steps.length, LAYOUT);
   const { minX, minY, width, height } = boundingViewBox(positions, NODE_W, NODE_H);
+  const mobilePositions = layoutVertical(steps.length, { nodeW: NODE_W, nodeH: NODE_H, rowSpacing: MOBILE_ROW_SPACING });
+  const mobileBox = boundingViewBox(mobilePositions, NODE_W, NODE_H);
   const hasDetail = steps.some((s) => s.detail);
   const activeStep = active !== null ? steps[active] : undefined;
 
   return (
+    <div>
     <figure className="hidden md:block">
       <svg
         viewBox={`${minX} ${minY} ${width} ${height}`}
@@ -69,6 +73,7 @@ export function ProcessDiagram({ steps }: { steps: Step[] }) {
               className="group cursor-default"
               onMouseEnter={() => setActive(i)}
               onMouseLeave={() => setActive((a) => (a === i ? null : a))}
+              onClick={() => setActive((a) => (a === i ? null : i))}
             >
               <rect
                 x={pos.x - NODE_W / 2}
@@ -105,5 +110,79 @@ export function ProcessDiagram({ steps }: { steps: Step[] }) {
         </figcaption>
       )}
     </figure>
+
+    <figure className="mt-8 md:hidden">
+      <svg
+        viewBox={`${mobileBox.minX} ${mobileBox.minY} ${mobileBox.width} ${mobileBox.height}`}
+        role="img"
+        aria-label={`Process: ${steps.map((s) => s.label).join(" → ")}.`}
+        className="w-full"
+      >
+        <defs>
+          <marker id="pd-arrow-mobile" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--color-border-strong)" />
+          </marker>
+        </defs>
+
+        {mobilePositions.slice(1).map((pos, i) => {
+          const from = mobilePositions[i];
+          if (!from) return null;
+          const { x1, y1, x2, y2 } = edgePoints(from, pos, NODE_W, NODE_H);
+          return (
+            <line
+              key={`mobile-edge-${i}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="var(--color-border-strong)"
+              strokeWidth={1.5}
+              markerEnd="url(#pd-arrow-mobile)"
+            />
+          );
+        })}
+
+        {mobilePositions.map((pos, i) => {
+          const step = steps[i];
+          if (!step) return null;
+          return (
+            <g key={`mobile-${step.label}`} className="cursor-pointer" onClick={() => setActive((a) => (a === i ? null : i))}>
+              <rect
+                x={pos.x - NODE_W / 2}
+                y={pos.y - NODE_H / 2}
+                width={NODE_W}
+                height={NODE_H}
+                rx={4}
+                className="fill-surface stroke-border transition-colors duration-[var(--duration-fast)]"
+                stroke={active === i ? "var(--color-accent)" : undefined}
+                strokeWidth={1.5}
+              />
+              <text
+                x={pos.x - NODE_W / 2 + 10}
+                y={pos.y - NODE_H / 2 - 8}
+                className="fill-text-faint font-mono text-[10px] tracking-[0.08em]"
+              >
+                {String(i + 1).padStart(2, "0")}
+              </text>
+              <text
+                x={pos.x}
+                y={pos.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="fill-text font-mono text-[15px] uppercase tracking-[0.08em]"
+              >
+                {step.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      {hasDetail && (
+        <figcaption className="label mt-4 min-h-[1.5em]">
+          {activeStep?.detail ?? "Tap a stage for detail."}
+        </figcaption>
+      )}
+    </figure>
+  </div>
   );
 }

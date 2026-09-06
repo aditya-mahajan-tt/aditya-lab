@@ -121,3 +121,28 @@ test("the full mobile menu is compact enough that CONTACT and RESUME are within 
   await resumeLink.scrollIntoViewIfNeeded();
   await expect(resumeLink).toBeVisible();
 });
+
+test("the Strategy Wall diagram renders as a real SVG (not a text list) at 375px", async ({ page }) => {
+  await page.goto("/systems", { waitUntil: "networkidle" });
+
+  const strategySection = page.locator("section", { hasText: "Strategy Wall" }).first();
+  const mobileFigure = strategySection.locator("figure svg").last();
+  await expect(mobileFigure).toBeVisible();
+
+  const nodeCount = await mobileFigure.locator("rect").count();
+  expect(nodeCount).toBeGreaterThanOrEqual(6); // MARKET, SEGMENTATION, ICP, POSITIONING, CHANNEL, GTM
+
+  await mobileFigure.locator("g").first().click();
+  await expect(strategySection.locator("figcaption").last()).not.toHaveText("Tap a stage for detail.");
+});
+
+test("the goSTOPS process diagram renders on the project detail page at 375px", async ({ page }) => {
+  await page.goto("/work/gostops-gtm", { waitUntil: "networkidle" });
+
+  const figures = page.locator("figure");
+  const mobileFigure = figures.last();
+  await expect(mobileFigure.locator("svg")).toBeVisible();
+
+  const nodeCount = await mobileFigure.locator("rect").count();
+  expect(nodeCount).toBe(5); // PROBLEM, RESEARCH, SEGMENTATION, STRATEGY, EXECUTION
+});

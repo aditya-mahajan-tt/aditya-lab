@@ -28,6 +28,17 @@ export function layoutSerpentine(count: number, opts: LayoutOptions): NodePositi
   });
 }
 
+/** Single-column, top-to-bottom node layout for narrow viewports. */
+export function layoutVertical(
+  count: number,
+  opts: Pick<LayoutOptions, "nodeW" | "nodeH" | "rowSpacing">,
+): NodePosition[] {
+  return Array.from({ length: count }, (_, i) => ({
+    x: opts.nodeW / 2 + 10,
+    y: opts.nodeH / 2 + 10 + i * opts.rowSpacing,
+  }));
+}
+
 /** Endpoints on the facing edges of two node boxes, for a clean connecting line. */
 export function edgePoints(a: NodePosition, b: NodePosition, nodeW: number, nodeH: number) {
   if (a.y === b.y) {

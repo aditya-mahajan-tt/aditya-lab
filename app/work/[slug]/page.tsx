@@ -85,8 +85,12 @@ export default async function ProjectPage({ params }: Params) {
               <p className="label mb-6">PROCESS</p>
               <ProcessDiagram steps={project.process} />
             </RevealText>
-            {/* Real accessible content: works with the diagram hidden below `md`, with JS off, and for screen readers. */}
-            <ol className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs uppercase tracking-widest md:sr-only">
+            {/* Real accessible content, for screen readers and JS off. ProcessDiagram
+                now renders a real diagram at every breakpoint (a vertical stack below
+                `md`, the serpentine layout at `md` and up) rather than being hidden
+                below `md`, so this stays screen-reader-only everywhere — otherwise it
+                would duplicate the mobile diagram's content visibly. */}
+            <ol className="sr-only mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs uppercase tracking-widest">
               {project.process.map((step, i) => (
                 <li key={step.label} className="flex items-center gap-3">
                   <span className="text-text">{step.label}</span>
