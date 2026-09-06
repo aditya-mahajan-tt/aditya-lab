@@ -92,10 +92,49 @@ for (const [vpName, width, height] of VIEWPORTS) {
   for (const [name, route] of ROUTES) {
     await page.goto(`${BASE}${route}`, { waitUntil: "networkidle" });
 
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth + 1,
-    );
-    if (overflow) problems.push(`horizontal overflow: ${route} @ ${width}px`);
+    // body { overflow-x: hidden } (app/globals.css) clips
+    // documentElement.scrollWidth to the viewport width, so that check can
+    // never fire. A per-element bounding-box check is not affected by the
+    // clip — getBoundingClientRect() still reports an element's true
+    // position even when the page hides the resulting scrollbar.
+    const overflowingElements = await page.evaluate(() => {
+      const vw = window.innerWidth;
+      const offenders = [];
+      for (const el of document.querySelectorAll("body *")) {
+        const style = getComputedStyle(el);
+        if (style.display === "none" || style.visibility === "hidden") continue;
+        // el.getAttribute alone only catches an element that carries the
+        // attribute itself — aria-hidden="true" on a wrapper (e.g.
+        // CustomCursor's dot) hides its children from the accessibility
+        // tree too, but doesn't set the attribute on them. closest() walks
+        // the ancestor chain, matching how aria-hidden actually propagates.
+        //
+        // This also silences every other aria-hidden subtree on the site —
+        // notably the 3D canvas containers (three/LabCanvas.tsx,
+        // three/LabEnvironmentCanvas.tsx) and decorative icon SVGs — which
+        // is intended, not a side effect: those are each documented at
+        // their own definition as holding no unique content, with a plain
+        // DOM fallback carrying the real information, and app/globals.css's
+        // `overflow-x: hidden` already made anything inside them invisible
+        // to a real visitor regardless of this check. If a route ever adds
+        // an aria-hidden subtree that DOES carry visible layout risk, this
+        // exclusion would blind this check to it — worth remembering before
+        // reaching for aria-hidden on something wider than "decorative".
+        if (el.closest('[aria-hidden="true"]')) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) continue;
+        if (rect.right > vw + 1 || rect.left < -1) {
+          const cls = typeof el.className === "string" && el.className
+            ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
+            : "";
+          offenders.push(`${el.tagName.toLowerCase()}${cls} [${Math.round(rect.left)}, ${Math.round(rect.right)}]`);
+        }
+      }
+      return offenders;
+    });
+    for (const offender of overflowingElements) {
+      problems.push(`horizontal overflow: ${route} @ ${width}px — ${offender}`);
+    }
 
     // Trigger every ScrollTrigger reveal (once:true, so this is permanent
     // for the rest of this page's life) before capturing, then return to
