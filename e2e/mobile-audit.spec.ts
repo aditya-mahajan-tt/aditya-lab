@@ -66,3 +66,29 @@ test("no interactive element renders under 44px in either dimension at 375px", a
 
   expect(offenders, offenders.join("\n")).toEqual([]);
 });
+
+test("the command palette trigger is hidden at 375px but Ctrl+K still opens it", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("button", { name: "Open command palette" })).toBeHidden();
+
+  await page.getByRole("button", { name: "Open Ask the Lab" }).focus();
+  await page.keyboard.press("Control+k");
+  await expect(page.locator('dialog[aria-label="Command palette"]')).toBeVisible();
+});
+
+test("MENU carries the same border as its header siblings at 375px", async ({ page }) => {
+  await page.goto("/");
+  // borderStyle is "solid" on every element in this Tailwind v4 build
+  // (preflight sets border: 0 solid globally) regardless of whether the
+  // `border` utility is applied — it can't tell "has a border" from
+  // "doesn't". borderTopWidth is the property Tailwind's `border` utility
+  // actually changes (0px -> 1px), so it's the one that can fail if the
+  // border is ever removed.
+  const menuBorderWidth = await page.locator("header summary").evaluate((el) => getComputedStyle(el).borderTopWidth);
+  const askBorderWidth = await page
+    .getByRole("button", { name: "Open Ask the Lab" })
+    .evaluate((el) => getComputedStyle(el).borderTopWidth);
+  expect(menuBorderWidth).not.toBe("0px");
+  expect(menuBorderWidth).toBe(askBorderWidth);
+});
