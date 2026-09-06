@@ -2,6 +2,8 @@ import { about } from "@/data/about";
 import { site } from "@/data/site";
 import { skillGroups } from "@/data/skills";
 import { thinking } from "@/data/thinking";
+import { experience } from "@/data/experience";
+import { education } from "@/data/education";
 import { getAllProjects, getAllExperiments } from "@/data/queries";
 import { isPlaceholder, isDraft } from "@/data/schema";
 
@@ -104,6 +106,42 @@ function buildExperimentsSection(): string | null {
   return entries.length > 0 ? entries.join("\n\n") : null;
 }
 
+function buildExperienceSection(): string | null {
+  const entries = experience
+    .map((e) => {
+      const bullets = e.bullets.map((b) => field(b)).filter((b): b is string => !!b);
+      const highlights = e.highlights
+        .map((h) => field(h.label) && `${h.value} — ${field(h.label)}`)
+        .filter((h): h is string => !!h);
+      return section(`Experience: ${e.role} at ${e.company}`, [
+        `Dates: ${e.start} to ${e.end ?? "Present"}`,
+        e.location ? `Location: ${e.location}` : null,
+        ...bullets,
+        e.tools.length > 0 ? `Tools: ${e.tools.join(", ")}` : null,
+        ...highlights,
+      ]);
+    })
+    .filter((e): e is string => !!e);
+  return entries.length > 0 ? entries.join("\n\n") : null;
+}
+
+function buildEducationSection(): string | null {
+  const entries = education
+    .map((e) => {
+      const highlights = e.highlights
+        .map((h) => field(h.label) && `${h.value} — ${field(h.label)}`)
+        .filter((h): h is string => !!h);
+      return section(`Education: ${e.program} at ${e.institution}`, [
+        `Dates: ${e.start} to ${e.end ?? "Present"}`,
+        e.location ? `Location: ${e.location}` : null,
+        e.note ? `Note: ${e.note}` : null,
+        ...highlights,
+      ]);
+    })
+    .filter((e): e is string => !!e);
+  return entries.length > 0 ? entries.join("\n\n") : null;
+}
+
 function buildThinkingSection(): string | null {
   const steps = thinking.steps
     .map((s) => field(s.body) && `${s.label}: ${field(s.body)}`)
@@ -128,6 +166,8 @@ function buildKnowledgeText(): string {
     section("Site", [`Name: ${site.name}`, `Title: ${site.title}`, `Description: ${site.description}`]),
     buildAboutSection(),
     buildSkillsSection(),
+    buildExperienceSection(),
+    buildEducationSection(),
     buildProjectsSection(),
     buildExperimentsSection(),
     buildThinkingSection(),
