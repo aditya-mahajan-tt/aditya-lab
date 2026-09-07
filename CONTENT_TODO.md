@@ -6,26 +6,12 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**51 missing, 6 unreviewed drafts.**
+**31 missing, 0 unreviewed drafts.**
 
 ## data/build.ts
 
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 7
-- [ ] `[X_REQUIRED]` — line 9
-- [ ] `[BUILD_MODE_WHY_REQUIRED]` — line 12
-- [ ] `[BUILD_MODE_BROKE_1_REQUIRED]` — line 62
-- [ ] `[BUILD_MODE_BROKE_2_REQUIRED]` — line 63
-- [ ] `[BUILD_MODE_BROKE_3_REQUIRED]` — line 64
-- [ ] `[BUILD_MODE_LEARNED_REQUIRED]` — line 67
-
-## data/experiments.ts
-
-- [ ] `[EXPERIMENT_001_TITLE_REQUIRED]` — line 14
-- [ ] `[EXPERIMENT_001_SUMMARY_REQUIRED]` — line 20
-- [ ] `[EXPERIMENT_001_HYPOTHESIS_REQUIRED]` — line 21
-- [ ] `[EXPERIMENT_001_BUILD_REQUIRED]` — line 22
-- [ ] `[EXPERIMENT_001_RESULT_REQUIRED]` — line 23
-- [ ] `[EXPERIMENT_001_LEARNING_REQUIRED]` — line 24
+- [ ] `[BUILD_MODE_BROKE_3_REQUIRED]` — line 68
+- [ ] `[BUILD_MODE_LEARNED_REQUIRED]` — line 71
 
 ## data/projects.ts
 
@@ -58,24 +44,3 @@
 - [ ] `[PROJECT_004_APPROACH_REQUIRED]` — line 139
 - [ ] `[PROJECT_004_EXECUTION_REQUIRED]` — line 140
 - [ ] `[PROJECT_004_LEARNING_1_REQUIRED]` — line 141
-
-## data/skills.ts
-
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 19
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 33
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 45
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 61
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 73
-
-## data/thinking.ts
-
-- [ ] `[THINKING_INTRO_REQUIRED]` — line 6
-- [ ] `[THINKING_OBSERVE_REQUIRED]` — line 8
-- [ ] `[THINKING_QUESTION_REQUIRED]` — line 9
-- [ ] `[THINKING_UNDERSTAND_REQUIRED]` — line 10
-- [ ] `[THINKING_FRAME_REQUIRED]` — line 11
-- [ ] `[THINKING_BUILD_REQUIRED]` — line 12
-- [ ] `[THINKING_TEST_REQUIRED]` — line 13
-- [ ] `[THINKING_LEARN_REQUIRED]` — line 14
-- [ ] `[THINKING_ITERATE_REQUIRED]` — line 15
-- [ ] `[THINKING_WORKED_EXAMPLE_REQUIRED]` — line 17

@@ -4,12 +4,16 @@ import { BuildModeSchema } from "./schema";
  * CONTENT_INTAKE.md §I. `stack`, `architecture` and `decisions` describe the
  * repo itself — objective, verifiable against package.json and
  * ARCHITECTURE.md's own stated rationale, so they're written directly rather
- * than routed through the [AI_DRAFT_REVIEW] marker (see data/schema.ts).
+ * than routed through the draft-review marker (see data/schema.ts's
+ * DRAFT_PATTERN comment).
  * `why`, `whatBroke` and `whatLearned` are personal reflection that must be
- * Aditya's own words — CONTENT_INTAKE.md §I1–I3 — left as [X_REQUIRED].
+ * Aditya's own words — CONTENT_INTAKE.md §I1–I3. `why` and two of three
+ * `whatBroke` entries are filled in (approved 2026-09-07); the third
+ * `whatBroke` entry and `whatLearned` are still open — Aditya deferred both
+ * deliberately rather than have them drafted.
  */
 export const buildMode = BuildModeSchema.parse({
-  why: "[BUILD_MODE_WHY_REQUIRED]",
+  why: "This site exists to prove the AI × Product × Business claim by being built well, not by asserting it in prose — every layer, from the data model to the 3D core, is itself the demonstration.",
 
   stack: [
     { id: "FRONTEND", tools: ["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS"] },
@@ -59,8 +63,8 @@ export const buildMode = BuildModeSchema.parse({
   ],
 
   whatBroke: [
-    "[BUILD_MODE_BROKE_1_REQUIRED]",
-    "[BUILD_MODE_BROKE_2_REQUIRED]",
+    "3D/R3F integration — bridging state across the React DOM and the React Three Fiber reconciler boundary took real trial and error before landing on a single flat Zustand store.",
+    "GSAP/ScrollTrigger fighting React's render lifecycle — animation timing and cleanup needed deliberate handling to avoid stale triggers on re-render.",
     "[BUILD_MODE_BROKE_3_REQUIRED]",
   ],
 

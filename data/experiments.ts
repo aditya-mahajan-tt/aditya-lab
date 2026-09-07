@@ -11,17 +11,22 @@ const raw = [
     id: "001",
     slug: "ai-lead-generation-engine",
     planes: ["ai", "product"],
-    title: "[EXPERIMENT_001_TITLE_REQUIRED]",
+    title: "AI Lead Generation Engine",
     category: ["AI", "Automation"],
     year: "2026",
     order: 1,
     type: "AI",
     status: "PROTOTYPE",
-    summary: "[EXPERIMENT_001_SUMMARY_REQUIRED]",
-    hypothesis: "[EXPERIMENT_001_HYPOTHESIS_REQUIRED]",
-    build: "[EXPERIMENT_001_BUILD_REQUIRED]",
-    result: "[EXPERIMENT_001_RESULT_REQUIRED]",
-    learning: "[EXPERIMENT_001_LEARNING_REQUIRED]",
+    summary:
+      "An AI agent that sources, qualifies and drafts outreach to leads automatically, cutting manual prospecting time.",
+    hypothesis:
+      "An LLM agent could do first-pass lead sourcing and qualification as well as a human, in a fraction of the time.",
+    build:
+      "A custom Python script calling an LLM API directly — no no-code workflow tool, just code wired straight to the model — to source, qualify and draft outreach to leads.",
+    result:
+      "Noticeably cut the time spent on manual lead prospecting and outreach drafting compared to doing it by hand — enough to prove the concept, without a formal before/after measurement.",
+    learning:
+      "AI agents are excellent at the first-pass grind — sourcing, qualifying — but still need a human in the loop for judgment calls. The win is time saved, not full replacement.",
     interactive: false,
     tools: [],
     media: [],
