@@ -236,3 +236,33 @@ test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bo
   const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
   await expect(kensaraLink).toHaveAttribute("tabindex", "0"); // spans product+business — stays visible/tabbable
 });
+
+test("every multi-plane body stays undimmed and tabbable on all three mobile tabs", async ({ page }) => {
+  // Regression guard: an earlier version of the per-body dimmed formula
+  // (`!body.planes.includes(activePlane)`) only exempted a spanning body
+  // from dimming when the ACTIVE tab happened to be one of its OWN planes —
+  // so a 2-plane body still dimmed (and lost its tab stop) on the one tab
+  // outside its plane set. Only Turbotork (spanning all three planes)
+  // accidentally satisfied "multi-plane bodies remain visible on every
+  // tab" by coincidence. This checks all four multi-plane bodies across
+  // all three tabs, per docs/superpowers/plans/2026-09-07-orbital-hero.md.
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const spanningHrefs = [
+    "/about#experience-turbotork", // ai + product + business
+    "/work/kensara-ai-gtm", // business + product
+    "/work/adda-d2c", // product + business
+    "/experiments/ai-lead-generation-engine", // ai + product
+  ];
+
+  for (const tabName of ["AI", "PRODUCT", "BUSINESS"]) {
+    const tab = page.getByRole("tab", { name: tabName });
+    await tab.click();
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+
+    for (const href of spanningHrefs) {
+      const link = page.locator(`.core-dom a[href="${href}"]`);
+      await expect(link, `${href} should stay tabbable on the ${tabName} tab`).toHaveAttribute("tabindex", "0");
+    }
+  }
+});

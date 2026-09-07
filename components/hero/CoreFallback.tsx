@@ -100,7 +100,7 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
           const radius = body.ring === "inner" ? INNER_RADIUS : OUTER_RADIUS;
           const { x, y } = degToXY(angle.deg, radius);
           const active = activeBodyId === body.id;
-          const dimmed = activePlane !== null && !body.planes.includes(activePlane);
+          const dimmed = activePlane !== null && !angle.spanning && !body.planes.includes(activePlane);
           const size = angle.spanning ? 14 : 10;
 
           return (
