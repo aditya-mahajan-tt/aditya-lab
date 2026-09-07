@@ -136,7 +136,7 @@ export function ChatWindow({
           e.preventDefault();
           void submit(value);
         }}
-        className="border-t border-border p-3"
+        className="border-t border-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
       >
         <label htmlFor="ask-the-lab-input" className="sr-only">
           Ask the Lab a question
