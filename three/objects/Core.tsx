@@ -103,9 +103,16 @@ export function Core({
   }, [materials]);
 
   /**
-   * Positions come from the same pure layout module the SVG layer uses — the
-   * screen convention's y maps to this group's z, so a body sits at the same
-   * clock position in both layers.
+   * Positions come from the same pure layout module the SVG layer uses
+   * (lib/heroOrbitalLayout), so a body's underlying *angle* is identical in
+   * both layers — the screen convention's y becomes this group's z.
+   *
+   * That is a shared-math claim, not a shared-pixels one. The SVG draws its
+   * circle face-on; here the same angles lie in the horizontal ground plane,
+   * which the camera sees near-edge-on. A body is therefore not at the same
+   * on-screen position in the two layers, and it is not meant to be — what
+   * carries across the cross-fade is the assembly's size and silhouette, and
+   * the fact that both layers order the bodies by one set of angles.
    */
   const nodeLayout = useMemo(() => {
     const angleById = new Map(layoutBodyAngles(bodies).map((a) => [a.id, a]));

@@ -45,13 +45,18 @@ export function CoreStage() {
   const activeBody = useMemo(() => bodies.find((b) => b.id === activeBodyId) ?? null, [bodies, activeBodyId]);
 
   /**
-   * The plane tabs are `md:hidden` (components/hero/OrbitalTabs) and
-   * CoreFallback's dimming is CSS-gated at the same breakpoint, so on desktop
-   * `activePlane` keeps its "ai" default forever and means nothing. The 3D
-   * layer cannot read it that way: "face the selected plane at the camera"
-   * would pin the assembly at the AI angle and stop the idle rotation
-   * outright. Desktop therefore gets `null` — every plane faces the camera in
-   * turn, as before — and only the phone layout drives the rotation.
+   * The plane tabs are `md:hidden` (components/hero/OrbitalTabs), so above
+   * `md` there is no way to change `activePlane` and it keeps its "ai"
+   * default forever — a selection nobody made. Both consumers therefore get
+   * `null` on desktop rather than the raw value:
+   *
+   * - the 3D layer, because "face the selected plane at the camera" would
+   *   pin the assembly at the AI angle and stop the idle rotation outright;
+   * - CoreFallback, because its per-body `dimmed` drives the *visual*
+   *   dimming (CSS-gated by `md:opacity-100`, so harmless) but also
+   *   `tabIndex`, which is a real prop and not gated by anything — passing
+   *   the raw value left 6 of the 11 fully visible desktop bodies at
+   *   `tabindex="-1"`.
    */
   const [planeGated, setPlaneGated] = useState(false);
   useEffect(() => {
@@ -144,43 +149,53 @@ export function CoreStage() {
   const live = phase === "live";
 
   return (
-    <div ref={stageRef} className="relative mx-auto w-full max-w-[420px]">
-      {/* Lifted above the 3D layer explicitly: the canvas overlay below is
-          `absolute inset-0` over this whole stage and takes pointer events,
-          so once it mounts it swallows every tap meant for the tabs — which
-          is exactly when the tabs matter most, since they also drive the 3D
-          layer's "face the selected plane" rotation. */}
+    <div ref={stageRef} className="mx-auto w-full max-w-[420px]">
+      {/* Lifted above the 3D layer explicitly: the canvas overlay takes
+          pointer events, so any stacking accident that put it over the tabs
+          would swallow every tap meant for them — which is exactly when the
+          tabs matter most, since they also drive the 3D layer's "face the
+          selected plane" rotation. */}
       <div className="relative" style={{ zIndex: "var(--z-content)" }}>
         <OrbitalTabs active={activePlane} onChange={setActivePlane} />
       </div>
-      <CoreFallback
-        suppressed={live}
-        bodies={bodies}
-        activePlane={activePlane}
-        activeBodyId={activeBodyId}
-        onBodyHover={setActiveBodyId}
-      />
 
-      {tier && near && (phase === "mounting" || live) && (
-        <CanvasBoundary onError={handleBoundaryError}>
-          <div
-            className="pointer-events-auto absolute inset-0 opacity-0 transition-opacity duration-[var(--duration-slow)] ease-[var(--ease-out-lab)] data-[ready=true]:opacity-100"
-            data-ready={live}
-            style={{ zIndex: "var(--z-canvas)" }}
-          >
-            <LabCanvas
-              tier={tier}
-              onReady={() => setPhase("live")}
-              onFailure={abandon}
-              onTierChange={(next) => next !== "low" && setTier(next)}
-              bodies={bodies}
-              activeBodyId={activeBodyId}
-              activePlane={planeGated ? activePlane : null}
-              onBodyHover={setActiveBodyId}
-            />
-          </div>
-        </CanvasBoundary>
-      )}
+      {/* The positioning parent for the canvas overlay is this wrapper, not
+          the stage: it holds the SVG core and nothing else, so `inset-0`
+          resolves to exactly the SVG's box. three/objects/Core depends on
+          that — the 3D core is the same object at the same size as the SVG,
+          and CameraController frames it with a fixed vertical FOV, so a
+          taller box (the tabs above, the caption below) would silently
+          render the 3D core larger than the SVG it cross-fades with. */}
+      <div className="relative">
+        <CoreFallback
+          suppressed={live}
+          bodies={bodies}
+          activePlane={planeGated ? activePlane : null}
+          activeBodyId={activeBodyId}
+          onBodyHover={setActiveBodyId}
+        />
+
+        {tier && near && (phase === "mounting" || live) && (
+          <CanvasBoundary onError={handleBoundaryError}>
+            <div
+              className="pointer-events-auto absolute inset-0 opacity-0 transition-opacity duration-[var(--duration-slow)] ease-[var(--ease-out-lab)] data-[ready=true]:opacity-100"
+              data-ready={live}
+              style={{ zIndex: "var(--z-canvas)" }}
+            >
+              <LabCanvas
+                tier={tier}
+                onReady={() => setPhase("live")}
+                onFailure={abandon}
+                onTierChange={(next) => next !== "low" && setTier(next)}
+                bodies={bodies}
+                activeBodyId={activeBodyId}
+                activePlane={planeGated ? activePlane : null}
+                onBodyHover={setActiveBodyId}
+              />
+            </div>
+          </CanvasBoundary>
+        )}
+      </div>
 
       {failed && (
         <p role="status" className="label mt-4 text-center text-text-faint">
@@ -194,7 +209,7 @@ export function CoreStage() {
             {activeBody.label} — <Fill value={activeBody.detail} />
           </>
         ) : (
-          "Hover or tap a body for detail."
+          "Hover a body for detail — tap to open."
         )}
       </p>
     </div>

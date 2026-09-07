@@ -101,7 +101,13 @@ export const getHeroBodies = (): HeroBody[] => {
     .filter((entry): entry is typeof entry & { planes: PlaneValue[] } => Boolean(entry.planes?.length))
     .map((entry) => ({
       id: `experience-${entry.id}`,
-      label: entry.company,
+      // A short display label, not `entry.company`: data/experience.ts holds
+      // the full legal name ("Turbotork Technologies Pvt. Ltd.") because the
+      // /about timeline needs it, but in the hero it towers over the other
+      // bodies' names ("goSTOPS", "Kensara AI") and reflows the caption row.
+      // Hardcoded rather than generalised: exactly one experience entry is
+      // ever selected into the hero.
+      label: "Turbotork",
       detail: entry.role,
       ring: "outer",
       planes: entry.planes,
