@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CanvasBoundary } from "@/components/hero/CanvasBoundary";
 import { CoreFallback } from "@/components/hero/CoreFallback";
+import { Fill } from "@/components/ui/Placeholder";
+import { getHeroBodies } from "@/data/queries";
 import { analytics } from "@/lib/analytics/events";
 import { detectCapability, resolveTier, type FallbackReason, type QualityTier } from "@/lib/quality";
 import { useLabStore } from "@/lib/store";
@@ -33,7 +35,11 @@ export function CoreStage() {
   const [tier, setTier] = useState<Exclude<QualityTier, "low"> | null>(null);
   const [failed, setFailed] = useState(false);
   const [near, setNear] = useState(false);
+  const [activeBodyId, setActiveBodyId] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+
+  const bodies = useMemo(() => getHeroBodies(), []);
+  const activeBody = useMemo(() => bodies.find((b) => b.id === activeBodyId) ?? null, [bodies, activeBodyId]);
 
   /**
    * On a phone the core sits below the fold. Downloading a quarter-megabyte
@@ -117,7 +123,7 @@ export function CoreStage() {
 
   return (
     <div ref={stageRef} className="relative mx-auto w-full max-w-[420px]">
-      <CoreFallback suppressed={live} />
+      <CoreFallback suppressed={live} bodies={bodies} activeBodyId={activeBodyId} onBodyHover={setActiveBodyId} />
 
       {tier && near && (phase === "mounting" || live) && (
         <CanvasBoundary onError={handleBoundaryError}>
@@ -141,6 +147,16 @@ export function CoreStage() {
           3D EXPERIENCE UNAVAILABLE — SWITCHING TO LIGHT MODE
         </p>
       )}
+
+      <p className="label mt-4 min-h-[2.5em] text-center text-text-faint">
+        {activeBody ? (
+          <>
+            {activeBody.label} — <Fill value={activeBody.detail} />
+          </>
+        ) : (
+          "Hover or tap a body for detail."
+        )}
+      </p>
     </div>
   );
 }

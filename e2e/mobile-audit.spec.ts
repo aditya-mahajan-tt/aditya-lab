@@ -171,3 +171,48 @@ test("every orbital hero body is a real, working link even with JavaScript disab
 
   await context.close();
 });
+
+test("the SVG orbital hero renders 11 real, focusable, distinctly-positioned bodies", async ({ page }) => {
+  // The stage's idle `core-rotate` animation (48s/rotation, globals.css)
+  // never stops moving, which makes Playwright's hover-stability check
+  // spin forever waiting for the target to settle. Freezing motion here
+  // mirrors the same fix already used elsewhere in this suite
+  // (e2e/smoke.spec.ts, e2e/webgl.spec.ts) for the identical animation —
+  // globals.css's prefers-reduced-motion rule sets animation-duration to
+  // ~0, so this only removes motion, not the geometry under test.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const stageLinks = page.locator(".core-dom a");
+  await expect(stageLinks).toHaveCount(11);
+
+  // Turbotork spans all three planes — layoutBodyAngles lands it at 0°,
+  // the point equidistant from AI (-90°), PRODUCT (30°) and BUSINESS
+  // (150°). Confirm its aria-label marks it as spanning.
+  const turbotorkLink = page.locator('.core-dom a[href="/about#experience-turbotork"]');
+  await expect(turbotorkLink).toHaveAttribute("aria-label", /spans multiple planes/);
+
+  // Hovering the Kensara AI body (business+product) updates the caption row.
+  // Target the body's marker <rect> specifically, not the wrapping <a>'s
+  // full bounding box: that box also spans the thin connector <line> back
+  // to the core, and its geometric center can land on unpainted SVG space
+  // (SVG child shapes only accept pointer events over actual paint), which
+  // would make Playwright report the ancestor <svg> as intercepting.
+  // .last() picks the small visible marker rect, not the invisible,
+  // larger 44px-minimum hit-target rect that precedes it in the DOM.
+  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  await kensaraLink.locator("rect").last().hover();
+  // The sr-only accessible link list (Task 4) also contains "Kensara AI"
+  // text, so match on the em-dash the caption row alone renders, not a
+  // bare substring.
+  await expect(page.getByText("Kensara AI —", { exact: false })).toBeVisible();
+});
+
+test("every SVG orbital body remains keyboard-reachable and shows a visible focus state", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+  const firstBody = page.locator(".core-dom a").first();
+  await firstBody.focus();
+  await expect(firstBody).toBeFocused();
+  const outline = await firstBody.evaluate((el) => getComputedStyle(el).outlineStyle);
+  expect(outline).not.toBe("none");
+});
