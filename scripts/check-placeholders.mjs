@@ -9,7 +9,13 @@
  *  - Development: reports them and regenerates CONTENT_TODO.md. Exit 0.
  *  - Production (NODE_ENV=production or --strict): FAILS. Exit 1.
  *
- * See CLAUDE.md §7. Neither state must ever reach the live site.
+ * See CLAUDE.md §7. Neither state should normally reach the live site.
+ *
+ * Escape hatch: setting ALLOW_PLACEHOLDERS_IN_PROD=1 (as a Vercel project
+ * env var, or locally) relaxes the production/--strict failure back to a
+ * warning, for a deliberate, temporary "ship what's real, backfill the
+ * rest live" window — Aditya's explicit call, not a default. Unset it once
+ * real content lands so the gate goes back to blocking.
  */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -24,7 +30,9 @@ const TOKENS = [
 // queries.ts is pure logic, so neither should ever be scanned for them.
 const EXCLUDE = new Set(["schema.ts", "queries.ts"]);
 
-const strict = process.argv.includes("--strict") || process.env.NODE_ENV === "production";
+const strictRequested = process.argv.includes("--strict") || process.env.NODE_ENV === "production";
+const override = process.env.ALLOW_PLACEHOLDERS_IN_PROD === "1";
+const strict = strictRequested && !override;
 
 const findings = [];
 
@@ -91,4 +99,11 @@ if (strict) {
   process.exit(1);
 }
 
-console.log("(dev mode — not failing. Run with --strict to enforce.)\n");
+if (strictRequested && override) {
+  console.warn(
+    "⚠ ALLOW_PLACEHOLDERS_IN_PROD=1 is set — shipping the above to production anyway. " +
+      "This is meant to be temporary; unset it once real content lands so this gate blocks again.\n",
+  );
+} else {
+  console.log("(dev mode — not failing. Run with --strict to enforce.)\n");
+}
