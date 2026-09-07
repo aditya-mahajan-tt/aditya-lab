@@ -174,9 +174,13 @@ export function Core({
     if (rotationRef.current) {
       if (activePlane) {
         // Mobile: rotate the assembly so the selected plane's center angle
-        // faces the camera (which looks down -Z, per CameraController — so
-        // "facing the camera" means cancelling the plane's own local angle).
-        const targetY = -(HERO_PLANE_CENTER_DEG[activePlane] * Math.PI) / 180;
+        // faces the camera. A node at plane-center angle theta sits at local
+        // (cos theta, 0, sin theta); rotating the group by phi around Y moves
+        // it to effective angle theta - phi (standard Y-axis rotation). The
+        // camera sits at +Z looking at the origin (CameraController), so
+        // "facing the camera" means that effective angle should be 90 deg —
+        // solving theta - phi = 90 for phi gives phi = theta - 90.
+        const targetY = ((HERO_PLANE_CENTER_DEG[activePlane] - 90) * Math.PI) / 180;
         rotationRef.current.rotation.y = MathUtils.damp(rotationRef.current.rotation.y, targetY, FACE_PLANE_DAMPING, step);
       } else {
         // Desktop: the existing idle rotation. Expanded, the machine spins up
