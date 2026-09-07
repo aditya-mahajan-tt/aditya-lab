@@ -25,11 +25,25 @@ export type BodyAngle = { id: string; deg: number; spanning: boolean };
 export function layoutBodyAngles(bodies: LayoutInput[], spreadDeg = 26): BodyAngle[] {
   const baseDeg = new Map<string, number>();
 
+  // Below this magnitude, x/y are floating-point noise from summing
+  // vectors that should mathematically cancel to exactly zero (e.g. a body
+  // spanning all three evenly-spaced planes) — not a real directional
+  // signal. atan2 of that noise is deterministic but semantically
+  // meaningless (it would land near one arbitrary sector rather than at
+  // the intended "equidistant from every plane" position), so treat
+  // near-zero magnitude as the canonical 0° "belongs to every plane
+  // equally" angle instead. The threshold sits comfortably above the
+  // float-noise floor (~1e-16) and comfortably below the smallest real
+  // multi-plane magnitude (a two-plane span's mean vector has magnitude
+  // cos(60°) = 0.5).
+  const ZERO_VECTOR_EPSILON = 1e-6;
+
   for (const body of bodies) {
     const radians = body.planes.map((plane) => (HERO_PLANE_CENTER_DEG[plane] * Math.PI) / 180);
     const x = radians.reduce((sum, r) => sum + Math.cos(r), 0) / radians.length;
     const y = radians.reduce((sum, r) => sum + Math.sin(r), 0) / radians.length;
-    baseDeg.set(body.id, (Math.atan2(y, x) * 180) / Math.PI);
+    const magnitude = Math.hypot(x, y);
+    baseDeg.set(body.id, magnitude < ZERO_VECTOR_EPSILON ? 0 : (Math.atan2(y, x) * 180) / Math.PI);
   }
 
   const groupKey = (body: LayoutInput) => [...body.planes].sort().join("+");
