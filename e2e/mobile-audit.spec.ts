@@ -146,3 +146,28 @@ test("the goSTOPS process diagram renders on the project detail page at 375px", 
   const nodeCount = await mobileFigure.locator("rect").count();
   expect(nodeCount).toBe(5); // PROBLEM, RESEARCH, SEGMENTATION, STRATEGY, EXECUTION
 });
+
+test("every orbital hero body is a real, working link even with JavaScript disabled", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 375, height: 812 } });
+  const page = await context.newPage();
+  await page.goto("/");
+
+  // 5 skill groups + 4 projects + 1 experiment + 1 selected experience entry.
+  const links = page.locator("h2:has-text('What Aditya works on, by discipline') ~ * a, h2:has-text('What Aditya works on, by discipline') + * a");
+  const hrefs = await page.evaluate(() => {
+    const heading = [...document.querySelectorAll("h2")].find((h) => h.textContent === "What Aditya works on, by discipline");
+    const container = heading?.parentElement;
+    return container ? [...container.querySelectorAll("a")].map((a) => a.getAttribute("href")) : [];
+  });
+
+  expect(hrefs.length).toBe(11);
+  expect(hrefs).toContain("/systems#neural-heading");
+  expect(hrefs).toContain("/work/gostops-gtm");
+  expect(hrefs).toContain("/work/kensara-ai-gtm");
+  expect(hrefs).toContain("/work/adda-d2c");
+  expect(hrefs).toContain("/work/cricket-game");
+  expect(hrefs).toContain("/experiments/ai-lead-generation-engine");
+  expect(hrefs).toContain("/about#experience-turbotork");
+
+  await context.close();
+});

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { about } from "@/data/about";
 import { CoreStage } from "@/components/hero/CoreStage";
+import { OrbitalBodyList } from "@/components/hero/OrbitalBodyList";
 import { ScrambleText } from "@/components/effects/ScrambleText";
 import { MagneticLink } from "@/components/effects/MagneticButton";
 import { analytics } from "@/lib/analytics/events";
+import { getHeroBodies } from "@/data/queries";
 
 /**
  * PLAN.md Phase 5/6. The headline is immediately visible (it's the LCP
@@ -59,6 +61,7 @@ export function Hero() {
         </div>
 
         <div className="hero-reveal" style={{ animationDelay: "450ms" }}>
+          <OrbitalBodyList bodies={getHeroBodies()} />
           <CoreStage />
         </div>
       </div>
