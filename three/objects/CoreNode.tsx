@@ -10,11 +10,13 @@ import type { LabTokens } from "@/three/materials/tokens";
  * One data node and the connector tying it back to the core (PLAN.md Phase
  * 9: "node illumination on hover").
  *
- * The node carries no information — it lights up and the whole assembly
- * responds, which is the point: the object demonstrates that it is a
- * machine rather than a picture. Nothing here is content, so nothing here
- * needs a DOM equivalent beyond the one CoreFallback already draws
- * (CLAUDE.md §3.5).
+ * Since the orbital rewrite each node is one real body from `getHeroBodies`
+ * (Task 2): hovering it names it in the caption row, clicking it routes.
+ * The node still holds no information of its own — its label, detail and
+ * href all live in `/data` and are drawn as real anchors by
+ * components/hero/OrbitalBodyList (layer 0) and components/hero/CoreFallback
+ * (layer 1), which is what lets this canvas stay `aria-hidden` and keeps 3D
+ * from ever being the only route to content (CLAUDE.md §3.5).
  *
  * The connector is a real cylinder, not a `Line` — WebGL caps line width at
  * ~1 physical pixel on almost every driver regardless of `linewidth`, which
@@ -25,7 +27,7 @@ import type { LabTokens } from "@/three/materials/tokens";
  * same zero-buffer-rewrite trick the old Line used, just on a mesh.
  */
 
-const REST_RADIUS = 1.05;
+/** Extra distance every node travels outward when the assembly is expanded. */
 const EXPANDED_EXTRA = 0.3;
 const DAMPING = 6;
 
@@ -35,14 +37,23 @@ const EXPANDED_EMISSIVE = 1.3;
 type Props = {
   /** Unit direction from the core. */
   direction: readonly [number, number, number];
+  /** Rest distance from the core — inner-ring bodies sit closer than outer-ring ones. */
+  radius: number;
   tokens: LabTokens;
   /** Shared, damped 0→1 expansion driven by Core. */
   expansion: MutableRefObject<number>;
+  /**
+   * Highlighted from outside — the caption row's current body, set by a
+   * desktop hover on either layer or a mobile tap. Lights the node exactly
+   * as a live pointer hover does, so "which body is highlighted" has one
+   * source of truth across all three layers.
+   */
+  active: boolean;
   onHoverChange: (hovered: boolean) => void;
   onSelect: () => void;
 };
 
-export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect }: Props) {
+export function CoreNode({ direction, radius, tokens, expansion, active, onHoverChange, onSelect }: Props) {
   const [hovered, setHovered] = useState(false);
 
   const material = useMemo(() => createMetalMaterial(tokens), [tokens]);
@@ -79,10 +90,10 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 1 / 30);
-    const radius = REST_RADIUS + expansion.current * EXPANDED_EXTRA;
+    const dist = radius + expansion.current * EXPANDED_EXTRA;
 
     if (meshRef.current) {
-      meshRef.current.position.set(direction[0] * radius, direction[1] * radius, direction[2] * radius);
+      meshRef.current.position.set(direction[0] * dist, direction[1] * dist, direction[2] * dist);
 
       const targetScale = hovered ? 1.35 : 1;
       const scale = MathUtils.damp(meshRef.current.scale.x, targetScale, DAMPING, step);
@@ -90,17 +101,17 @@ export function CoreNode({ direction, tokens, expansion, onHoverChange, onSelect
     }
 
     if (connectorRef.current) {
-      // Cylinder is centered on its local origin, so a length of `radius`
+      // Cylinder is centered on its local origin, so a length of `dist`
       // running from the core out to the node sits at the midpoint.
-      connectorRef.current.position.y = radius / 2;
-      connectorRef.current.scale.y = radius;
+      connectorRef.current.position.y = dist / 2;
+      connectorRef.current.scale.y = dist;
     }
 
     // Expansion lights every node, hover lights one. Without this the click
     // only moves things a few percent, which is not a legible response —
     // "the machine is energised" has to be readable in a still frame, not
     // only in motion.
-    const target = (hovered ? HOVER_EMISSIVE : 0) + expansion.current * EXPANDED_EMISSIVE;
+    const target = (hovered || active ? HOVER_EMISSIVE : 0) + expansion.current * EXPANDED_EMISSIVE;
     material.emissiveIntensity = MathUtils.damp(material.emissiveIntensity, target, DAMPING, step);
 
     const lit = Math.min(material.emissiveIntensity / HOVER_EMISSIVE, 1);

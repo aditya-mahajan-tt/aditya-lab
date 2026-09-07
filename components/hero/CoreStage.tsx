@@ -45,6 +45,25 @@ export function CoreStage() {
   const activeBody = useMemo(() => bodies.find((b) => b.id === activeBodyId) ?? null, [bodies, activeBodyId]);
 
   /**
+   * The plane tabs are `md:hidden` (components/hero/OrbitalTabs) and
+   * CoreFallback's dimming is CSS-gated at the same breakpoint, so on desktop
+   * `activePlane` keeps its "ai" default forever and means nothing. The 3D
+   * layer cannot read it that way: "face the selected plane at the camera"
+   * would pin the assembly at the AI angle and stop the idle rotation
+   * outright. Desktop therefore gets `null` — every plane faces the camera in
+   * turn, as before — and only the phone layout drives the rotation.
+   */
+  const [planeGated, setPlaneGated] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia("(min-width: 768px)");
+    const sync = () => setPlaneGated(!query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  /**
    * On a phone the core sits below the fold. Downloading a quarter-megabyte
    * of renderer for something the visitor may never scroll to is exactly the
    * kind of cost QA_AND_PERFORMANCE.md §1 budgets against, so the dynamic
@@ -126,7 +145,14 @@ export function CoreStage() {
 
   return (
     <div ref={stageRef} className="relative mx-auto w-full max-w-[420px]">
-      <OrbitalTabs active={activePlane} onChange={setActivePlane} />
+      {/* Lifted above the 3D layer explicitly: the canvas overlay below is
+          `absolute inset-0` over this whole stage and takes pointer events,
+          so once it mounts it swallows every tap meant for the tabs — which
+          is exactly when the tabs matter most, since they also drive the 3D
+          layer's "face the selected plane" rotation. */}
+      <div className="relative" style={{ zIndex: "var(--z-content)" }}>
+        <OrbitalTabs active={activePlane} onChange={setActivePlane} />
+      </div>
       <CoreFallback
         suppressed={live}
         bodies={bodies}
@@ -147,6 +173,10 @@ export function CoreStage() {
               onReady={() => setPhase("live")}
               onFailure={abandon}
               onTierChange={(next) => next !== "low" && setTier(next)}
+              bodies={bodies}
+              activeBodyId={activeBodyId}
+              activePlane={planeGated ? activePlane : null}
+              onBodyHover={setActiveBodyId}
             />
           </div>
         </CanvasBoundary>

@@ -266,3 +266,27 @@ test("every multi-plane body stays undimmed and tabbable on all three mobile tab
     }
   }
 });
+
+test("the SVG layer's bodies stay reachable once the 3D layer has had time to mount", async ({ page }) => {
+  // The R3F layer (three/objects/Core) now navigates on click, but it must
+  // never become the *only* route to a body (CLAUDE.md §3, principle 5). A
+  // literal 3D click test is not meaningful here: headless Chromium renders
+  // WebGL through SwiftShader, which makes canvas raycast hit-testing
+  // unreliable in CI — that path is covered by manual QA instead. This
+  // asserts the part that matters and *is* deterministic: after the 3D layer
+  // has had time to mount and cross-fade in, the SVG layer's real anchors are
+  // still in the DOM and still navigate.
+  await page.goto("/", { waitUntil: "networkidle" });
+  await page.waitForTimeout(1000);
+
+  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  await expect(kensaraLink).toHaveCount(1);
+  // Activated by keyboard, not by a pointer: the bodies ride `.core-rotate`,
+  // a continuous CSS rotation, so Playwright's pointer actionability check
+  // ("element is not stable") can never settle on one. Focus + Enter proves
+  // the same thing — the anchor is real and navigates — and additionally
+  // covers the keyboard route CLAUDE.md §4 requires.
+  await kensaraLink.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/work\/kensara-ai-gtm/);
+});

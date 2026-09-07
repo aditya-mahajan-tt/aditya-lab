@@ -1,8 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { MathUtils, type Group, type Mesh, type MeshStandardMaterial } from "three";
+import type { PlaneValue } from "@/data/schema";
+import type { HeroBody } from "@/data/queries";
+import { degToXY, HERO_PLANE_CENTER_DEG, layoutBodyAngles } from "@/lib/heroOrbitalLayout";
 import type { QualityTier } from "@/lib/quality";
 import { createCoreMaterial } from "@/three/materials/CoreMaterial";
 import { createGlassMaterial } from "@/three/materials/GlassMaterial";
@@ -13,23 +17,46 @@ import { CoreNode } from "./CoreNode";
 /**
  * The computational core (PLAN.md Phase 9) — the same object the DOM
  * fallback draws (components/hero/CoreFallback), built as a machine:
- * layered rings carrying modules, a structural frame, five data nodes on
- * connectors, and a slow-pulsing energy core inside a housing.
+ * layered rings carrying modules, a structural frame, one node per hero
+ * body on connectors, and a slow-pulsing energy core inside a housing.
+ *
+ * Since the orbital rewrite the nodes are data, not decoration: they come
+ * from `getHeroBodies()` and are placed by `lib/heroOrbitalLayout`, the same
+ * angles and rings layers 0 and 1 use, so the cross-fade lands on itself and
+ * hovering a body here names it in the same caption row.
  *
  * Deliberately not a glowing sphere, a brain or a crypto cube: every part
  * is a flat facet, a thin ring or a machined block, and the silhouette is
  * built from counter-rotating layers so it reads as a mechanism.
  *
- * Interactions here are response, never information. Hovering lights a
- * node; clicking expands the assembly. Neither reveals anything that is
- * not already in the DOM, which is what lets the canvas stay `aria-hidden`
- * (CLAUDE.md §3.5).
+ * Interactions here are a shortcut, never the only route. Hovering a node
+ * lights it and names its body in the caption row; clicking it routes to the
+ * page its `<a>` in layers 0/1 already points at; clicking the housing
+ * expands the assembly. Nothing here is reachable only in 3D, which is what
+ * lets the canvas stay `aria-hidden` (CLAUDE.md §3.5).
  *
- * ~4.6k triangles against a 60k HIGH budget / 20k MEDIUM.
+ * ~5k triangles against a 60k HIGH budget / 20k MEDIUM.
  */
 
-/** Same five positions as the SVG core, so the cross-fade lands on itself. */
-const NODE_ANGLES_DEG = [-90, -18, 54, 126, 198];
+/**
+ * The two ring depths, in world units — CoreFallback's 95/155 viewBox radii
+ * at 1/100 scale, so both layers read as the same diagram at the same size.
+ * The inner ring keeps the 1.05 the single node ring used before the orbital
+ * rewrite (a hair outside the SVG's proportional 0.95): closer than that and
+ * an inner body starts to overlap the housing once the assembly expands.
+ */
+const INNER_RADIUS = 1.05;
+const OUTER_RADIUS = 1.55;
+/** How fast the assembly settles onto the selected mobile plane. */
+const FACE_PLANE_DAMPING = 3;
+
+/**
+ * Sentinel id for the housing, which accepts a hover/click of its own but is
+ * not a body. It is reported upward so the INTERACT cursor still marks the
+ * housing as responsive; downstream it matches no body, so the caption row
+ * correctly reads as "nothing selected" while the pointer is on it.
+ */
+const HOUSING_ID = "__core-housing__";
 
 /** Machined blocks riding the outer ring — the "modular" in modular machine. */
 const MODULE_COUNT = 12;
@@ -40,7 +67,21 @@ const RING_SEGMENTS: Record<Exclude<QualityTier, "low">, number> = { high: 160, 
 /** How fast expansion settles. Frame-rate independent via MathUtils.damp. */
 const EXPANSION_DAMPING = 4.5;
 
-export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low">; onHoverChange: (hovered: boolean) => void }) {
+export function Core({
+  tier,
+  bodies,
+  activeBodyId,
+  activePlane,
+  onBodyHover,
+}: {
+  tier: Exclude<QualityTier, "low">;
+  bodies: HeroBody[];
+  activeBodyId: string | null;
+  /** `null` on desktop (every plane faces the camera at once); a plane on mobile. */
+  activePlane: PlaneValue | null;
+  onBodyHover: (id: string | null) => void;
+}) {
+  const router = useRouter();
   const tokens = useMemo(readTokens, []);
   const segments = RING_SEGMENTS[tier];
 
@@ -61,14 +102,26 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
     };
   }, [materials]);
 
-  const directions = useMemo(
-    () =>
-      NODE_ANGLES_DEG.map((deg) => {
-        const rad = (deg * Math.PI) / 180;
-        return [Math.cos(rad), 0, Math.sin(rad)] as const;
-      }),
-    [],
-  );
+  /**
+   * Positions come from the same pure layout module the SVG layer uses — the
+   * screen convention's y maps to this group's z, so a body sits at the same
+   * clock position in both layers.
+   */
+  const nodeLayout = useMemo(() => {
+    const angleById = new Map(layoutBodyAngles(bodies).map((a) => [a.id, a]));
+    return bodies.flatMap((body) => {
+      const angle = angleById.get(body.id);
+      if (!angle) return [];
+      const { x, y } = degToXY(angle.deg, 1);
+      return [
+        {
+          body,
+          radius: body.ring === "inner" ? INNER_RADIUS : OUTER_RADIUS,
+          direction: [x, 0, y] as const,
+        },
+      ];
+    });
+  }, [bodies]);
 
   const modules = useMemo(
     () =>
@@ -83,17 +136,21 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
   );
 
   /**
-   * Hover is tracked as a count, not a boolean: moving between two adjacent
-   * nodes fires the new node's `over` before the old one's `out`, and a
-   * boolean would flicker the cursor off and on.
+   * Hover is tracked as a set of ids, not a boolean count: moving between two
+   * adjacent nodes fires the new node's `over` before the old one's `out`, so
+   * a naive "cleared on pointer-out" would flicker the caption row and the
+   * cursor off and on. The most recently entered id wins, and only an empty
+   * set reports `null`.
    */
-  const hoverCount = useRef(0);
+  const hoveredIds = useRef(new Set<string>());
   const handleNodeHover = useCallback(
-    (hovered: boolean) => {
-      hoverCount.current = Math.max(0, hoverCount.current + (hovered ? 1 : -1));
-      onHoverChange(hoverCount.current > 0);
+    (id: string, hovered: boolean) => {
+      if (hovered) hoveredIds.current.add(id);
+      else hoveredIds.current.delete(id);
+      const [mostRecent] = [...hoveredIds.current].slice(-1);
+      onBodyHover(mostRecent ?? null);
     },
-    [onHoverChange],
+    [onBodyHover],
   );
 
   const [expanded, setExpanded] = useState(false);
@@ -115,9 +172,18 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
     const e = expansion.current;
 
     if (rotationRef.current) {
-      // Expanded, the machine spins up slightly — the response to a click
-      // has to be legible in motion, not only in position.
-      rotationRef.current.rotation.y += step * (0.14 + e * 0.16);
+      if (activePlane) {
+        // Mobile: rotate the assembly so the selected plane's center angle
+        // faces the camera (which looks down -Z, per CameraController — so
+        // "facing the camera" means cancelling the plane's own local angle).
+        const targetY = -(HERO_PLANE_CENTER_DEG[activePlane] * Math.PI) / 180;
+        rotationRef.current.rotation.y = MathUtils.damp(rotationRef.current.rotation.y, targetY, FACE_PLANE_DAMPING, step);
+      } else {
+        // Desktop: the existing idle rotation. Expanded, the machine spins up
+        // slightly — the response to a click has to be legible in motion, not
+        // only in position.
+        rotationRef.current.rotation.y += step * (0.14 + e * 0.16);
+      }
       rotationRef.current.rotation.x = Math.sin(t * 0.16) * 0.05;
     }
 
@@ -157,11 +223,11 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
     },
     onPointerOver: (event: ThreeEvent<PointerEvent>) => {
       event.stopPropagation();
-      handleNodeHover(true);
+      handleNodeHover(HOUSING_ID, true);
     },
     onPointerOut: (event: ThreeEvent<PointerEvent>) => {
       event.stopPropagation();
-      handleNodeHover(false);
+      handleNodeHover(HOUSING_ID, false);
     },
   };
 
@@ -186,14 +252,16 @@ export function Core({ tier, onHoverChange }: { tier: Exclude<QualityTier, "low"
           ))}
         </group>
 
-        {directions.map((direction, i) => (
+        {nodeLayout.map(({ body, radius, direction }) => (
           <CoreNode
-            key={i}
+            key={body.id}
             direction={direction}
+            radius={radius}
             tokens={tokens}
             expansion={expansion}
-            onHoverChange={handleNodeHover}
-            onSelect={toggle}
+            active={activeBodyId === body.id}
+            onHoverChange={(hovered) => handleNodeHover(body.id, hovered)}
+            onSelect={() => router.push(body.href)}
           />
         ))}
       </group>

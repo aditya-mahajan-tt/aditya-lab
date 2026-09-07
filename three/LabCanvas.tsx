@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import type { PlaneValue } from "@/data/schema";
+import type { HeroBody } from "@/data/queries";
 import { dprFor, type FallbackReason, type QualityTier } from "@/lib/quality";
 import { Scene } from "./scene/Scene";
 
@@ -24,9 +26,25 @@ type Props = {
   onFailure: (reason: FallbackReason) => void;
   /** The runtime tier changed under us, for the quality readout. */
   onTierChange?: (tier: QualityTier) => void;
+  /** The hero bodies, from `getHeroBodies()` — the same list layers 0 and 1 draw. */
+  bodies: HeroBody[];
+  activeBodyId: string | null;
+  /** `null` on desktop; the mobile tabs' selected plane otherwise. */
+  activePlane: PlaneValue | null;
+  /** The body under the pointer, or `null` when nothing responsive is. */
+  onBodyHover: (id: string | null) => void;
 };
 
-export default function LabCanvas({ tier: initialTier, onReady, onFailure, onTierChange }: Props) {
+export default function LabCanvas({
+  tier: initialTier,
+  onReady,
+  onFailure,
+  onTierChange,
+  bodies,
+  activeBodyId,
+  activePlane,
+  onBodyHover,
+}: Props) {
   const [tier, setTier] = useState<Exclude<QualityTier, "low">>(initialTier);
   const [visible, setVisible] = useState(true);
   const [hovered, setHovered] = useState(false);
@@ -117,7 +135,16 @@ export default function LabCanvas({ tier: initialTier, onReady, onFailure, onTie
           onReady={onReady}
           onDowngrade={handleDowngrade}
           onGiveUp={onFailure}
-          onHoverChange={setHovered}
+          bodies={bodies}
+          activeBodyId={activeBodyId}
+          activePlane={activePlane}
+          onBodyHover={(id) => {
+            // `hovered` is still just "is the pointer over something that
+            // responds" — the INTERACT pill's condition, unchanged; it is now
+            // derived from the id callback rather than a separate boolean one.
+            setHovered(id !== null);
+            onBodyHover(id);
+          }}
         />
       </Canvas>
     </div>
