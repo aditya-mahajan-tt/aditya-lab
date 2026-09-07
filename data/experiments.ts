@@ -10,6 +10,7 @@ const raw = [
   {
     id: "001",
     slug: "ai-lead-generation-engine",
+    planes: ["ai", "product"],
     title: "[EXPERIMENT_001_TITLE_REQUIRED]",
     category: ["AI", "Automation"],
     year: "2026",

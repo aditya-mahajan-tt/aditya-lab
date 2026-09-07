@@ -10,6 +10,7 @@ import { ExperienceEntrySchema } from "./schema";
 const raw = [
   {
     id: "turbotork",
+    planes: ["ai", "product", "business"],
     company: "Turbotork Technologies Pvt. Ltd.",
     role: "AI Product Manager, Founder's Office",
     location: "Gurugram",

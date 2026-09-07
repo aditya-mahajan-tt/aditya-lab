@@ -14,6 +14,7 @@ import { SkillGroupSchema } from "./schema";
 const raw = [
   {
     id: "THINK",
+    planes: ["business"],
     description:
       "[AI_DRAFT_REVIEW] Strategy work grounded in real operating data — segmentation, portfolio analytics and problem framing built for C-suite decisions, not slide decks.",
     items: [
@@ -27,6 +28,7 @@ const raw = [
   },
   {
     id: "BUILD",
+    planes: ["product"],
     description:
       "[AI_DRAFT_REVIEW] Shipping working products with a small team — from a fleet-service SaaS MVP to a D2C storefront, built rather than just specified.",
     items: [
@@ -38,6 +40,7 @@ const raw = [
   },
   {
     id: "AUTOMATE",
+    planes: ["product"],
     description:
       "[AI_DRAFT_REVIEW] Turning manual operations into repeatable workflows — payments, compliance and communications wired together so a two-person team can run at scale.",
     items: [
@@ -53,6 +56,7 @@ const raw = [
   },
   {
     id: "INTELLIGENCE",
+    planes: ["ai"],
     description:
       "[AI_DRAFT_REVIEW] Layering AI agent workflows onto already-digitized processes, where it's a genuine productivity multiplier rather than a bolt-on.",
     items: [
@@ -64,6 +68,7 @@ const raw = [
   },
   {
     id: "GROW",
+    planes: ["business"],
     description:
       "[AI_DRAFT_REVIEW] GTM and fundraising narrative work — from a $250K pre-seed raise to a 100-member outreach team generating ₹40L+ in revenue.",
     items: [

@@ -35,6 +35,15 @@ export const isDraft = (value: string) => DRAFT_PATTERN.test(value);
 /** Strips the draft marker for consumers that need the plain text (metadata, search, etc). */
 export const stripDraftMarker = (value: string) => value.replace(DRAFT_PATTERN, "");
 
+/**
+ * The three "planes" the orbital hero (docs/superpowers/specs/
+ * 2026-09-06-mobile-audit-and-orbital-hero-design.md §3) groups Aditya's
+ * work into. Assignment is a statement about his own work and is always
+ * confirmed by him — see the plan that added this field for the record.
+ */
+export const Plane = z.enum(["ai", "product", "business"]);
+export type PlaneValue = z.infer<typeof Plane>;
+
 /* ---------------------------------------------------------------- media */
 
 export const MediaSchema = z.object({
@@ -67,6 +76,7 @@ export const ProjectSchema = z.object({
   title: Fillable,
   subtitle: z.string().optional(),
   category: z.array(z.string()).min(1),
+  planes: z.array(Plane).min(1),
   year: z.string(),
   status: ProjectStatus,
   featured: z.boolean().default(false),
@@ -117,6 +127,7 @@ export const ExperimentSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/),
   title: Fillable,
   category: z.array(z.string()).min(1),
+  planes: z.array(Plane).min(1),
   year: z.string(),
   order: z.number(),
   summary: Fillable,
@@ -139,6 +150,7 @@ export const SkillDepth = z.enum(["working knowledge", "comfortable", "strong"])
 export const SkillGroupSchema = z.object({
   id: z.enum(["THINK", "BUILD", "AUTOMATE", "INTELLIGENCE", "GROW"]),
   description: Fillable,
+  planes: z.array(Plane).min(1),
   items: z.array(z.object({ name: z.string(), depth: SkillDepth })).min(1),
 });
 
@@ -202,6 +214,8 @@ export const ExperienceEntrySchema = z.object({
   bullets: z.array(Fillable).min(1),
   tools: z.array(z.string()).default([]),
   highlights: z.array(HighlightSchema).default([]),
+  /** Only set on entries the orbital hero's outer ring reads (spec §3.2/§6). */
+  planes: z.array(Plane).min(1).optional(),
 });
 
 /* ------------------------------------------------------------ education */

@@ -24,6 +24,7 @@ const raw = [
   {
     id: "001",
     slug: "gostops-gtm",
+    planes: ["business"],
     title: "goSTOPS",
     subtitle: "GTM Strategy",
     category: ["Strategy", "Marketing", "Segmentation"],
@@ -57,6 +58,7 @@ const raw = [
   {
     id: "002",
     slug: "kensara-ai-gtm",
+    planes: ["business", "product"],
     title: "Kensara AI",
     subtitle: "GTM & Partnership Strategy",
     category: ["Strategy", "GTM"],
@@ -87,6 +89,7 @@ const raw = [
   {
     id: "003",
     slug: "adda-d2c",
+    planes: ["product", "business"],
     title: "Adda",
     subtitle: "D2C E-commerce Venture",
     category: ["Product", "E-commerce"],
@@ -120,6 +123,7 @@ const raw = [
   {
     id: "004",
     slug: "cricket-game",
+    planes: ["product"],
     title: "[PROJECT_004_TITLE_REQUIRED]",
     category: ["Product", "Creative"],
     year: "2025",
