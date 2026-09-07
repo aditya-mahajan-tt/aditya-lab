@@ -69,8 +69,7 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
           <g
             key={plane}
             aria-hidden="true"
-            opacity={dimmed ? 0.35 : 1}
-            className="transition-opacity duration-[var(--duration-base)]"
+            className={`transition-opacity duration-[var(--duration-base)] ${dimmed ? "opacity-35 md:opacity-100" : ""}`}
           >
             <path
               d={`M ${200 + start.x} ${200 + start.y} A ${OUTER_RADIUS + 18} ${OUTER_RADIUS + 18} 0 0 1 ${200 + end.x} ${200 + end.y}`}
@@ -116,7 +115,7 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
               onClick={() => onBodyHover(body.id)}
               tabIndex={dimmed || suppressed ? -1 : 0}
             >
-              <g opacity={dimmed ? 0.3 : 1} className="transition-opacity duration-[var(--duration-base)]">
+              <g className={`transition-opacity duration-[var(--duration-base)] ${dimmed ? "opacity-30 md:opacity-100" : ""}`}>
                 <line
                   x1="200"
                   y1="200"

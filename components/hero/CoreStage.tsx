@@ -4,7 +4,9 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CanvasBoundary } from "@/components/hero/CanvasBoundary";
 import { CoreFallback } from "@/components/hero/CoreFallback";
+import { OrbitalTabs } from "@/components/hero/OrbitalTabs";
 import { Fill } from "@/components/ui/Placeholder";
+import type { PlaneValue } from "@/data/schema";
 import { getHeroBodies } from "@/data/queries";
 import { analytics } from "@/lib/analytics/events";
 import { detectCapability, resolveTier, type FallbackReason, type QualityTier } from "@/lib/quality";
@@ -36,6 +38,7 @@ export function CoreStage() {
   const [failed, setFailed] = useState(false);
   const [near, setNear] = useState(false);
   const [activeBodyId, setActiveBodyId] = useState<string | null>(null);
+  const [activePlane, setActivePlane] = useState<PlaneValue>("ai");
   const stageRef = useRef<HTMLDivElement>(null);
 
   const bodies = useMemo(() => getHeroBodies(), []);
@@ -123,7 +126,14 @@ export function CoreStage() {
 
   return (
     <div ref={stageRef} className="relative mx-auto w-full max-w-[420px]">
-      <CoreFallback suppressed={live} bodies={bodies} activeBodyId={activeBodyId} onBodyHover={setActiveBodyId} />
+      <OrbitalTabs active={activePlane} onChange={setActivePlane} />
+      <CoreFallback
+        suppressed={live}
+        bodies={bodies}
+        activePlane={activePlane}
+        activeBodyId={activeBodyId}
+        onBodyHover={setActiveBodyId}
+      />
 
       {tier && near && (phase === "mounting" || live) && (
         <CanvasBoundary onError={handleBoundaryError}>

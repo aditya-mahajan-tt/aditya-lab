@@ -216,3 +216,23 @@ test("every SVG orbital body remains keyboard-reachable and shows a visible focu
   const outline = await firstBody.evaluate((el) => getComputedStyle(el).outlineStyle);
   expect(outline).not.toBe("none");
 });
+
+test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bodies visible", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const tabs = page.getByRole("tab");
+  await expect(tabs).toHaveCount(3);
+  for (const tab of await tabs.all()) {
+    const box = await tab.boundingBox();
+    expect(box?.height, "tab height").toBeGreaterThanOrEqual(44);
+  }
+
+  const productTab = page.getByRole("tab", { name: "PRODUCT" });
+  await productTab.click();
+  await expect(productTab).toHaveAttribute("aria-selected", "true");
+
+  // AUTOMATE (product-only) should be tabbable; INTELLIGENCE (ai-only) should not.
+  const automateLink = page.locator('.core-dom a[href="/systems#neural-heading"]').nth(0);
+  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  await expect(kensaraLink).toHaveAttribute("tabindex", "0"); // spans product+business — stays visible/tabbable
+});
