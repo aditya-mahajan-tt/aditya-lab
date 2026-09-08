@@ -35,7 +35,12 @@ Near-black rather than pure black (pure black on OLED plus high-contrast white c
                                         from the reference's #858D8B, which
                                         only hits 5.90:1, to hold this
                                         project's 7:1 body-text floor) */
-  --color-text-faint:    #7C837E;   /*  5.16:1 — chrome only, never body copy */
+  --color-text-faint:    #8D948F;   /*  6.46:1 on --color-bg, 5.96:1 on --color-surface —
+                                        chrome only, never body copy. Lightened from #7C837E
+                                        (Phase 16 audit): its 4.76:1 on --color-surface measured
+                                        4.47:1 in WebKit at the .label class's 12px/9pt mono size —
+                                        under the 4.5:1 AA floor once real font rasterisation is
+                                        accounted for, not just the flat token math. */
 
   /* Accent — the one signal colour, used for one thing at a time */
   --color-accent:        #B6FF4A;   /* SIGNAL GREEN — 16.60:1 on --color-bg */
@@ -46,7 +51,7 @@ Near-black rather than pure black (pure black on OLED plus high-contrast white c
   --color-live:          #B6FF4A;   /* = --color-accent */
   --color-building:      #FFB547;   /* SIGNAL AMBER — 11.41:1 on --color-bg */
   --color-failed:        #FF5C5C;   /* SIGNAL RED — 6.62:1 on --color-bg */
-  --color-archived:      #7C837E;   /* = --color-text-faint */
+  --color-archived:      #8D948F;   /* = --color-text-faint */
 
   /* Focus — a deliberately different hue from the accent, so a focus ring
      never reads as "this is the brand colour" */
