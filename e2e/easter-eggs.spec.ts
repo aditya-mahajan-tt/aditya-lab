@@ -8,7 +8,9 @@ import { test, expect } from "@playwright/test";
 
 test("the hidden route works by direct URL but is absent from navigation and the command palette", async ({
   page,
+  isMobile,
 }) => {
+  test.skip(isMobile, "the ⌘K trigger is hidden below md — nothing to check the palette's contents with on touch");
   await page.goto("/experiments/hidden");
   await expect(page.locator("h1")).toHaveText("You found the hidden room.");
 
@@ -24,7 +26,11 @@ test("the hidden route works by direct URL but is absent from navigation and the
   expect(hrefs.join(" ")).not.toContain("/experiments/hidden");
 });
 
-test("typing sudo in the command palette shows the denied message but no navigable result", async ({ page }) => {
+test("typing sudo in the command palette shows the denied message but no navigable result", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "the ⌘K trigger is hidden below md — no way to reach the palette on touch");
   await page.goto("/");
   await page.getByRole("button", { name: "Open command palette" }).click();
   const dialog = page.locator('dialog[aria-label="Command palette"]');

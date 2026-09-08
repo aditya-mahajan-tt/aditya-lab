@@ -78,7 +78,8 @@ test("a suggested question answers instantly with no network call", async ({ pag
   expect(askCalled).toBe(false);
 });
 
-test("the command palette can open Ask the Lab", async ({ page }) => {
+test("the command palette can open Ask the Lab", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the ⌘K trigger is hidden below md — Ask the Lab still has its own dedicated button there");
   await page.goto("/");
   await page.getByRole("button", { name: "Open command palette" }).focus();
   await page.keyboard.press("Control+k");

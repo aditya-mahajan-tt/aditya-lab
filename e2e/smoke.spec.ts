@@ -156,7 +156,8 @@ test("no focus escapes the open menu overlay", async ({ page }) => {
   expect(focusStayedInside).toBe(true);
 });
 
-test("command palette opens with the keyboard shortcut, searches, and navigates", async ({ page }) => {
+test("command palette opens with the keyboard shortcut, searches, and navigates", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the ⌘K trigger is hidden below md — no keyboard shortcut to discover on touch");
   await page.goto("/");
   // Wait for hydration — the global ⌘K listener only exists after React
   // attaches, same as it would for a real visitor.
@@ -177,7 +178,8 @@ test("command palette opens with the keyboard shortcut, searches, and navigates"
   await expect(page).toHaveURL(/\/work$/);
 });
 
-test("command palette closes on Escape and returns focus to its trigger", async ({ page }) => {
+test("command palette closes on Escape and returns focus to its trigger", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the ⌘K trigger is hidden below md — no keyboard shortcut to discover on touch");
   await page.goto("/");
   const trigger = page.getByRole("button", { name: "Open command palette" });
   await trigger.focus();

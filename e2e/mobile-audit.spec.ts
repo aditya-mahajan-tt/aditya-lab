@@ -217,7 +217,17 @@ test("every SVG orbital body remains keyboard-reachable and shows a visible focu
   expect(outline).not.toBe("none");
 });
 
-test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bodies visible", async ({ page }) => {
+test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bodies visible", async ({
+  page,
+  browserName,
+}) => {
+  // Scope note (see the SVG-layer test below for the full explanation):
+  // headless Chromium rasterises WebGL through SwiftShader, so lib/quality
+  // auto-declines and .core-dom stays live. Headless WebKit's WebGL is real,
+  // so the 3D layer actually mounts and correctly suppresses .core-dom
+  // (tabindex -1 on every link, not just the plane-dimmed ones) in favour of
+  // the 3D layer's own always-in-DOM accessible link list.
+  test.skip(browserName === "webkit", "assumes the Chromium SwiftShader auto-decline keeps .core-dom live");
   await page.goto("/", { waitUntil: "networkidle" });
 
   const tabs = page.getByRole("tab");
@@ -237,7 +247,10 @@ test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bo
   await expect(kensaraLink).toHaveAttribute("tabindex", "0"); // spans product+business — stays visible/tabbable
 });
 
-test("every multi-plane body stays undimmed and tabbable on all three mobile tabs", async ({ page }) => {
+test("every multi-plane body stays undimmed and tabbable on all three mobile tabs", async ({ page, browserName }) => {
+  // Scope note: same Chromium-SwiftShader-vs-WebKit-real-WebGL dependency as
+  // the plane-tabs test above — see its comment and the SVG-layer test below.
+  test.skip(browserName === "webkit", "assumes the Chromium SwiftShader auto-decline keeps .core-dom live");
   // Regression guard: an earlier version of the per-body dimmed formula
   // (`!body.planes.includes(activePlane)`) only exempted a spanning body
   // from dimming when the ACTIVE tab happened to be one of its OWN planes —
