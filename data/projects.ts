@@ -18,13 +18,8 @@ import { ProjectSchema } from "./schema";
  * replacing the untouched "cricket-game" stub), were drafted from source
  * material Aditya supplied directly (gostops_strategy_deck.pdf,
  * Kensara AI_Catalysis'T'26.pdf, Adda_Store_Setup_AddaStore,
- * LeadIQ-Submission.pdf, his OnePager). Every [AI_DRAFT_REVIEW]-marked
- * field below is Claude Code's wording, not his — real facts drawn from
- * those documents, but needs his read-through/rewrite before it ships
- * (CLAUDE.md §7, data/schema.ts's DRAFT_PATTERN comment). goSTOPS' `role`
- * stays an explicit placeholder: the source deck never states who did the
- * work or in what capacity, and CLAUDE.md §4 bars inventing that even as
- * a draft.
+ * LeadIQ-Submission.pdf, his OnePager) and approved as final by Aditya the
+ * same day.
  */
 const raw = [
   {
@@ -45,22 +40,22 @@ const raw = [
     order: 3,
 
     summary:
-      "[AI_DRAFT_REVIEW] Primary market research and behavioural segmentation for goSTOPS' monsoon (JAS) offsite push — a 12-variable framework, a single-survey Google Form, and a 2×2 behavioural segmentation used to pick which companies to target and how to price the offer.",
+      "Primary market research and behavioural segmentation for goSTOPS' monsoon (JAS) offsite push — a 12-variable framework, a single-survey Google Form, and a 2×2 behavioural segmentation used to pick which companies to target and how to price the offer.",
 
     context:
-      "[AI_DRAFT_REVIEW] goSTOPS wanted to grow company-offsite bookings during its traditionally slow monsoon (July–September) season, but rather than guess at which kind of company to target, the project treated audience segmentation as something to derive from data, not assume upfront.",
+      "goSTOPS wanted to grow company-offsite bookings during its traditionally slow monsoon (July–September) season, but rather than guess at which kind of company to target, the project treated audience segmentation as something to derive from data, not assume upfront.",
     problem:
-      "[AI_DRAFT_REVIEW] Standard demographic segments don't predict who actually books an offsite — a company's real behaviour (how remote the team is, how infrastructure-dependent it is, how price-sensitive it is) turned out to matter more than its size or industry, and none of that was measurable without primary research designed specifically to capture it.",
-    role: "[PROJECT_001_ROLE_REQUIRED]",
+      "Standard demographic segments don't predict who actually books an offsite — a company's real behaviour (how remote the team is, how infrastructure-dependent it is, how price-sensitive it is) turned out to matter more than its size or industry, and none of that was measurable without primary research designed specifically to capture it.",
+    role: "Team effort — contributed across the full project, from research and segmentation through strategy and execution.",
     thinking:
-      "[AI_DRAFT_REVIEW] Work started from the business problem, not the audience: 12 behavioural variables were defined first — each mapped to a specific hypothesis about what drives offsite decisions — before a single survey question was written, so every question in the resulting Google Form existed to measure one variable, not to poll opinion generally.",
+      "Work started from the business problem, not the audience: 12 behavioural variables were defined first — each mapped to a specific hypothesis about what drives offsite decisions — before a single survey question was written, so every question in the resulting Google Form existed to measure one variable, not to poll opinion generally.",
     approach:
-      "[AI_DRAFT_REVIEW] Survey responses were standardised into the 12 variables, then clustered into a 2×2 behavioural segmentation (not simple demographic buckets) — Monsoon-Ready Hostel-Lovers, Curious but Cautious, Deal Hunters and Traditionalists — and each segment was scored against six weighted criteria (JAS willingness, product fit, revenue potential, ease of acquisition, operational feasibility, competitive differentiation) to rank which to prioritise.",
+      "Survey responses were standardised into the 12 variables, then clustered into a 2×2 behavioural segmentation (not simple demographic buckets) — Monsoon-Ready Hostel-Lovers, Curious but Cautious, Deal Hunters and Traditionalists — and each segment was scored against six weighted criteria (JAS willingness, product fit, revenue potential, ease of acquisition, operational feasibility, competitive differentiation) to rank which to prioritise.",
     execution:
-      "[AI_DRAFT_REVIEW] Monsoon-Ready Hostel-Lovers scored highest (4.5/5.0, driven by remote/hybrid team structure and a direct founder/HR purchasing path) and became the primary target, backed by a priced product pack (Founder's Cabin & Tech Sprints); Deal Hunters and Curious-but-Cautious were kept as secondary segments with their own offers — weekday flash pricing locked before September 30, and a monsoon-flex rebooking guarantee to de-risk the one weak cell in the scorecard, operational feasibility during monsoon upkeep.",
+      "Monsoon-Ready Hostel-Lovers scored highest (4.5/5.0, driven by remote/hybrid team structure and a direct founder/HR purchasing path) and became the primary target, backed by a priced product pack (Founder's Cabin & Tech Sprints); Deal Hunters and Curious-but-Cautious were kept as secondary segments with their own offers — weekday flash pricing locked before September 30, and a monsoon-flex rebooking guarantee to de-risk the one weak cell in the scorecard, operational feasibility during monsoon upkeep.",
     // outcome intentionally omitted until there is a real, defensible one.
     learnings: [
-      "[AI_DRAFT_REVIEW] Stated willingness isn't intent — a respondent saying monsoon pricing is appealing doesn't predict booking behaviour on its own; operational signals like infrastructure dependency and team structure turned out to be the stronger predictors, which is why the segmentation was built on behaviour, not survey sentiment alone.",
+      "Stated willingness isn't intent — a respondent saying monsoon pricing is appealing doesn't predict booking behaviour on its own; operational signals like infrastructure dependency and team structure turned out to be the stronger predictors, which is why the segmentation was built on behaviour, not survey sentiment alone.",
     ],
 
     tools: ["Google Forms"],
@@ -93,19 +88,19 @@ const raw = [
       "Leading GTM and partnership strategy for an AI startup at the IIT Guwahati case competition, advancing to the top 10 of 120 teams.",
 
     context:
-      "[AI_DRAFT_REVIEW] Kensara AI is an early-stage AI compliance platform entering the market right as India's Digital Personal Data Protection Act (DPDPA) creates a real but finite window — full-force enforcement lands by May 2027, with penalties up to ₹250 Cr or 4% of global turnover — giving roughly nine months to build awareness and convert enterprises before that urgency fades.",
+      "Kensara AI is an early-stage AI compliance platform entering the market right as India's Digital Personal Data Protection Act (DPDPA) creates a real but finite window — full-force enforcement lands by May 2027, with penalties up to ₹250 Cr or 4% of global turnover — giving roughly nine months to build awareness and convert enterprises before that urgency fades.",
     problem:
-      "[AI_DRAFT_REVIEW] As part of the Catalysis'T national case competition (IIT Guwahati), five-person Team Audax had one month to design and pressure-test a customer-acquisition strategy for Kensara AI — not just a GTM deck, but real competitive benchmarking, real outreach, and real market signal to prove the strategy would work before recommending it.",
+      "As part of the Catalysis'T national case competition (IIT Guwahati), five-person Team Audax had one month to design and pressure-test a customer-acquisition strategy for Kensara AI — not just a GTM deck, but real competitive benchmarking, real outreach, and real market signal to prove the strategy would work before recommending it.",
     role: "Team Lead — leading GTM and partnership strategy for an AI startup as part of a case-competition team.",
     thinking:
-      "[AI_DRAFT_REVIEW] The core bet: don't sell Kensara everywhere — sell the regulatory trigger (DPDPA), not the compliance-software category, and build distribution where trust already exists (CA firms, CISO/DPO communities) rather than broad outbound. DPDPA becomes the entry wedge; GRC and AI Governance are the expansion path once Kensara is inside the account; continuous monitoring and evidence generation are what keep it there.",
+      "The core bet: don't sell Kensara everywhere — sell the regulatory trigger (DPDPA), not the compliance-software category, and build distribution where trust already exists (CA firms, CISO/DPO communities) rather than broad outbound. DPDPA becomes the entry wedge; GRC and AI Governance are the expansion path once Kensara is inside the account; continuous monitoring and evidence generation are what keep it there.",
     approach:
-      "[AI_DRAFT_REVIEW] Five workstreams ran in parallel: competitive intelligence (live product demos with two category incumbents, benchmarked against Kensara's own compliance-operating-layer positioning), customer acquisition (direct outreach and warm introductions), Reddit community and answer-engine optimisation (practitioner-led posts in compliance/cybersecurity communities, used as a live voice-of-customer channel rather than pure marketing), market and ecosystem mapping (CA-firm white-label distribution, CISO/DPO communities, sponsored seminars), and a phased GTM roadmap tying acquisition activity to the DPDPA enforcement timeline.",
+      "Five workstreams ran in parallel: competitive intelligence (live product demos with two category incumbents, benchmarked against Kensara's own compliance-operating-layer positioning), customer acquisition (direct outreach and warm introductions), Reddit community and answer-engine optimisation (practitioner-led posts in compliance/cybersecurity communities, used as a live voice-of-customer channel rather than pure marketing), market and ecosystem mapping (CA-firm white-label distribution, CISO/DPO communities, sponsored seminars), and a phased GTM roadmap tying acquisition activity to the DPDPA enforcement timeline.",
     execution:
-      "[AI_DRAFT_REVIEW] The Reddit workstream alone generated a reported 100K+ cumulative post reach and one flagship security thread with 32 upvotes and 49 comments from practitioners describing real compliance pain — evidence used directly to sharpen Kensara's positioning, not just to build visibility. Combined with direct outreach, the month produced qualified leads and several pilot conversations in progress, testing the DPDPA-entry-wedge strategy against real market response rather than a hypothesis alone.",
+      "The Reddit workstream alone generated a reported 100K+ cumulative post reach and one flagship security thread with 32 upvotes and 49 comments from practitioners describing real compliance pain — evidence used directly to sharpen Kensara's positioning, not just to build visibility. Combined with direct outreach, the month produced qualified leads and several pilot conversations in progress, testing the DPDPA-entry-wedge strategy against real market response rather than a hypothesis alone.",
     outcome: "Advanced to the top 10 of 120 teams. (As stated on Aditya's resume — self-reported.)",
     learnings: [
-      "[AI_DRAFT_REVIEW] The strongest buying signal wasn't interest in \"another compliance platform\" — it was operational pain: evidence collection and proving controls exist were what practitioners actually complained about. And on AI specifically, practitioners trusted it for repetitive work but wanted humans to keep interpretation and accountability — a distinction worth designing the product around, not just the pitch.",
+      "The strongest buying signal wasn't interest in \"another compliance platform\" — it was operational pain: evidence collection and proving controls exist were what practitioners actually complained about. And on AI specifically, practitioners trusted it for repetitive work but wanted humans to keep interpretation and accountability — a distinction worth designing the product around, not just the pitch.",
     ],
 
     tools: [],
@@ -131,20 +126,20 @@ const raw = [
       "Built a Shopify-based D2C e-commerce store end-to-end — product research, vendor sourcing and payment integration — as founder.",
 
     context:
-      "[AI_DRAFT_REVIEW] Adda (अड्डा — Hindi for \"a gathering place\") is a D2C wellness and lifestyle-electronics brand Aditya founded, launching with a massage gun as its first SKU into a category dominated by RGB/sport-styled incumbents like boAt and JBL.",
+      "Adda (अड्डा — Hindi for \"a gathering place\") is a D2C wellness and lifestyle-electronics brand Aditya founded, launching with a massage gun as its first SKU into a category dominated by RGB/sport-styled incumbents like boAt and JBL.",
     problem:
-      "[AI_DRAFT_REVIEW] Category-leading massage guns had a documented quality gap — reviewers consistently flagged build-quality and motor/battery complaints on the market's #1 bestseller — but closing that gap meant standing up a store, a payment stack and a distinct brand fast enough to catch the Raksha Bandhan and Diwali gifting season, without over-building before the SKU was validated.",
+      "Category-leading massage guns had a documented quality gap — reviewers consistently flagged build-quality and motor/battery complaints on the market's #1 bestseller — but closing that gap meant standing up a store, a payment stack and a distinct brand fast enough to catch the Raksha Bandhan and Diwali gifting season, without over-building before the SKU was validated.",
     role: "Founder — owned the venture end-to-end, from product research and vendor sourcing to payment integration.",
     thinking:
-      "[AI_DRAFT_REVIEW] Four decisions had to be made to go from strategy to a live, checkout-ready store — who the store is built for, which platform to build it on, how the brand shows up, and which payment gateway to use — and each was treated as a real trade-off against named criteria, not a default choice.",
+      "Four decisions had to be made to go from strategy to a live, checkout-ready store — who the store is built for, which platform to build it on, how the brand shows up, and which payment gateway to use — and each was treated as a real trade-off against named criteria, not a default choice.",
     approach:
-      "[AI_DRAFT_REVIEW] Shopify won on launch speed and India-specific app ecosystem (COD/RTO tracking, Razorpay/PayU support) over WooCommerce and Dukaan, with enough theme flexibility to carry a deliberately heritage-leaning identity — navy and mustard, a Devanagari wordmark — instead of reading as a templated storefront. Razorpay won on UPI depth, native Shopify integration and built-in COD reconciliation, which mattered directly since the unit-economics model already priced in a 10% return-to-origin rate on cash-on-delivery orders.",
+      "Shopify won on launch speed and India-specific app ecosystem (COD/RTO tracking, Razorpay/PayU support) over WooCommerce and Dukaan, with enough theme flexibility to carry a deliberately heritage-leaning identity — navy and mustard, a Devanagari wordmark — instead of reading as a templated storefront. Razorpay won on UPI depth, native Shopify integration and built-in COD reconciliation, which mattered directly since the unit-economics model already priced in a 10% return-to-origin rate on cash-on-delivery orders.",
     execution:
       "Built a Shopify-based D2C storefront end-to-end, covering product research, vendor sourcing, and payment integration.",
     outcome:
-      "[AI_DRAFT_REVIEW] Generated over ₹1L+ in revenue within the first 2 months, across the Shopify store and offline sales. (As stated on Aditya's resume — self-reported.)",
+      "Generated over ₹1L+ in revenue within the first 2 months, across the Shopify store and offline sales. (As stated on Aditya's resume — self-reported.)",
     learnings: [
-      "[AI_DRAFT_REVIEW] Cash-on-delivery, not card or UPI alone, drives this category's buying behaviour in Tier-1/Tier-2 India — so the payment gateway decision had to be judged on COD reconciliation tooling as much as on checkout speed, not treated as a generic \"pick the cheapest processor\" call.",
+      "Cash-on-delivery, not card or UPI alone, drives this category's buying behaviour in Tier-1/Tier-2 India — so the payment gateway decision had to be judged on COD reconciliation tooling as much as on checkout speed, not treated as a generic \"pick the cheapest processor\" call.",
     ],
 
     tools: ["Shopify", "Razorpay"],
@@ -169,20 +164,20 @@ const raw = [
     order: 4,
 
     summary:
-      "[AI_DRAFT_REVIEW] A personal, single-user lead-discovery dashboard — pulls real local businesses from OpenStreetMap, audits each one's live website against a set of checkable signals, and turns the gaps it finds into a score and a specific, evidence-backed outreach angle.",
+      "A personal, single-user lead-discovery dashboard — pulls real local businesses from OpenStreetMap, audits each one's live website against a set of checkable signals, and turns the gaps it finds into a score and a specific, evidence-backed outreach angle.",
     context:
-      "[AI_DRAFT_REVIEW] Built as a course assessment submission and used as a real, hosted tool — LeadIQ exists for anyone selling website, automation or AI-integration services into local businesses, who otherwise spends hours per prospect searching maps, reading each site, and guessing at a pitch.",
+      "Built as a course assessment submission and used as a real, hosted tool — LeadIQ exists for anyone selling website, automation or AI-integration services into local businesses, who otherwise spends hours per prospect searching maps, reading each site, and guessing at a pitch.",
     problem:
-      "[AI_DRAFT_REVIEW] A plain list of business names and phone numbers isn't a pipeline — it doesn't tell a salesperson why a given business is worth calling or what to say. LeadIQ had to automate the research step itself: finding real local businesses, and reading their websites the way a human researcher would, to produce a reason to reach out, not just a contact.",
-    role: "[AI_DRAFT_REVIEW] Solo builder — designed and built the product end-to-end: discovery, the rule-based audit/scoring engine, the lead pipeline UI, and the auth and security fixes that shipped with it.",
+      "A plain list of business names and phone numbers isn't a pipeline — it doesn't tell a salesperson why a given business is worth calling or what to say. LeadIQ had to automate the research step itself: finding real local businesses, and reading their websites the way a human researcher would, to produce a reason to reach out, not just a contact.",
+    role: "Solo builder — designed and built the product end-to-end: discovery, the rule-based audit/scoring engine, the lead pipeline UI, and the auth and security fixes that shipped with it.",
     thinking:
-      "[AI_DRAFT_REVIEW] A lead's score isn't \"how polished is this website\" — it's \"how much real, sellable opportunity exists here.\" A slick site with no gaps scores low because there's nothing left to pitch; a business with real, fixable problems scores high, because that's exactly what a cold outreach message needs.",
+      "A lead's score isn't \"how polished is this website\" — it's \"how much real, sellable opportunity exists here.\" A slick site with no gaps scores low because there's nothing left to pitch; a business with real, fixable problems scores high, because that's exactly what a cold outreach message needs.",
     approach:
-      "[AI_DRAFT_REVIEW] From a campaign (an industry + a location), Discover queries OpenStreetMap's Overpass API for real local businesses and flags duplicates against existing leads. Adding a lead fetches its actual website and runs a rule-based audit — HTTPS, contact form, CTA language, FAQ density, Shopify/WooCommerce platform, live chat, mobile viewport — in order of severity, producing a score, an opportunity category (Website, Automation, AI Integration, Shopify UX) and a one- or two-sentence outreach angle grounded in what the audit actually found, not a template.",
+      "From a campaign (an industry + a location), Discover queries OpenStreetMap's Overpass API for real local businesses and flags duplicates against existing leads. Adding a lead fetches its actual website and runs a rule-based audit — HTTPS, contact form, CTA language, FAQ density, Shopify/WooCommerce platform, live chat, mobile viewport — in order of severity, producing a score, an opportunity category (Website, Automation, AI Integration, Shopify UX) and a one- or two-sentence outreach angle grounded in what the audit actually found, not a template.",
     execution:
-      "[AI_DRAFT_REVIEW] Leads move through a real status lifecycle — Discovered → Enriched → Analysed → Qualified/Manual Review → Contacted → Replied → Call Booked → Client — worked from a filterable grid or a Kanban board with native drag-and-drop. Built on Next.js 15, React 19, TypeScript and Supabase (Auth + Postgres), deployed on Vercel; two real security issues were found and fixed during build — an open-redirect vulnerability in the Google sign-in flow, and a missing SSRF protection on the site-fetcher that let the audit engine request arbitrary URLs server-side.",
+      "Leads move through a real status lifecycle — Discovered → Enriched → Analysed → Qualified/Manual Review → Contacted → Replied → Call Booked → Client — worked from a filterable grid or a Kanban board with native drag-and-drop. Built on Next.js 15, React 19, TypeScript and Supabase (Auth + Postgres), deployed on Vercel; two real security issues were found and fixed during build — an open-redirect vulnerability in the Google sign-in flow, and a missing SSRF protection on the site-fetcher that let the audit engine request arbitrary URLs server-side.",
     learnings: [
-      "[AI_DRAFT_REVIEW] The riskiest part of the product wasn't the lead-scoring logic — it was the plumbing: a server that fetches arbitrary user-supplied URLs is an SSRF risk by default, and a login redirect is an open-redirect risk by default, unless you specifically close both. Neither showed up until they were looked for directly.",
+      "The riskiest part of the product wasn't the lead-scoring logic — it was the plumbing: a server that fetches arbitrary user-supplied URLs is an SSRF risk by default, and a login redirect is an open-redirect risk by default, unless you specifically close both. Neither showed up until they were looked for directly.",
     ],
 
     tools: ["Next.js", "React", "TypeScript", "Supabase", "OpenStreetMap Overpass API", "Vercel"],
