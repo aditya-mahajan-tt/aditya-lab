@@ -89,7 +89,11 @@ export function Core({
     () => ({
       core: createCoreMaterial(tokens),
       glass: createGlassMaterial(tokens, tier),
-      metal: createMetalMaterial(tokens),
+      // Rings, modules and meridians read as green-tinted brushed metal
+      // rather than the neutral steel other 3D objects use — at
+      // metalness:1(ish) that neutral tint was reading as near-invisible
+      // against the near-black background outside a passing highlight.
+      metal: createMetalMaterial(tokens, tokens.accentDim),
     }),
     [tokens, tier],
   );
@@ -291,12 +295,12 @@ export function Core({
 
       {/* Structural frame. A detail-0 octahedron's wireframe is exactly its
           twelve edges — no EdgesGeometry, no second geometry to dispose.
-          borderStrong + higher opacity than the original border/0.45: at
-          hero size a 1px wireframe line in near-black-on-black was reading
-          as absent rather than subtle. */}
+          accentDim, not borderStrong: a neutral 1px wireframe line in
+          near-black-on-black was reading as absent, not subtle — the same
+          fade-into-background problem the ring/module metal had. */}
       <mesh ref={frameRef}>
         <octahedronGeometry args={[1.34, 0]} />
-        <meshBasicMaterial color={tokens.borderStrong} wireframe transparent opacity={0.65} toneMapped={false} />
+        <meshBasicMaterial color={tokens.accentDim} wireframe transparent opacity={0.65} toneMapped={false} />
       </mesh>
 
       {/* The shell is a housing, not a gem: it has to stay small enough that

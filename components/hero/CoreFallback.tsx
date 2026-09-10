@@ -74,9 +74,10 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
             <path
               d={`M ${200 + start.x} ${200 + start.y} A ${OUTER_RADIUS + 18} ${OUTER_RADIUS + 18} 0 0 1 ${200 + end.x} ${200 + end.y}`}
               fill="none"
-              stroke="var(--color-border-strong)"
+              stroke="var(--color-accent-dim)"
               strokeWidth="1"
               strokeDasharray={PLANE_DASH[plane]}
+              opacity="0.55"
             />
             <text
               x={200 + label.x}
@@ -90,8 +91,8 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
         );
       })}
 
-      <circle cx="200" cy="200" r={OUTER_RADIUS} stroke="var(--color-border)" strokeWidth="1" fill="none" opacity="0.4" />
-      <circle cx="200" cy="200" r={INNER_RADIUS} stroke="var(--color-border)" strokeWidth="1" fill="none" opacity="0.4" />
+      <circle cx="200" cy="200" r={OUTER_RADIUS} stroke="var(--color-accent-dim)" strokeWidth="1" fill="none" opacity="0.5" />
+      <circle cx="200" cy="200" r={INNER_RADIUS} stroke="var(--color-accent-dim)" strokeWidth="1" fill="none" opacity="0.5" />
 
       <g className="core-rotate">
         {bodies.map((body) => {
@@ -121,9 +122,9 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                   y1="200"
                   x2={200 + x}
                   y2={200 + y}
-                  stroke="var(--color-border)"
+                  stroke="var(--color-accent-dim)"
                   strokeWidth="1"
-                  opacity="0.5"
+                  opacity="0.6"
                 />
                 {/* Invisible hit-target, centered on the body: the visible marker
                     alone (10-14 viewBox units) plus the thin connector line can

@@ -67,9 +67,16 @@ type Props = {
 export function CoreNode({ direction, radius, tokens, expansion, active, onHoverChange, onSelect }: Props) {
   const [hovered, setHovered] = useState(false);
 
-  const material = useMemo(() => createMetalMaterial(tokens), [tokens]);
+  // Green-tinted metal, matching the ring/frame structure (three/objects/Core)
+  // — a gray node sitting on a green assembly would read as the one dead
+  // part of the machine rather than a resting state.
+  const material = useMemo(() => createMetalMaterial(tokens, tokens.accentDim), [tokens]);
+  // Rests dim green (visible against the background, unlike the old
+  // near-invisible borderStrong) and lerps to full-brightness accent on
+  // hover/active in useFrame below — the same rest→hot progression the
+  // node's own emissive material already uses.
   const connectorMaterial = useMemo(
-    () => new MeshBasicMaterial({ color: new Color(tokens.borderStrong), transparent: true, opacity: 0.85, toneMapped: false }),
+    () => new MeshBasicMaterial({ color: new Color(tokens.accentDim), transparent: true, opacity: 0.85, toneMapped: false }),
     [tokens],
   );
 
@@ -97,8 +104,8 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
   const connectorGroupRef = useRef<Group>(null);
   const connectorRef = useRef<Mesh>(null);
 
-  const restColor = useMemo(() => new Color(tokens.borderStrong), [tokens]);
-  const activeColor = useMemo(() => new Color(tokens.accentDim), [tokens]);
+  const restColor = useMemo(() => new Color(tokens.accentDim), [tokens]);
+  const activeColor = useMemo(() => new Color(tokens.accent), [tokens]);
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 1 / 30);
