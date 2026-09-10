@@ -171,7 +171,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   expect(hrefs).toContain("/work/gostops-gtm");
   expect(hrefs).toContain("/work/kensara-ai-gtm");
   expect(hrefs).toContain("/work/adda-d2c");
-  expect(hrefs).toContain("/work/cricket-game");
+  expect(hrefs).toContain("/work/leadiq");
   expect(hrefs).toContain("/experiments/ai-lead-generation-engine");
   expect(hrefs).toContain("/about#experience-turbotork");
 

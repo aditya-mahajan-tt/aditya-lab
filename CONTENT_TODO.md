@@ -6,7 +6,7 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**31 missing, 0 unreviewed drafts.**
+**4 missing, 28 unreviewed drafts.**
 
 ## data/build.ts
 
@@ -16,31 +16,32 @@
 ## data/projects.ts
 
 - [ ] `[X_REQUIRED]` — line 8
-- [ ] `[PROJECT_001_SUMMARY_REQUIRED]` — line 41
-- [ ] `[PROJECT_001_CONTEXT_REQUIRED]` — line 43
-- [ ] `[PROJECT_001_PROBLEM_REQUIRED]` — line 44
-- [ ] `[PROJECT_001_ROLE_REQUIRED]` — line 45
-- [ ] `[PROJECT_001_THINKING_REQUIRED]` — line 46
-- [ ] `[PROJECT_001_APPROACH_REQUIRED]` — line 47
-- [ ] `[PROJECT_001_EXECUTION_REQUIRED]` — line 48
-- [ ] `[PROJECT_001_LEARNING_1_REQUIRED]` — line 50
-- [ ] `[PROJECT_002_CONTEXT_REQUIRED]` — line 81
-- [ ] `[PROJECT_002_PROBLEM_REQUIRED]` — line 82
-- [ ] `[PROJECT_002_THINKING_REQUIRED]` — line 84
-- [ ] `[PROJECT_002_APPROACH_REQUIRED]` — line 85
-- [ ] `[PROJECT_002_EXECUTION_REQUIRED]` — line 86
-- [ ] `[PROJECT_002_LEARNING_1_REQUIRED]` — line 88
-- [ ] `[PROJECT_003_CONTEXT_REQUIRED]` — line 112
-- [ ] `[PROJECT_003_PROBLEM_REQUIRED]` — line 113
-- [ ] `[PROJECT_003_THINKING_REQUIRED]` — line 115
-- [ ] `[PROJECT_003_APPROACH_REQUIRED]` — line 116
-- [ ] `[PROJECT_003_LEARNING_1_REQUIRED]` — line 120
-- [ ] `[PROJECT_004_TITLE_REQUIRED]` — line 135
-- [ ] `[PROJECT_004_SUMMARY_REQUIRED]` — line 142
-- [ ] `[PROJECT_004_CONTEXT_REQUIRED]` — line 143
-- [ ] `[PROJECT_004_PROBLEM_REQUIRED]` — line 144
-- [ ] `[PROJECT_004_ROLE_REQUIRED]` — line 145
-- [ ] `[PROJECT_004_THINKING_REQUIRED]` — line 146
-- [ ] `[PROJECT_004_APPROACH_REQUIRED]` — line 147
-- [ ] `[PROJECT_004_EXECUTION_REQUIRED]` — line 148
-- [ ] `[PROJECT_004_LEARNING_1_REQUIRED]` — line 149
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 21
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 48
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 51
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 53
+- [ ] `[PROJECT_001_ROLE_REQUIRED]` — line 54
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 56
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 58
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 60
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 63
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 96
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 98
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 101
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 103
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 105
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 108
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 134
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 136
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 139
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 141
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 145
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 147
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 172
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 174
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 176
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 177
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 179
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 181
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 183
+- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 185
