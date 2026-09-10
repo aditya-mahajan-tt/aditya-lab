@@ -111,20 +111,32 @@ export function StationMarkers({ items, hoveredId, focusedId, onHoverChange, onS
       </instancedMesh>
 
       {/* One name tag per placeholder — the pole-and-cap shape alone reads
-          as "something is here," not "what." */}
-      {items.map((item) => (
-        <Html
-          key={item.id}
-          position={[item.position[0], item.position[1] + POLE_HEIGHT + 0.12, item.position[2]]}
-          center
-          distanceFactor={6}
-          style={{ pointerEvents: "none" }}
-        >
-          <span className={`label whitespace-nowrap ${item.id === hoveredId || item.id === focusedId ? "text-accent" : ""}`}>
-            {item.label}
-          </span>
-        </Html>
-      ))}
+          as "something is here," not "what." Suppressed for whichever item
+          is currently focused: drei's `distanceFactor` scales the tag up as
+          the camera closes in on it, and at focus range that growth
+          overlaps the 2D info card LabEnvironmentStage already renders for
+          the focused station (same label, same effect as
+          three/objects/stations/Workstation's identical tag). */}
+      {items.map((item) =>
+        item.id === focusedId ? null : (
+          <Html
+            key={item.id}
+            position={[item.position[0], item.position[1] + POLE_HEIGHT + 0.12, item.position[2]]}
+            center
+            distanceFactor={6}
+            style={{ pointerEvents: "none" }}
+          >
+            {/* Inline colour, not a text-accent* class — see the identical
+                comment in three/objects/stations/Workstation.tsx. */}
+            <span
+              className="label whitespace-nowrap"
+              style={{ color: item.id === hoveredId ? "var(--color-accent)" : "var(--color-accent-dim)" }}
+            >
+              {item.label}
+            </span>
+          </Html>
+        ),
+      )}
     </>
   );
 }

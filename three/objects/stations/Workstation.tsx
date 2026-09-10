@@ -115,10 +115,24 @@ export function Workstation({ label, hovered, focused, onHoverChange, onSelect }
 
       {/* A persistent name tag, not a hover tooltip — a visitor orbiting past
           six stations needs to read what each one is without stopping on
-          it first. */}
-      <Html position={[0, 0.58, 0]} center distanceFactor={6} style={{ pointerEvents: "none" }}>
-        <span className={`label whitespace-nowrap ${active ? "text-accent" : ""}`}>{label}</span>
-      </Html>
+          it first. Hidden once this station is focused: drei's
+          `distanceFactor` scales the tag up as the camera closes in to frame
+          it, and at focus range that growth overlaps the 2D info card
+          LabEnvironmentStage renders for the focused station — which already
+          shows this same label, so nothing is lost by dropping the 3D one
+          here. */}
+      {!focused && (
+        <Html position={[0, 0.58, 0]} center distanceFactor={6} style={{ pointerEvents: "none" }}>
+          {/* Inline colour, not a text-accent* class: .label's own color
+              declaration sits later than Tailwind's color utilities in the
+              compiled stylesheet, inside the same layer, so it wins on
+              source order regardless of which utility class is also
+              present — a class here would silently do nothing. */}
+          <span className="label whitespace-nowrap" style={{ color: active ? "var(--color-accent)" : "var(--color-accent-dim)" }}>
+            {label}
+          </span>
+        </Html>
+      )}
     </group>
   );
 }
