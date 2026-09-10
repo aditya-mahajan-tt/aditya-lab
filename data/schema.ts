@@ -275,8 +275,12 @@ export const BuildModeSchema = z.object({
   stack: z.array(StackCategorySchema).min(1),
   architecture: SystemDiagramSchema,
   decisions: z.array(z.object({ title: z.string(), body: Fillable })).min(1),
-  whatBroke: z.array(Fillable).min(3),
-  whatLearned: Fillable,
+  // Optional, not required-with-a-placeholder: Aditya pulled the "what
+  // broke"/"what was learned" sections off /build for now rather than ship
+  // an incomplete one (2026-09-10). Re-add both fields (and the min(3) on
+  // whatBroke) once there's real content for both.
+  whatBroke: z.array(Fillable).min(3).optional(),
+  whatLearned: Fillable.optional(),
 });
 
 /* ---------------------------------------------------------------- types */

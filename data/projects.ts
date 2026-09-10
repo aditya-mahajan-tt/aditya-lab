@@ -5,8 +5,9 @@ import { ProjectSchema } from "./schema";
  * CONTENT_INTAKE.md §C.
  *
  * Ship V1 with THREE excellent case studies, not seven thin ones.
- * Every [X_REQUIRED] token below must be replaced before production —
- * `npm run check:placeholders` fails the production build otherwise.
+ * Every `_REQUIRED`-suffixed placeholder token below must be replaced
+ * before production — `npm run check:placeholders` fails the production
+ * build otherwise (see CLAUDE.md §7 for the exact token format).
  *
  * Adding a project = adding one object here. Nothing else changes.
  *

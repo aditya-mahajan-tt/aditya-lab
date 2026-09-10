@@ -9,12 +9,27 @@ test.use({ viewport: { width: 375, height: 812 } });
 
 test("check:placeholders --strict exits non-zero when data has an outstanding token", async () => {
   const { spawnSync } = await import("node:child_process");
-  const run = spawnSync("node", ["scripts/check-placeholders.mjs", "--strict"], {
-    encoding: "utf8",
-  });
-  // This repo currently has real, intentional placeholders (CLAUDE.md §7/§8) —
-  // this assertion documents that the guard is armed, not that content is done.
-  expect(run.status).not.toBe(0);
+  const { writeFileSync, unlinkSync } = await import("node:fs");
+  const { join } = await import("node:path");
+
+  // Proves the gate is armed by injecting a synthetic placeholder into
+  // /data for the duration of this check, rather than relying on real
+  // content happening to still be incomplete — that assumption broke the
+  // moment content actually caught up (2026-09-10: every real
+  // `_REQUIRED` token in /data was filled or removed).
+  const scratchPath = join(process.cwd(), "data", "__placeholder-gate-check.ts");
+  writeFileSync(scratchPath, 'export const scratch = "[SCRATCH_TOKEN_REQUIRED]";\n');
+  try {
+    const run = spawnSync("node", ["scripts/check-placeholders.mjs", "--strict"], {
+      encoding: "utf8",
+    });
+    expect(run.status).not.toBe(0);
+  } finally {
+    unlinkSync(scratchPath);
+    // Regenerate CONTENT_TODO.md against real /data again — otherwise it's
+    // left reflecting the scratch file's now-deleted placeholder.
+    spawnSync("node", ["scripts/check-placeholders.mjs"], { encoding: "utf8" });
+  }
 });
 
 test("no interactive element renders under 44px in either dimension at 375px", async ({ page }) => {

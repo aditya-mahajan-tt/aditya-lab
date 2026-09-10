@@ -85,40 +85,11 @@ export default function BuildPage() {
         </div>
       </section>
 
-      <section className="section border-t border-border" aria-labelledby="broke-heading">
-        <div className="container-lab">
-          <RevealText>
-            <p className="label mb-4">WHAT BROKE</p>
-            <h2 id="broke-heading" className="text-[length:var(--text-2xl)]">
-              Honestly
-            </h2>
-          </RevealText>
-          <RevealText className="prose-lab mt-8 max-w-[68ch] space-y-3 text-text-muted">
-            <ul className="space-y-3">
-              {buildMode.whatBroke.map((item, i) => (
-                <li key={i} className="flex gap-4">
-                  <span className="text-accent">—</span>
-                  <Fill value={item} />
-                </li>
-              ))}
-            </ul>
-          </RevealText>
-        </div>
-      </section>
-
-      <section className="section border-t border-border" aria-labelledby="learned-heading">
-        <div className="container-lab">
-          <RevealText>
-            <p className="label mb-4">WHAT WAS LEARNED</p>
-            <h2 id="learned-heading" className="sr-only">
-              What was learned
-            </h2>
-            <div className="prose-lab text-[length:var(--text-lg)] text-text-muted">
-              <Fill value={buildMode.whatLearned} as="p" />
-            </div>
-          </RevealText>
-        </div>
-      </section>
+      {/* "WHAT BROKE" / "WHAT WAS LEARNED" — pulled 2026-09-10 rather than
+          ship an incomplete list or a placeholder paragraph. Both fields
+          are optional in BuildModeSchema; re-add these two sections (see
+          data/build.ts's comment for the two already-approved whatBroke
+          entries) once there's real content for both. */}
     </>
   );
 }

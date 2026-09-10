@@ -6,13 +6,4 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**3 missing, 0 unreviewed drafts.**
-
-## data/build.ts
-
-- [ ] `[BUILD_MODE_BROKE_3_REQUIRED]` — line 68
-- [ ] `[BUILD_MODE_LEARNED_REQUIRED]` — line 71
-
-## data/projects.ts
-
-- [ ] `[X_REQUIRED]` — line 8
+**No outstanding placeholders or unreviewed drafts. Content is complete.**

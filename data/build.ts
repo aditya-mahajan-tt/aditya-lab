@@ -7,10 +7,22 @@ import { BuildModeSchema } from "./schema";
  * than routed through the draft-review marker (see data/schema.ts's
  * DRAFT_PATTERN comment).
  * `why`, `whatBroke` and `whatLearned` are personal reflection that must be
- * Aditya's own words — CONTENT_INTAKE.md §I1–I3. `why` and two of three
- * `whatBroke` entries are filled in (approved 2026-09-07); the third
- * `whatBroke` entry and `whatLearned` are still open — Aditya deferred both
- * deliberately rather than have them drafted.
+ * Aditya's own words — CONTENT_INTAKE.md §I1–I3. `why` is filled in
+ * (approved 2026-09-07). `whatBroke`/`whatLearned` are omitted entirely
+ * (2026-09-10) — app/build/page.tsx no longer renders those two sections
+ * while they're incomplete, rather than shipping a partial list or a
+ * placeholder paragraph. Two `whatBroke` entries were already approved
+ * before this; restore them first when the third lands:
+ *
+ *   whatBroke: [
+ *     "3D/R3F integration — bridging state across the React DOM and the
+ *      React Three Fiber reconciler boundary took real trial and error
+ *      before landing on a single flat Zustand store.",
+ *     "GSAP/ScrollTrigger fighting React's render lifecycle — animation
+ *      timing and cleanup needed deliberate handling to avoid stale
+ *      triggers on re-render.",
+ *     "<third entry>",
+ *   ],
  */
 export const buildMode = BuildModeSchema.parse({
   why: "This site exists to prove the AI × Product × Business claim by being built well, not by asserting it in prose — every layer, from the data model to the 3D core, is itself the demonstration.",
@@ -61,12 +73,4 @@ export const buildMode = BuildModeSchema.parse({
       body: "Every icon on this site is hand-drawn inline SVG — 1.5px stroke, a 24px grid, currentColor — rather than a package like lucide-react. One fewer dependency, and every icon matches the same hand.",
     },
   ],
-
-  whatBroke: [
-    "3D/R3F integration — bridging state across the React DOM and the React Three Fiber reconciler boundary took real trial and error before landing on a single flat Zustand store.",
-    "GSAP/ScrollTrigger fighting React's render lifecycle — animation timing and cleanup needed deliberate handling to avoid stale triggers on re-render.",
-    "[BUILD_MODE_BROKE_3_REQUIRED]",
-  ],
-
-  whatLearned: "[BUILD_MODE_LEARNED_REQUIRED]",
 });
