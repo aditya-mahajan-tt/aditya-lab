@@ -60,7 +60,6 @@ export function SystemDiagramCard({
       <figure className="mt-8 hidden md:block">
         <svg
           viewBox={`${minX} ${minY} ${width} ${height}`}
-          role="img"
           aria-label={`${diagram.title}: ${diagram.nodes.map((n) => n.label).join(" → ")}.`}
           className="w-full"
         >
@@ -113,10 +112,20 @@ export function SystemDiagramCard({
             return (
               <g
                 key={node.label}
+                tabIndex={node.detail ? 0 : undefined}
+                role={node.detail ? "button" : undefined}
+                aria-label={node.detail ? `${node.label} — show detail` : undefined}
                 className="group cursor-default"
                 onMouseEnter={() => setActive(i)}
                 onMouseLeave={() => setActive((a) => (a === i ? null : a))}
+                onFocus={() => setActive(i)}
+                onBlur={() => setActive((a) => (a === i ? null : a))}
                 onClick={() => setActive((a) => (a === i ? null : i))}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" && e.key !== " ") return;
+                  e.preventDefault();
+                  setActive((a) => (a === i ? null : i));
+                }}
               >
                 <rect
                   x={pos.x - NODE_W / 2}
@@ -124,7 +133,7 @@ export function SystemDiagramCard({
                   width={NODE_W}
                   height={NODE_H}
                   rx={4}
-                  className="fill-surface stroke-border transition-colors duration-[var(--duration-fast)] group-hover:stroke-accent"
+                  className="fill-surface stroke-border transition-colors duration-[var(--duration-fast)] group-hover:stroke-accent group-focus-visible:stroke-accent"
                   strokeWidth={1.5}
                 />
                 <text
@@ -141,7 +150,7 @@ export function SystemDiagramCard({
           })}
         </svg>
         <figcaption className="label mt-4 min-h-[1.5em]">
-          {activeNode?.detail ?? "Hover a stage for detail."}
+          {activeNode?.detail ?? "Hover or tab to a stage for detail."}
         </figcaption>
       </figure>
 
@@ -151,7 +160,6 @@ export function SystemDiagramCard({
       <figure className="mt-8 md:hidden">
         <svg
           viewBox={`${mobileBox.minX} ${mobileBox.minY} ${mobileBox.width} ${mobileBox.height}`}
-          role="img"
           aria-label={`${diagram.title}: ${diagram.nodes.map((n) => n.label).join(" → ")}.`}
           className="w-full"
         >
@@ -193,8 +201,17 @@ export function SystemDiagramCard({
             return (
               <g
                 key={`mobile-${node.label}`}
+                tabIndex={node.detail ? 0 : undefined}
+                role={node.detail ? "button" : undefined}
+                aria-label={node.detail ? `${node.label} — show detail` : undefined}
                 className="cursor-pointer"
+                onFocus={() => setActive(i)}
                 onClick={() => setActive((a) => (a === i ? null : i))}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" && e.key !== " ") return;
+                  e.preventDefault();
+                  setActive((a) => (a === i ? null : i));
+                }}
               >
                 <rect
                   x={pos.x - NODE_W / 2}
@@ -202,7 +219,7 @@ export function SystemDiagramCard({
                   width={NODE_W}
                   height={NODE_H}
                   rx={4}
-                  className="fill-surface stroke-border transition-colors duration-[var(--duration-fast)]"
+                  className="fill-surface stroke-border transition-colors duration-[var(--duration-fast)] focus-visible:stroke-accent"
                   stroke={active === i ? "var(--color-accent)" : undefined}
                   strokeWidth={1.5}
                 />
@@ -220,7 +237,7 @@ export function SystemDiagramCard({
           })}
         </svg>
         <figcaption className="label mt-4 min-h-[1.5em]">
-          {activeNode?.detail ?? "Tap a stage for detail."}
+          {activeNode?.detail ?? "Tap or tab to a stage for detail."}
         </figcaption>
       </figure>
 
