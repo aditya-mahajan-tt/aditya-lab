@@ -16,7 +16,7 @@ export default function ExperimentsPage() {
     <section className="section">
       <div className="container-lab">
         <RevealText>
-          <p className="label mb-4">EXPERIMENT TABLE</p>
+          <p className="label mb-4">EXPERIMENT LOG</p>
           <h1 className="text-[length:var(--text-3xl)]">Experiments</h1>
           <p className="prose-lab mt-6 text-text-muted">
             Things I&rsquo;m building, testing, breaking and learning from. Some of these failed.
