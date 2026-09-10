@@ -29,9 +29,14 @@ const raw = [
     subtitle: "GTM Strategy",
     category: ["Strategy", "Marketing", "Segmentation"],
     year: "2026",
-    status: "CASE STUDY",
+    // Was "CASE STUDY" / order 1 — the Work list's lead slot. Diagnostic
+    // Report §02/§17: this project's narrative fields are still almost
+    // entirely placeholders, so the "CASE STUDY" tag and lead position moved
+    // to Adda (order 3 below) until real content lands here. Revert both
+    // once goSTOPS is written.
+    status: "IN PROGRESS",
     featured: true,
-    order: 1,
+    order: 3,
 
     summary: "[PROJECT_001_SUMMARY_REQUIRED]",
 
@@ -94,9 +99,12 @@ const raw = [
     subtitle: "D2C E-commerce Venture",
     category: ["Product", "E-commerce"],
     year: "2026",
-    status: "SHIPPED",
+    // Promoted to "CASE STUDY" / order 1 — Diagnostic Report §02/§17: this
+    // is the most complete project narrative on the site, so it leads the
+    // Work list instead of goSTOPS until goSTOPS has real content.
+    status: "CASE STUDY",
     featured: true,
-    order: 3,
+    order: 1,
 
     summary:
       "Built a Shopify-based D2C e-commerce store end-to-end — product research, vendor sourcing and payment integration — as founder.",
