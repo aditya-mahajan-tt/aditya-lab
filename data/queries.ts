@@ -76,7 +76,11 @@ export const getHeroBodies = (): HeroBody[] => {
     detail: stripDraftMarker(group.description),
     ring: "inner",
     planes: group.planes,
-    href: "/systems#neural-heading",
+    // Each of the 5 capability nodes routes to its own pre-selected group in
+    // the Neural Core rather than all 5 landing on the same anchor with
+    // whichever group happens to be first (Diagnostic Report §03/§16): the
+    // query param drives NeuralCore's initial `active` state.
+    href: `/systems?capability=${group.id}#neural-heading`,
   }));
 
   const outerProjects: HeroBody[] = projects.map((project) => ({

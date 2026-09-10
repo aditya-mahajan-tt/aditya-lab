@@ -31,6 +31,17 @@ import type { LabTokens } from "@/three/materials/tokens";
 const EXPANDED_EXTRA = 0.3;
 const DAMPING = 6;
 
+/**
+ * The visible node is a 0.085-unit box — at the hero's on-screen scale that
+ * raycasts to roughly a 12px target (16px at the 1.35x hover scale), well
+ * under the 44px-equivalent hit area components/hero/CoreFallback
+ * deliberately pads its own SVG markers with. An invisible mesh this much
+ * larger is the 3D layer's equivalent of that padding, so clicking "near" a
+ * node is exactly as forgiving in 3D as it already is in the DOM/SVG
+ * fallback, instead of demanding pixel-precision only here.
+ */
+const HIT_TARGET_SIZE = 0.34;
+
 const HOVER_EMISSIVE = 2.4;
 const EXPANDED_EMISSIVE = 1.3;
 
@@ -82,6 +93,7 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
   }, [material, connectorMaterial, tokens]);
 
   const meshRef = useRef<Mesh>(null);
+  const hitRef = useRef<Mesh>(null);
   const connectorGroupRef = useRef<Group>(null);
   const connectorRef = useRef<Mesh>(null);
 
@@ -98,6 +110,14 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
       const targetScale = hovered ? 1.35 : 1;
       const scale = MathUtils.damp(meshRef.current.scale.x, targetScale, DAMPING, step);
       meshRef.current.scale.setScalar(scale);
+    }
+
+    // The hit target tracks the visible node's position but never its hover
+    // scale — it has to stay a stable, predictable size to raycast against,
+    // not grow/shrink under the same pointer event that's deciding whether
+    // it's hovered.
+    if (hitRef.current) {
+      hitRef.current.position.set(direction[0] * dist, direction[1] * dist, direction[2] * dist);
     }
 
     if (connectorRef.current) {
@@ -132,9 +152,18 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
         </mesh>
       </group>
 
+      <mesh ref={meshRef} material={material}>
+        <boxGeometry args={[0.085, 0.085, 0.085]} />
+      </mesh>
+
+      {/* Invisible, larger hit target — the actual raycast surface. Kept as
+          a second mesh rather than scaling the visible one up: the visible
+          box's own size is a deliberate visual choice (small enough that the
+          node reads as a machine part, not a button), and it still needs to
+          hover-scale independently for the "lit up" response. */}
       <mesh
-        ref={meshRef}
-        material={material}
+        ref={hitRef}
+        visible={false}
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
           setHover(true);
@@ -148,7 +177,7 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
           onSelect();
         }}
       >
-        <boxGeometry args={[0.085, 0.085, 0.085]} />
+        <boxGeometry args={[HIT_TARGET_SIZE, HIT_TARGET_SIZE, HIT_TARGET_SIZE]} />
       </mesh>
     </>
   );

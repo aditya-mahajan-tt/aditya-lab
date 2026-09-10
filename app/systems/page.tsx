@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { RevealText } from "@/components/effects/RevealText";
 import { AutomationEngine } from "@/components/systems/AutomationEngine";
 import { NeuralCore } from "@/components/systems/NeuralCore";
@@ -63,7 +64,12 @@ export default function SystemsPage() {
             </h2>
           </RevealText>
           <RevealText className="mt-8">
-            <NeuralCore />
+            {/* NeuralCore reads `?capability=` via useSearchParams, which Next
+                requires to be wrapped in Suspense so the rest of the (static)
+                page isn't forced into fully dynamic rendering. */}
+            <Suspense fallback={null}>
+              <NeuralCore />
+            </Suspense>
           </RevealText>
         </div>
       </section>

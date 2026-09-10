@@ -161,7 +161,13 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   });
 
   expect(hrefs.length).toBe(11);
-  expect(hrefs).toContain("/systems#neural-heading");
+  // Each of the 5 capability nodes routes to its own pre-selected group
+  // (data/queries.ts's getHeroBodies) rather than all 5 sharing one anchor.
+  expect(hrefs).toContain("/systems?capability=THINK#neural-heading");
+  expect(hrefs).toContain("/systems?capability=BUILD#neural-heading");
+  expect(hrefs).toContain("/systems?capability=AUTOMATE#neural-heading");
+  expect(hrefs).toContain("/systems?capability=INTELLIGENCE#neural-heading");
+  expect(hrefs).toContain("/systems?capability=GROW#neural-heading");
   expect(hrefs).toContain("/work/gostops-gtm");
   expect(hrefs).toContain("/work/kensara-ai-gtm");
   expect(hrefs).toContain("/work/adda-d2c");
@@ -242,7 +248,7 @@ test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bo
   await expect(productTab).toHaveAttribute("aria-selected", "true");
 
   // AUTOMATE (product-only) should be tabbable; INTELLIGENCE (ai-only) should not.
-  const automateLink = page.locator('.core-dom a[href="/systems#neural-heading"]').nth(0);
+  const automateLink = page.locator('.core-dom a[href="/systems?capability=AUTOMATE#neural-heading"]');
   const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
   await expect(kensaraLink).toHaveAttribute("tabindex", "0"); // spans product+business — stays visible/tabbable
 });

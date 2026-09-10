@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { skillGroups } from "@/data/skills";
 import { getAllProjects } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
@@ -30,7 +31,18 @@ const CENTER = 170;
  * is reachable by keyboard, not hidden behind hover.
  */
 export function NeuralCore() {
-  const [active, setActive] = useState<string>(skillGroups[0]?.id ?? "THINK");
+  // The hero's 5 orbit-body capability nodes each link here with their own
+  // `?capability=` (data/queries.ts's getHeroBodies) so clicking THINK vs.
+  // GROW actually lands on a different pre-selected group instead of all 5
+  // opening the same default (Diagnostic Report §03). Falls back to the
+  // first group for any visitor who arrives without the param.
+  const searchParams = useSearchParams();
+  const requestedCapability = searchParams.get("capability");
+  const initialActive = skillGroups.some((g) => g.id === requestedCapability)
+    ? (requestedCapability as string)
+    : (skillGroups[0]?.id ?? "THINK");
+
+  const [active, setActive] = useState<string>(initialActive);
   const activeGroup = skillGroups.find((g) => g.id === active);
   const relatedProjects = getAllProjects().filter((p) =>
     (CAPABILITY_CATEGORIES[active] ?? []).some((cat) => p.category.includes(cat)),
