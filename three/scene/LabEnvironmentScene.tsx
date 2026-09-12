@@ -1,10 +1,14 @@
 "use client";
 
-import { useMemo, type RefObject } from "react";
+import { useMemo, type ComponentType, type RefObject } from "react";
 import type { FallbackReason, QualityTier } from "@/lib/quality";
 import { stations as allStations, type StationId } from "@/data/stations";
+import { AutomationEngine } from "@/three/objects/stations/AutomationEngine";
+import { CommunicationTerminal } from "@/three/objects/stations/CommunicationTerminal";
+import { ExperimentTable } from "@/three/objects/stations/ExperimentTable";
 import { Hub } from "@/three/objects/stations/Hub";
-import { StationMarkers } from "@/three/objects/stations/StationMarkers";
+import { NeuralCore } from "@/three/objects/stations/NeuralCore";
+import { StrategyWall } from "@/three/objects/stations/StrategyWall";
 import { Workstation } from "@/three/objects/stations/Workstation";
 import { FirstFrame } from "@/three/systems/FirstFrame";
 import { OrbitalCameraController } from "@/three/systems/OrbitalCameraController";
@@ -14,6 +18,25 @@ import { Environment } from "./Environment";
 import { Lighting } from "./Lighting";
 
 const STATION_RING_RADIUS = 2.6;
+
+type StationObjectProps = {
+  label: string;
+  hovered: boolean;
+  focused: boolean;
+  onHoverChange: (hovered: boolean) => void;
+  onSelect: () => void;
+};
+
+/** Every station now has its own object (PLAN.md Phase 13) — no shared
+ * placeholder mesh left; see the removed StationMarkers. */
+const STATION_OBJECTS: Record<StationId, ComponentType<StationObjectProps>> = {
+  workstation: Workstation,
+  "neural-core": NeuralCore,
+  "automation-engine": AutomationEngine,
+  "strategy-wall": StrategyWall,
+  "experiment-table": ExperimentTable,
+  "communication-terminal": CommunicationTerminal,
+};
 
 type Props = {
   tier: Exclude<QualityTier, "low">;
@@ -54,9 +77,6 @@ export function LabEnvironmentScene({
     return { angles, positions };
   }, []);
 
-  const workstation = allStations.find((s) => s.id === "workstation")!;
-  const unbuilt = allStations.filter((s) => s.id !== "workstation");
-
   return (
     <>
       <Environment />
@@ -66,23 +86,24 @@ export function LabEnvironmentScene({
 
       <Hub tier={tier} />
 
-      <group position={layout.positions[workstation.id]} rotation={[0, -((layout.angles[workstation.id] * Math.PI) / 180), 0]}>
-        <Workstation
-          label={workstation.label}
-          hovered={hoveredId === workstation.id}
-          focused={focusedId === workstation.id}
-          onHoverChange={(h) => onHoverChange(h ? workstation.id : null)}
-          onSelect={() => onSelect(workstation.id)}
-        />
-      </group>
-
-      <StationMarkers
-        items={unbuilt.map((s) => ({ id: s.id, label: s.label, position: layout.positions[s.id] }))}
-        hoveredId={hoveredId}
-        focusedId={focusedId}
-        onHoverChange={onHoverChange}
-        onSelect={onSelect}
-      />
+      {allStations.map((station) => {
+        const StationObject = STATION_OBJECTS[station.id];
+        return (
+          <group
+            key={station.id}
+            position={layout.positions[station.id]}
+            rotation={[0, -((layout.angles[station.id] * Math.PI) / 180), 0]}
+          >
+            <StationObject
+              label={station.label}
+              hovered={hoveredId === station.id}
+              focused={focusedId === station.id}
+              onHoverChange={(h) => onHoverChange(h ? station.id : null)}
+              onSelect={() => onSelect(station.id)}
+            />
+          </group>
+        );
+      })}
 
       <FirstFrame onReady={onReady} />
     </>

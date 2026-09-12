@@ -37,7 +37,7 @@ export const stations: Station[] = [
     label: "Neural Core",
     route: "/systems",
     description: "The capability graph — AI, product, automation and strategy, linked to real projects.",
-    built: false,
+    built: true,
   },
   {
     id: "automation-engine",
@@ -45,7 +45,7 @@ export const stations: Station[] = [
     label: "Automation Engine",
     route: "/systems",
     description: "Input → data → enrich → AI → decision → automation → output, animated end to end.",
-    built: false,
+    built: true,
   },
   {
     id: "strategy-wall",
@@ -53,7 +53,7 @@ export const stations: Station[] = [
     label: "Strategy Wall",
     route: "/systems",
     description: "Segmentation, GTM, positioning and customer-journey work laid out visually.",
-    built: false,
+    built: true,
   },
   {
     id: "experiment-table",
@@ -61,7 +61,7 @@ export const stations: Station[] = [
     label: "Experiment Table",
     route: "/experiments",
     description: "What's being built and broken right now, including the honest failures.",
-    built: false,
+    built: true,
   },
   {
     id: "communication-terminal",
@@ -69,6 +69,6 @@ export const stations: Station[] = [
     label: "Communication Terminal",
     route: "/contact",
     description: "Where a visitor starts a conversation.",
-    built: false,
+    built: true,
   },
 ];

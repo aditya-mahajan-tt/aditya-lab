@@ -17,6 +17,8 @@ const FALLBACK = {
   text: "#e9eceb",
   accent: "#b6ff4a",
   accentDim: "#77bd0f",
+  building: "#ffb547",
+  failed: "#ff5c5c",
 } as const;
 
 export type LabTokens = { -readonly [K in keyof typeof FALLBACK]: string };
@@ -30,6 +32,8 @@ const CSS_VAR: Record<keyof LabTokens, string> = {
   text: "--color-text",
   accent: "--color-accent",
   accentDim: "--color-accent-dim",
+  building: "--color-building",
+  failed: "--color-failed",
 };
 
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
