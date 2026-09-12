@@ -8,7 +8,10 @@ export const AskRequestSchema = z.object({
     .array(
       z.object({
         role: z.enum(["user", "assistant"]),
-        content: z.string().trim().min(1).max(500),
+        // Assistant turns aren't user input — they're the model's own prior
+        // output (or a canned answer) echoed back for context, and routinely
+        // run longer than the 500-char cap on a fresh question.
+        content: z.string().trim().min(1).max(2000),
       }),
     )
     .max(4)
