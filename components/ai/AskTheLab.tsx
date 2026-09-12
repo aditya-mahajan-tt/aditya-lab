@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLabStore } from "@/lib/store";
 import { useBodyScrollLock } from "@/lib/utils/useBodyScrollLock";
 import { analytics } from "@/lib/analytics/events";
+import { cn } from "@/lib/utils/cn";
 import { ChatWindow } from "./ChatWindow";
+import type { AskStatus } from "./types";
 
 /**
  * "Ask the Lab" (PLAN.md Phase 10, AI_SPEC.md §6). Mounted once (in the
@@ -22,6 +24,8 @@ export function AskTheLab() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const [status, setStatus] = useState<AskStatus>("idle");
+  const degraded = status === "offline" || status === "rate_limited";
 
   useBodyScrollLock(open);
 
@@ -79,18 +83,36 @@ export function AskTheLab() {
         <div className="mx-auto flex h-full w-full max-w-xl flex-col border border-border-strong bg-surface-raised md:h-[70vh] md:rounded-md">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <p className="label">ASK THE LAB</p>
-            <button
-              type="button"
-              onClick={() => dialogRef.current?.close()}
-              aria-label="Close Ask the Lab"
-              data-cursor="interact"
-              className="flex h-11 w-11 items-center justify-center text-text-faint transition-colors duration-[var(--duration-fast)] hover:text-text"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5">
+                <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                  {!degraded && (
+                    <span className="ask-lab-status-pulse absolute inline-flex h-full w-full rounded-full bg-accent" />
+                  )}
+                  <span
+                    className={cn(
+                      "relative inline-flex h-1.5 w-1.5 rounded-full",
+                      degraded ? "bg-building" : "bg-accent",
+                    )}
+                  />
+                </span>
+                <span className={cn("label", degraded ? "text-building" : "text-accent-dim")}>
+                  {status === "offline" ? "Offline" : status === "rate_limited" ? "Limited" : "Online"}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => dialogRef.current?.close()}
+                aria-label="Close Ask the Lab"
+                data-cursor="interact"
+                className="flex h-11 w-11 items-center justify-center text-text-faint transition-colors duration-[var(--duration-fast)] hover:text-text"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
-          <ChatWindow open={open} inputRef={inputRef} />
+          <ChatWindow open={open} inputRef={inputRef} status={status} setStatus={setStatus} />
         </div>
       </dialog>
     </>

@@ -7,7 +7,7 @@ import { REFUSAL_STRING } from "@/lib/ai/system-prompt";
 import { analytics } from "@/lib/analytics/events";
 import { MessageList } from "./MessageList";
 import { SuggestedQuestions } from "./SuggestedQuestions";
-import type { ChatMessage } from "./types";
+import type { AskStatus, ChatMessage } from "./types";
 
 type AskApiResponse =
   | { status: "answered"; message: string; link?: { label: string; href: string }; cached?: boolean }
@@ -15,8 +15,6 @@ type AskApiResponse =
   | { status: "invalid" }
   | { status: "rate_limited" }
   | { status: "offline" };
-
-type Status = "idle" | "pending" | "offline" | "rate_limited";
 
 const MANUAL_LINKS = [
   { label: "Work", href: "/work" },
@@ -27,13 +25,16 @@ const MANUAL_LINKS = [
 export function ChatWindow({
   open,
   inputRef,
+  status,
+  setStatus,
 }: {
   open: boolean;
   inputRef: RefObject<HTMLTextAreaElement | null>;
+  status: AskStatus;
+  setStatus: (status: AskStatus) => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [value, setValue] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fresh input every time the dialog opens — conversation history is
@@ -44,7 +45,7 @@ export function ChatWindow({
       setValue("");
       setStatus("idle");
     }
-  }, [open]);
+  }, [open, setStatus]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -52,7 +53,11 @@ export function ChatWindow({
 
   function selectSuggested(question: string) {
     const answer = CANNED_ANSWERS[question as keyof typeof CANNED_ANSWERS] ?? REFUSAL_STRING;
-    setMessages((prev) => [...prev, { role: "user", content: question }, { role: "assistant", content: answer }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: question, timestamp: Date.now() },
+      { role: "assistant", content: answer, timestamp: Date.now() },
+    ]);
     setStatus("idle");
     analytics.askLabQuestion(answer === REFUSAL_STRING);
   }
@@ -62,7 +67,7 @@ export function ChatWindow({
     if (!trimmed || trimmed.length > 500 || status === "pending") return;
 
     const history = messages.slice(-4).map((m) => ({ role: m.role, content: m.content }));
-    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+    setMessages((prev) => [...prev, { role: "user", content: trimmed, timestamp: Date.now() }]);
     setValue("");
     setStatus("pending");
 
@@ -81,6 +86,7 @@ export function ChatWindow({
             role: "assistant",
             content: data.message,
             link: "link" in data ? data.link : undefined,
+            timestamp: Date.now(),
           },
         ]);
         setStatus("idle");
@@ -107,20 +113,32 @@ export function ChatWindow({
         <MessageList messages={messages} pending={status === "pending"} />
 
         {(status === "offline" || status === "rate_limited") && (
-          <div role="alert" className="mt-3 rounded-md border border-building/50 bg-building/10 px-4 py-3">
-            <p className="font-mono text-xs uppercase tracking-widest text-building">
-              {status === "offline" ? "AI CORE TEMPORARILY OFFLINE." : "RATE LIMIT REACHED. The Lab resets hourly."}
-            </p>
-            <p className="mt-2 text-sm text-text-muted">Explore the Lab manually →</p>
-            <ul className="mt-2 flex gap-4">
-              {MANUAL_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-accent hover:text-accent-dim">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div role="alert" className="mt-3 flex gap-3">
+            <span className="shrink-0 pt-0.5 font-mono text-xs uppercase tracking-widest text-building">
+              SYS &gt;
+            </span>
+            <div className="min-w-0 flex-1 border-l-2 border-building pl-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-building">
+                {status === "offline" ? "AI Core Offline" : "Rate Limit Reached"}
+              </p>
+              <p className="mt-1.5 text-sm text-text-muted">
+                {status === "offline"
+                  ? "Explore the Lab manually."
+                  : "The Lab resets hourly. Explore manually meanwhile."}
+              </p>
+              <ul className="mt-2 flex gap-4">
+                {MANUAL_LINKS.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      className="font-mono text-xs uppercase tracking-widest text-accent hover:text-accent-dim"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
@@ -142,6 +160,9 @@ export function ChatWindow({
           Ask the Lab a question
         </label>
         <div className="flex items-end gap-2">
+          <span aria-hidden="true" className="pb-2 font-mono text-sm text-accent-dim">
+            &gt;
+          </span>
           <textarea
             id="ask-the-lab-input"
             ref={inputRef}
@@ -169,7 +190,11 @@ export function ChatWindow({
           </button>
         </div>
 
-        <p className="mt-3 text-xs text-text-faint">
+        <div className="mt-1 flex justify-end">
+          <span className="font-mono text-xs tabular-nums text-text-faint">{value.length} / 500</span>
+        </div>
+
+        <p className="mt-2 text-xs text-text-faint">
           Lab assistant. Answers come only from Aditya&rsquo;s written portfolio.
         </p>
         <p className="mt-1 text-xs text-text-faint">

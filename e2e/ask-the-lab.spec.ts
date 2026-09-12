@@ -107,7 +107,7 @@ test("a free-form question shows the honest offline state on API failure", async
   await input.fill("What year did Aditya graduate primary school?");
   await input.press("Enter");
 
-  await expect(dialog.getByRole("alert")).toContainText("AI CORE TEMPORARILY OFFLINE");
+  await expect(dialog.getByRole("alert")).toContainText("AI Core Offline");
   await expect(dialog.getByRole("link", { name: "Work" })).toBeVisible();
   await expect(dialog.getByRole("link", { name: "About" })).toBeVisible();
   await expect(dialog.getByRole("link", { name: "Contact" })).toBeVisible();
