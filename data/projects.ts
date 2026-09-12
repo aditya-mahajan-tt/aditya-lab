@@ -78,7 +78,7 @@ const raw = [
     subtitle: "GTM & Partnership Strategy",
     category: ["Strategy", "GTM"],
     year: "2026",
-    status: "IN PROGRESS",
+    status: "CASE STUDY",
     // Not on the homepage: the resume gives one bullet for this one, not
     // enough to earn a featured slot yet — see data/experience.ts's sibling
     // reasoning. Still a full entry in the /work archive.
@@ -86,7 +86,7 @@ const raw = [
     order: 2,
 
     summary:
-      "Leading GTM and partnership strategy for an AI startup at the IIT Guwahati case competition, advancing to the top 10 of 120 teams.",
+      "Leading GTM and partnership strategy for an AI startup — Team Audax won the IIT Guwahati case competition outright, finishing first out of 120 teams.",
 
     context:
       "Kensara AI is an early-stage AI compliance platform entering the market right as India's Digital Personal Data Protection Act (DPDPA) creates a real but finite window — full-force enforcement lands by May 2027, with penalties up to ₹250 Cr or 4% of global turnover — giving roughly nine months to build awareness and convert enterprises before that urgency fades.",
@@ -99,7 +99,7 @@ const raw = [
       "Five workstreams ran in parallel: competitive intelligence (live product demos with two category incumbents, benchmarked against Kensara's own compliance-operating-layer positioning), customer acquisition (direct outreach and warm introductions), Reddit community and answer-engine optimisation (practitioner-led posts in compliance/cybersecurity communities, used as a live voice-of-customer channel rather than pure marketing), market and ecosystem mapping (CA-firm white-label distribution, CISO/DPO communities, sponsored seminars), and a phased GTM roadmap tying acquisition activity to the DPDPA enforcement timeline.",
     execution:
       "The Reddit workstream alone generated a reported 100K+ cumulative post reach and one flagship security thread with 32 upvotes and 49 comments from practitioners describing real compliance pain — evidence used directly to sharpen Kensara's positioning, not just to build visibility. Combined with direct outreach, the month produced qualified leads and several pilot conversations in progress, testing the DPDPA-entry-wedge strategy against real market response rather than a hypothesis alone.",
-    outcome: "Advanced to the top 10 of 120 teams. (As stated on Aditya's resume — self-reported.)",
+    outcome: "Team Audax won the Catalysis'T'26 national case competition outright — first place out of 120 teams.",
     learnings: [
       "The strongest buying signal wasn't interest in \"another compliance platform\" — it was operational pain: evidence collection and proving controls exist were what practitioners actually complained about. And on AI specifically, practitioners trusted it for repetitive work but wanted humans to keep interpretation and accountability — a distinction worth designing the product around, not just the pitch.",
     ],
