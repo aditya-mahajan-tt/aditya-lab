@@ -11,6 +11,20 @@ const raw = [
   {
     id: "turbotork",
     planes: ["ai", "product", "business"],
+    // Ask the Lab grounds AI / leadership / founding questions here first —
+    // this is the only role where Aditya owned product, led engineers, helped
+    // close a round and shipped AI workflows himself. Aditya's call, 2026-09-18.
+    leadTopics: [
+      "AI",
+      "AI product",
+      "AI agents and automation",
+      "leadership",
+      "managing or leading a team",
+      "entrepreneurship and founding",
+      "startups and 0-to-1 building",
+      "fundraising",
+      "ownership and end-to-end product",
+    ],
     company: "Turbotork Technologies Pvt. Ltd.",
     role: "AI Product Manager, Founder's Office",
     location: "Gurugram",

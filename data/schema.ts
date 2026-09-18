@@ -216,6 +216,14 @@ export const ExperienceEntrySchema = z.object({
   highlights: z.array(HighlightSchema).default([]),
   /** Only set on entries the orbital hero's outer ring reads (spec §3.2/§6). */
   planes: z.array(Plane).min(1).optional(),
+  /**
+   * Topics this role is the canonical answer for. Ask the Lab surfaces these
+   * into the grounding corpus and is instructed to ground a matching question
+   * in this entry first, rather than picking whichever entry happens to share
+   * the most words with the question. Ordering preference only — it never
+   * licenses a claim that isn't already in `bullets` or `highlights`.
+   */
+  leadTopics: z.array(z.string()).default([]),
 });
 
 /* ------------------------------------------------------------ education */

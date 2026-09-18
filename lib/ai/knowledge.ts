@@ -35,6 +35,29 @@ function section(heading: string, lines: (string | null)[]): string | null {
   return [`## ${heading}`, ...body].join("\n");
 }
 
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * "2025-07" -> "July 2025 (2025-07)". Both forms, deliberately.
+ *
+ * The corpus used to carry the ISO form alone, and a model asked about a
+ * role answered — correctly — "from July 2022 to October 2024". guardrails.
+ * ts's isGrounded then looked for "October" in the corpus, didn't find it,
+ * and replaced a true answer with the refusal string (live probe,
+ * 2026-09-18). Emitting the spoken form is the honest fix: it puts the
+ * words an answer will actually use into the grounding text, instead of
+ * stoplisting month names, which would let a fabricated "March 2021" pass.
+ */
+function formatDate(value: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) return value; // education stores year-only precision
+  const month = MONTHS[Number(match[2]) - 1];
+  return month ? `${month} ${match[1]} (${value})` : value;
+}
+
 function buildAboutSection(): string | null {
   return section("About", [
     field(about.heroHeadline),
@@ -107,15 +130,24 @@ function buildExperimentsSection(): string | null {
 }
 
 function buildExperienceSection(): string | null {
-  const entries = experience
+  const entries = [...experience]
+    // Entries carrying leadTopics go first. Position in the corpus is a weak
+    // signal on its own, but it costs nothing and points the same way as the
+    // explicit PRIMARY REFERENCE line rather than fighting it.
+    .sort((a, b) => Number(b.leadTopics.length > 0) - Number(a.leadTopics.length > 0))
     .map((e) => {
       const bullets = e.bullets.map((b) => field(b)).filter((b): b is string => !!b);
       const highlights = e.highlights
         .map((h) => field(h.label) && `${h.value} — ${field(h.label)}`)
         .filter((h): h is string => !!h);
       return section(`Experience: ${e.role} at ${e.company}`, [
-        `Dates: ${e.start} to ${e.end ?? "Present"}`,
+        `Dates: ${formatDate(e.start)} to ${e.end ? formatDate(e.end) : "Present"}`,
         e.location ? `Location: ${e.location}` : null,
+        // Read by system-prompt.ts rule 9. Emitted first so it frames the
+        // bullets that follow rather than trailing them.
+        e.leadTopics.length > 0
+          ? `PRIMARY REFERENCE for questions about: ${e.leadTopics.join(", ")}.`
+          : null,
         ...bullets,
         e.tools.length > 0 ? `Tools: ${e.tools.join(", ")}` : null,
         ...highlights,
@@ -132,7 +164,7 @@ function buildEducationSection(): string | null {
         .map((h) => field(h.label) && `${h.value} — ${field(h.label)}`)
         .filter((h): h is string => !!h);
       return section(`Education: ${e.program} at ${e.institution}`, [
-        `Dates: ${e.start} to ${e.end ?? "Present"}`,
+        `Dates: ${formatDate(e.start)} to ${e.end ? formatDate(e.end) : "Present"}`,
         e.location ? `Location: ${e.location}` : null,
         e.note ? `Note: ${e.note}` : null,
         ...highlights,

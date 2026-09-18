@@ -6,6 +6,7 @@ import {
   FRIENDLY_REDIRECT,
   isGrounded,
   isPromptInjection,
+  sanitizeAnswer,
 } from "@/lib/ai/guardrails";
 import { checkRateLimit, getClientIp } from "@/lib/ai/rate-limit";
 import { recordSpend, spendCapExceeded } from "@/lib/ai/spend-cap";
@@ -88,14 +89,25 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
 
   try {
     const result = await callGroq(messages);
-    let answer = result.text.trim();
+    // Sanitize before grounding, not after: a stray URL or citation marker
+    // should clean up, not cost the visitor an otherwise correct answer.
+    let answer = sanitizeAnswer(result.text);
     const grounded = isGrounded(answer, knowledge.text);
     if (!grounded) {
       answer = REFUSAL_STRING;
     }
 
     recordSpend(result.totalTokens);
-    setCached(question, answer);
+    // Only cache real answers. The grounding check is deliberately cheap and
+    // imperfect (guardrails.ts), so it will occasionally reject a correct
+    // answer over one unlucky word. Caching that outcome froze the refusal
+    // in for 24h and, worse, baked it into the pre-generated canned answers
+    // — "What technologies does he use?" shipped as "I don't have that in
+    // Aditya's portfolio." on a page whose whole point is the technologies.
+    // A retry costs one cheap API call; a stuck refusal costs a recruiter.
+    if (grounded) {
+      setCached(question, answer);
+    }
     logQuestion({
       question,
       outcome: grounded ? "answered" : "refused",

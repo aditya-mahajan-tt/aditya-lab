@@ -32,23 +32,44 @@ const SUGGESTED_QUESTIONS = [
 const BASE_URL = process.env.ASK_LAB_BASE_URL ?? "http://localhost:3000";
 const OUTPUT = resolve(import.meta.dirname, "..", "lib", "ai", "canned-answers.generated.ts");
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Groq's free tier caps tokens-per-minute, and the grounding corpus is
+ * ~5k tokens per call — so six back-to-back questions reliably trip a 429,
+ * which the route turns into a plain "offline" status. The script used to
+ * read that as a fatal misconfiguration and exit on the second question.
+ * Pace the calls and retry, rather than telling the operator their key is
+ * broken when it isn't.
+ */
+const PACE_MS = Number(process.env.ASK_LAB_PACE_MS ?? 62_000);
+const MAX_ATTEMPTS = 3;
+
 async function ask(question) {
-  const res = await fetch(`${BASE_URL}/api/ask`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, history: [] }),
-  });
-  const data = await res.json();
-  if (data.status !== "answered") {
-    throw new Error(`"${question}" → status "${data.status}" (server offline, unreachable, or not configured?)`);
+  let lastStatus = "unknown";
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const res = await fetch(`${BASE_URL}/api/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, history: [] }),
+    });
+    const data = await res.json();
+    if (data.status === "answered") return data.message;
+    lastStatus = data.status;
+    // "offline" is the route's catch-all, and a rate limit is by far its
+    // most likely cause here — worth waiting out before giving up.
+    if (data.status !== "offline" || attempt === MAX_ATTEMPTS) break;
+    process.stdout.write(`(offline, retrying in ${PACE_MS / 1000}s) `);
+    await sleep(PACE_MS);
   }
-  return data.message;
+  throw new Error(`"${question}" → status "${lastStatus}" (server offline, unreachable, rate-limited, or not configured?)`);
 }
 
 console.log(`Generating canned answers against ${BASE_URL} ...\n`);
 
 const answers = {};
-for (const question of SUGGESTED_QUESTIONS) {
+for (const [i, question] of SUGGESTED_QUESTIONS.entries()) {
+  if (i > 0) await sleep(PACE_MS);
   process.stdout.write(`  ${question} ... `);
   try {
     answers[question] = await ask(question);

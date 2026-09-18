@@ -49,12 +49,57 @@ export const FRIENDLY_REDIRECT =
   "That's not something the Lab can help with — try asking about Aditya's work, skills, or approach.";
 
 /**
- * A small stoplist of common capitalised English words that would otherwise
- * false-positive as "proper nouns absent from the knowledge file" in
- * isGrounded below. Not exhaustive by design (AI_SPEC.md §4: "cheap,
- * imperfect, catches the worst cases") — erring toward over-refusing a
- * grounded answer is the safe failure direction here, not under-refusing
- * a fabricated one.
+ * AI_SPEC.md §4 requires that no URL the model produces ever reaches the
+ * visitor — internal links come only from link-suggestions.ts's allowlist,
+ * rendered as a separate chip. Nothing was actually enforcing that on the
+ * answer text: a live probe on 2026-09-18 returned prose containing
+ * "<https://adityalab.com/work/gostops-gtm>", and the six pre-generated
+ * canned answers still carry bare absolute URLs, one of them to a domain
+ * with a www prefix the site does not use.
+ *
+ * The same probe showed reasoning models emitting corpus headings back as
+ * citation spans — "...roughly 70%【Experience: AI Product Manager,
+ * Founder's Office at Turbotork Technologies Pvt. Ltd.】" — which leaks the
+ * grounding document's structure into a recruiter-facing answer.
+ *
+ * Both are stripped here, before the grounding check runs, so a stray URL
+ * or citation marker cleans up rather than failing an otherwise good
+ * answer. Runs on every answer path including the canned ones.
+ */
+export function sanitizeAnswer(answer: string): string {
+  return (
+    answer
+      // CJK bracket citation spans, and the ASCII [[...]] form.
+      .replace(/【[^】]*】/g, "")
+      .replace(/\[\[[^\]]*\]\]/g, "")
+      // Markdown links: keep the label, drop the target.
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      // Bare or angle-bracketed URLs, and any trailing "see: " lead-in left
+      // dangling once the URL is gone.
+      .replace(/<?\bhttps?:\/\/[^\s<>)\]]+>?/gi, "")
+      .replace(/\s+([,.;:])/g, "$1")
+      .replace(/(?:\b(?:see|at|via|visit)\s*)?[:,]?\s*\.(?=\s|$)/gi, ".")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim()
+  );
+}
+
+/**
+ * Capitalised words that are ordinary English rather than proper nouns.
+ * Without this, isGrounded below throws away a perfectly grounded answer
+ * whenever the model opens a sentence with a connective — a live probe on
+ * 2026-09-18 lost a correct, fully-sourced answer about Aditya's AI work to
+ * the single word "Additionally", and the visitor saw the refusal string
+ * instead. That failure is not "safe": it makes a working feature look
+ * broken on exactly the questions the portfolio most wants to answer.
+ *
+ * So this list covers the closed class the false positives come from —
+ * determiners, conjunctions, connectives, prepositions, modals and the
+ * handful of common nouns this assistant's register starts sentences with.
+ * It deliberately does NOT weaken the check itself: a capitalised word that
+ * is genuinely a fabricated employer, client or technology is still absent
+ * from the corpus, still not in this list, and still triggers a refusal
+ * (AI_SPEC.md §4: "cheap, imperfect, catches the worst cases").
  */
 const COMMON_CAPITALISED_WORDS = new Set([
   "The",
@@ -72,36 +117,123 @@ const COMMON_CAPITALISED_WORDS = new Set([
   "Her",
   "Their",
   "Its",
+  "Our",
   "A",
   "An",
+  "Each",
+  "Every",
+  "Both",
+  "Either",
+  "Neither",
+  "Some",
+  "Most",
+  "Many",
+  "Much",
+  "Few",
+  "Several",
+  "Any",
+  "All",
+  "One",
+  "Two",
+  "Three",
   "And",
   "But",
   "Or",
+  "Nor",
+  "Yet",
   "So",
+  "For",
   "If",
   "When",
   "While",
   "Because",
   "Since",
+  "Although",
+  "Though",
+  "Unless",
+  "Until",
+  "Whether",
+  "Whereas",
+  "However",
+  "Moreover",
+  "Furthermore",
+  "Additionally",
+  "Also",
+  "Therefore",
+  "Thus",
+  "Hence",
+  "Instead",
+  "Otherwise",
+  "Meanwhile",
+  "Nevertheless",
+  "Nonetheless",
+  "Besides",
+  "Overall",
+  "Altogether",
+  "Together",
+  "Beyond",
+  "Rather",
+  "Still",
+  "Then",
+  "Once",
+  "Before",
+  "After",
+  "During",
+  "Across",
+  "Alongside",
+  "Regarding",
+  "Concerning",
   "As",
   "To",
-  "For",
   "In",
   "On",
   "At",
   "Of",
   "With",
+  "Without",
+  "Within",
   "By",
   "From",
+  "Into",
+  "Onto",
+  "Over",
+  "Under",
+  "Through",
+  "Throughout",
+  "Between",
+  "Among",
+  "Against",
+  "Toward",
+  "Towards",
+  "Upon",
+  "About",
+  "Above",
+  "Below",
+  "Here",
+  "There",
+  "Where",
+  "Why",
+  "How",
+  "What",
+  "Which",
+  "Who",
+  "Whom",
+  "Whose",
   "Is",
   "Are",
   "Was",
   "Were",
   "Be",
   "Been",
+  "Being",
+  "Am",
   "Has",
   "Have",
   "Had",
+  "Having",
+  "Does",
+  "Did",
+  "Doing",
   "Will",
   "Would",
   "Should",
@@ -109,15 +241,116 @@ const COMMON_CAPITALISED_WORDS = new Set([
   "Can",
   "May",
   "Might",
-  "Not",
-  "No",
-  "Yes",
+  "Must",
+  "Shall",
+  "Let",
+  "Make",
+  "Made",
+  "Get",
+  "Got",
+  "Give",
+  "Given",
+  "Take",
+  "Taken",
+  "Use",
+  "Used",
+  "Using",
+  "Work",
+  "Works",
+  "Worked",
+  "Working",
+  "Build",
+  "Built",
+  "Building",
+  "Based",
+  "Focused",
+  "Drawn",
+  "Known",
+  "Seen",
+  "Said",
+  "Says",
+  "Look",
+  "Looking",
+  "Note",
+  "Notably",
+  "Specifically",
+  "Currently",
+  "Previously",
+  "Recently",
+  "Earlier",
+  "Later",
+  "Finally",
+  "First",
+  "Second",
+  "Third",
+  "Next",
+  "Last",
+  "Prior",
   "Aditya",
   "Ask",
   "Lab",
-  "AI",
   "Want",
   "Explore",
+  "More",
+  "Other",
+  "Another",
+  "Such",
+  "Same",
+  "Similar",
+  "Different",
+  "Key",
+  "Main",
+  "Early",
+  "Late",
+  "Good",
+  "Best",
+  "Strong",
+  "Clear",
+  "Real",
+  "Full",
+  "Long",
+  "Short",
+  "Small",
+  "Large",
+  "High",
+  "Low",
+  "New",
+  "Old",
+  "According",
+  "Details",
+  "Example",
+  "Examples",
+  "Experience",
+  "Project",
+  "Projects",
+  "Skills",
+  "Portfolio",
+  "Page",
+  "Site",
+  "Contact",
+  "Resume",
+  "Email",
+  "Yes",
+  "Not",
+  "No",
+  "Nothing",
+  "None",
+  "Never",
+  "Always",
+  "Often",
+  "Sometimes",
+  "Unfortunately",
+  "Importantly",
+  "Interestingly",
+  "Essentially",
+  "Generally",
+  "Typically",
+  "Broadly",
+  "Largely",
+  "Mostly",
+  "Primarily",
+  "Particularly",
+  "Notable",
 ]);
 
 function extractNumbers(text: string): string[] {
