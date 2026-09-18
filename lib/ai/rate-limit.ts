@@ -34,16 +34,24 @@ function maybeCleanup() {
   if (callsSinceCleanup < 500) return;
   callsSinceCleanup = 0;
   const now = Date.now();
-  for (const [ip, bucket] of ipBuckets) {
-    if (bucket.resetAt <= now) ipBuckets.delete(ip);
+  for (const [key, bucket] of ipBuckets) {
+    if (bucket.resetAt <= now) ipBuckets.delete(key);
   }
 }
 
 export type RateLimitResult = { allowed: true } | { allowed: false; reason: "ip" | "global" };
 
-export function checkRateLimit(ip: string): RateLimitResult {
+/**
+ * `scope` keeps separate budgets for separate endpoints. Voice transcription
+ * shares an IP with the questions that follow it, but spending a visitor's
+ * ten hourly questions on the act of dictating them would be absurd — a
+ * spoken question costs one transcribe and one ask, and each is counted in
+ * its own bucket.
+ */
+export function checkRateLimit(ip: string, scope: "ask" | "transcribe" | "speak" = "ask"): RateLimitResult {
   maybeCleanup();
   const now = Date.now();
+  const key = `${scope}:${ip}`;
 
   if (globalBucket.resetAt <= now) {
     globalBucket = { count: 0, resetAt: startOfNextUtcDay() };
@@ -52,10 +60,10 @@ export function checkRateLimit(ip: string): RateLimitResult {
     return { allowed: false, reason: "global" };
   }
 
-  let bucket = ipBuckets.get(ip);
+  let bucket = ipBuckets.get(key);
   if (!bucket || bucket.resetAt <= now) {
     bucket = { count: 0, resetAt: now + HOUR_MS };
-    ipBuckets.set(ip, bucket);
+    ipBuckets.set(key, bucket);
   }
   if (bucket.count >= PER_IP_LIMIT) {
     return { allowed: false, reason: "ip" };

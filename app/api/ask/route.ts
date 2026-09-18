@@ -14,6 +14,7 @@ import { getCached, setCached } from "@/lib/ai/cache";
 import { callGroq, type ChatMessage } from "@/lib/ai/groq-client";
 import { stripUnknownInternalPaths, suggestLink } from "@/lib/ai/link-suggestions";
 import { logQuestion } from "@/lib/ai/log";
+import { isInjectionByClassifier } from "@/lib/ai/prompt-guard";
 
 /**
  * "Ask the Lab" (AI_SPEC.md, PLAN.md Phase 10). Server-route-only access to
@@ -60,7 +61,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
   }
   const { question, history } = parsed.data;
 
-  if (isPromptInjection(question)) {
+  // Two layers, because each misses what the other catches. The regex is
+  // free and instant and catches persona-swaps ("you are now Aditya") that
+  // Prompt Guard scores as harmless; Prompt Guard catches the phrasings
+  // nobody wrote a pattern for. Regex first, so an obvious attempt never
+  // costs a network round trip. See lib/ai/prompt-guard.ts for the scores.
+  if (isPromptInjection(question) || (await isInjectionByClassifier(question))) {
     logQuestion({ question, outcome: "blocked", latencyMs: Date.now() - start });
     return NextResponse.json({ status: "redirected", message: FRIENDLY_REDIRECT });
   }
@@ -113,6 +119,8 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
       outcome: grounded ? "answered" : "refused",
       latencyMs: Date.now() - start,
       totalTokens: result.totalTokens,
+      model: result.model,
+      failedOver: result.failedOver,
     });
 
     const link = grounded ? (suggestLink(answer) ?? undefined) : undefined;

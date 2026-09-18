@@ -214,7 +214,46 @@ function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-const TOKEN_WARN_THRESHOLD = 20_000;
+/**
+ * The corpus is sent in full on EVERY question, so its size is not a
+ * storage concern — it is a per-request cost, and the binding limit is
+ * Groq's tokens-per-minute ceiling, not the model's context window. The
+ * models here hold 131,072 tokens; the free tier allows 8,000 per minute.
+ * The context window is ~4% used and irrelevant.
+ *
+ * AI_SPEC.md §2 set the trigger for section retrieval at 20,000 tokens,
+ * reasoning about context size. That number is unreachable: a request
+ * whose prompt alone exceeds the per-minute allowance fails EVERY time,
+ * with no slow degradation to warn anyone first — and it surfaces to the
+ * visitor as "AI CORE TEMPORARILY OFFLINE", which points at the API, not
+ * at the content change that actually caused it.
+ *
+ * Note that lib/ai/groq-client.ts's model failover does NOT relax this.
+ * Failover spreads separate questions across models with separate budgets;
+ * a single question is still served by a single model, so the ceiling on
+ * one request is one model's TPM.
+ *
+ * The budget below is what is left for the corpus after everything else
+ * that shares the request. It is deliberately checked against a realistic
+ * request rather than an absolute worst case: the history cap (4 turns x
+ * 2,000 chars) would reserve 2,000 tokens that a real conversation almost
+ * never uses, and budgeting for it would forbid content that works fine.
+ */
+const TOKENS_PER_MINUTE = Number(process.env.AI_TOKENS_PER_MINUTE ?? 8_000);
+const RESERVED_FOR_OUTPUT = Number(process.env.AI_MAX_OUTPUT_TOKENS ?? 500);
+const RESERVED_FOR_RULES = 400; // the nine system-prompt rules and delimiters
+const RESERVED_FOR_QUESTION = 125; // the 500-character input cap
+const RESERVED_FOR_HISTORY = 1_000; // two typical prior turns, not the 4x2000 cap
+
+export const CORPUS_TOKEN_BUDGET =
+  TOKENS_PER_MINUTE -
+  RESERVED_FOR_OUTPUT -
+  RESERVED_FOR_RULES -
+  RESERVED_FOR_QUESTION -
+  RESERVED_FOR_HISTORY;
+
+/** Warn while there is still room to act, rather than at the cliff edge. */
+const CORPUS_TOKEN_WARN = Math.floor(CORPUS_TOKEN_BUDGET * 0.85);
 
 export type Knowledge = {
   text: string;
@@ -233,12 +272,15 @@ export function getKnowledge(): Knowledge {
   const text = buildKnowledgeText();
   const tokenCount = estimateTokens(text);
 
-  if (tokenCount > TOKEN_WARN_THRESHOLD) {
-    // AI_SPEC.md §2: at this size, switch to per-section retrieval by
-    // keyword score — not a vector DB. Not yet implemented; this is the
-    // trigger to come back and do it.
+  if (tokenCount > CORPUS_TOKEN_WARN) {
+    // The fix at this point is AI_SPEC.md §2's own fallback: score the
+    // corpus sections by keyword overlap with the question and send the
+    // best three. Not a vector database — the corpus is far too small for
+    // embeddings to earn their infrastructure.
     console.warn(
-      `[ask-the-lab] knowledge corpus is ${tokenCount} tokens, over the ${TOKEN_WARN_THRESHOLD} warn threshold.`,
+      `[ask-the-lab] knowledge corpus is ${tokenCount} tokens of a ${CORPUS_TOKEN_BUDGET} budget` +
+        `${tokenCount > CORPUS_TOKEN_BUDGET ? " — OVER BUDGET: every request will be rate-limited" : ""}.` +
+        " Switch to per-section retrieval before adding more content.",
     );
   }
 

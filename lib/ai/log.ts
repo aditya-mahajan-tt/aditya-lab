@@ -13,6 +13,9 @@ export function logQuestion(entry: {
   outcome: AskOutcome;
   latencyMs: number;
   totalTokens?: number;
+  /** Which model answered, and which were skipped getting there. */
+  model?: string;
+  failedOver?: string[];
 }) {
   console.log(
     JSON.stringify({
@@ -21,6 +24,10 @@ export function logQuestion(entry: {
       outcome: entry.outcome,
       latencyMs: entry.latencyMs,
       totalTokens: entry.totalTokens ?? 0,
+      // Empty on the happy path. A field that starts filling up is the
+      // signal that one model's per-minute budget is routinely exhausted.
+      ...(entry.model ? { model: entry.model } : {}),
+      ...(entry.failedOver?.length ? { failedOver: entry.failedOver } : {}),
     }),
   );
 }

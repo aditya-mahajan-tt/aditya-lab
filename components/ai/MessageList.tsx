@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
+import { SpeakButton } from "./SpeakButton";
 import type { ChatMessage } from "./types";
 
 function formatTime(timestamp: number): string {
@@ -15,7 +16,15 @@ function formatTime(timestamp: number): string {
  * the Lab's system language (SYSTEM · STATUS · ONLINE) carried into the
  * conversation itself, per CLAUDE.md §10.
  */
-export function MessageList({ messages, pending }: { messages: ChatMessage[]; pending: boolean }) {
+export function MessageList({
+  messages,
+  pending,
+  canSpeak = false,
+}: {
+  messages: ChatMessage[];
+  pending: boolean;
+  canSpeak?: boolean;
+}) {
   if (messages.length === 0 && !pending) return null;
 
   return (
@@ -49,6 +58,7 @@ export function MessageList({ messages, pending }: { messages: ChatMessage[]; pe
                   → {m.link.label}
                 </Link>
               )}
+              {canSpeak && m.role === "assistant" && <SpeakButton text={m.content} />}
             </div>
           </div>
         </div>
