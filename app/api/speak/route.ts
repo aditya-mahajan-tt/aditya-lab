@@ -29,10 +29,43 @@ import { checkRateLimit, getClientIp } from "@/lib/ai/rate-limit";
 export const runtime = "nodejs";
 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/audio/speech";
-const TIMEOUT_MS = 15_000;
+/**
+ * Synthesis time scales with the text: 254 characters took 3.0s and 54 took
+ * 0.8s, measured 2026-09-18. At that rate the MAX_CHARS cap below lands near
+ * 14s, which 15s would have clipped for the longest answers only — the
+ * failure mode where a feature looks fine until someone asks a real
+ * question. This is not the 10s answer budget in AI_SPEC §7: nobody is
+ * waiting on a blank screen here, they already have the answer in text and
+ * pressed a button to also hear it.
+ */
+const TIMEOUT_MS = 25_000;
 
 /** Long enough for any 2-4 sentence answer, short enough to be useless as a service. */
 const MAX_CHARS = 1_200;
+
+/**
+ * The voices canopylabs/orpheus-v1-english actually accepts, read off the
+ * API's own rejection on 2026-09-18 and confirmed one by one — all six
+ * return audio. The model does NOT take Orpheus's widely documented default
+ * ("tara"), which this route originally used: every call failed with
+ * `voice must be one of the following voices: [...]`, and because that is a
+ * 400 like the terms error, it would have looked like the terms were still
+ * unaccepted rather than like a bad parameter.
+ *
+ * Validated here rather than passed through, so a typo in AI_TTS_VOICE
+ * degrades to a working default instead of breaking every answer's audio.
+ */
+const VOICES = ["autumn", "diana", "hannah", "austin", "daniel", "troy"] as const;
+const DEFAULT_VOICE = "daniel";
+
+function voice(): string {
+  const configured = process.env.AI_TTS_VOICE?.trim().toLowerCase();
+  if (configured && (VOICES as readonly string[]).includes(configured)) return configured;
+  if (configured) {
+    console.warn(`[ask-the-lab] AI_TTS_VOICE="${configured}" is not one of ${VOICES.join(", ")}; using ${DEFAULT_VOICE}.`);
+  }
+  return DEFAULT_VOICE;
+}
 
 /**
  * Capability probe. The chat UI is a client component and cannot read
@@ -40,62 +73,35 @@ const MAX_CHARS = 1_200;
  * where it ships to every visitor whether or not they open the assistant.
  * One cheap GET when the dialog opens keeps the switch server-side.
  *
- * It asks the provider rather than trusting the env var, because those two
- * can disagree in exactly the way that produces a broken button: setting
- * AI_TTS_MODEL is not the same as the Groq org admin having accepted the
- * model's terms, and on 2026-09-18 the variable was set while the terms
- * were not, so every synthesis returned model_terms_required. Reading the
- * env alone would have rendered a "Listen" control that silently did
- * nothing — the precise failure this route was written to avoid.
+ * It answers from configuration and does NOT synthesise anything to check.
+ * An earlier version did, to catch the case where AI_TTS_MODEL is set but
+ * the model is unusable — but Groq allows only 100 speech requests a DAY
+ * (measured 2026-09-18, against 1,000 for chat). On serverless, every cold
+ * start is a fresh module scope and therefore a fresh probe, so verifying
+ * availability would have spent the budget for reading answers aloud on
+ * repeatedly asking whether answers can be read aloud.
  *
- * The verdict is cached per server instance. A positive one is kept for the
- * instance's life (terms are not un-accepted); a negative one expires, so
- * accepting the terms starts working on its own instead of needing a
- * redeploy to notice.
+ * Correctness is preserved at the other end instead: a synthesis rejected
+ * for terms or an invalid voice records the failure below, so the control
+ * retires itself after at most one press rather than failing forever.
  */
-const NEGATIVE_PROBE_TTL_MS = 10 * 60 * 1000;
+const UNAVAILABLE_TTL_MS = 10 * 60 * 1000;
 
-let probe: { enabled: boolean; at: number } | null = null;
+/** Set when the provider says this model cannot serve us; expires so accepting terms self-heals. */
+let unavailableSince: number | null = null;
 
-async function ttsAvailable(): Promise<boolean> {
-  const model = process.env.AI_TTS_MODEL?.trim();
-  const apiKey = process.env.AI_PROVIDER_API_KEY;
-  if (!model || !apiKey) return false;
-
-  if (probe && (probe.enabled || Date.now() - probe.at < NEGATIVE_PROBE_TTL_MS)) {
-    return probe.enabled;
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
-  try {
-    // One syllable: enough to prove the model will serve this account,
-    // small enough to be negligible against the audio-seconds budget.
-    const response = await fetch(GROQ_ENDPOINT, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model,
-        input: "ok",
-        voice: process.env.AI_TTS_VOICE ?? "tara",
-        response_format: "wav",
-      }),
-      signal: controller.signal,
-    });
-    if (!response.ok) console.warn(`[ask-the-lab] tts unavailable: ${await response.text()}`);
-    probe = { enabled: response.ok, at: Date.now() };
-    return response.ok;
-  } catch (err) {
-    console.warn("[ask-the-lab] tts probe failed:", err);
-    probe = { enabled: false, at: Date.now() };
-    return false;
-  } finally {
-    clearTimeout(timeout);
-  }
+function markUnavailable() {
+  unavailableSince = Date.now();
 }
 
-export async function GET() {
-  return NextResponse.json({ enabled: await ttsAvailable() });
+function configured(): boolean {
+  if (!process.env.AI_TTS_MODEL?.trim() || !process.env.AI_PROVIDER_API_KEY) return false;
+  if (unavailableSince && Date.now() - unavailableSince < UNAVAILABLE_TTL_MS) return false;
+  return true;
+}
+
+export function GET() {
+  return NextResponse.json({ enabled: configured() });
 }
 
 export async function POST(req: NextRequest) {
@@ -137,7 +143,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model,
         input: text,
-        voice: process.env.AI_TTS_VOICE ?? "tara",
+        voice: voice(),
         response_format: "wav",
       }),
       signal: controller.signal,
@@ -148,11 +154,14 @@ export async function POST(req: NextRequest) {
       console.error(`[ask-the-lab] speech failed: ${response.status} ${detail}`);
       // The terms-acceptance case is a configuration problem, not an
       // outage, and saying so is what tells Aditya to go and accept them.
-      const needsTerms = detail.includes("model_terms_required");
-      // Keep the probe honest: if synthesis is refused, the next dialog
-      // opening should stop offering the control.
-      if (needsTerms) probe = { enabled: false, at: Date.now() };
-      return NextResponse.json({ status: needsTerms ? "disabled" : "offline" }, { status: 503 });
+      // A refusal that is about the model rather than this one request
+      // means the control should stop being offered: unaccepted terms, or
+      // a voice this model does not have. Both are 400s that would
+      // otherwise repeat on every answer.
+      const unusable =
+        detail.includes("model_terms_required") || detail.includes("voice must be one of");
+      if (unusable) markUnavailable();
+      return NextResponse.json({ status: unusable ? "disabled" : "offline" }, { status: 503 });
     }
 
     const audio = await response.arrayBuffer();

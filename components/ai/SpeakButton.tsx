@@ -14,7 +14,7 @@ type SpeakState = "idle" | "loading" | "playing";
  * will never press it, and pre-fetching speech for every message would
  * spend the rate-limit budget on silence.
  */
-export function SpeakButton({ text }: { text: string }) {
+export function SpeakButton({ text, onUnavailable }: { text: string; onUnavailable?: () => void }) {
   const [state, setState] = useState<SpeakState>("idle");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const urlRef = useRef<string | null>(null);
@@ -51,6 +51,11 @@ export function SpeakButton({ text }: { text: string }) {
       });
       if (!res.ok) {
         setState("idle");
+        // "disabled" means the model itself cannot serve this account —
+        // unaccepted terms, or a voice it does not have. Retire the control
+        // rather than leaving a button that fails on every press.
+        const body = (await res.json().catch(() => null)) as { status?: string } | null;
+        if (body?.status === "disabled") onUnavailable?.();
         return;
       }
       const blob = await res.blob();

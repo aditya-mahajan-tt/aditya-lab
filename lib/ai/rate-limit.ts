@@ -15,10 +15,29 @@ type Bucket = { count: number; resetAt: number };
 const HOUR_MS = 60 * 60 * 1000;
 
 const PER_IP_LIMIT = Number(process.env.AI_RATE_LIMIT_PER_IP_PER_HOUR ?? 10);
-const GLOBAL_DAILY_LIMIT = Number(process.env.AI_RATE_LIMIT_GLOBAL_PER_DAY ?? 200);
+
+/**
+ * Site-wide daily caps, per endpoint rather than pooled.
+ *
+ * A single shared bucket let voice traffic starve the thing the feature
+ * exists for: a visitor playing answers aloud would spend the same daily
+ * allowance as a recruiter trying to ask a question. They also face very
+ * different upstream limits — Groq allows 1,000 chat requests a day but
+ * only 100 speech ones (measured 2026-09-18), so one number cannot be
+ * correct for both.
+ *
+ * Speech is capped below Groq's own 100 so the Lab refuses politely, in its
+ * own voice, instead of letting the provider return an error we then have
+ * to explain.
+ */
+const GLOBAL_DAILY_LIMITS: Record<Scope, number> = {
+  ask: Number(process.env.AI_RATE_LIMIT_GLOBAL_PER_DAY ?? 200),
+  transcribe: Number(process.env.AI_RATE_LIMIT_TRANSCRIBE_PER_DAY ?? 200),
+  speak: Number(process.env.AI_RATE_LIMIT_SPEAK_PER_DAY ?? 80),
+};
 
 const ipBuckets = new Map<string, Bucket>();
-let globalBucket: Bucket = { count: 0, resetAt: startOfNextUtcDay() };
+const globalBuckets = new Map<Scope, Bucket>();
 
 let callsSinceCleanup = 0;
 
@@ -39,6 +58,8 @@ function maybeCleanup() {
   }
 }
 
+export type Scope = "ask" | "transcribe" | "speak";
+
 export type RateLimitResult = { allowed: true } | { allowed: false; reason: "ip" | "global" };
 
 /**
@@ -48,15 +69,17 @@ export type RateLimitResult = { allowed: true } | { allowed: false; reason: "ip"
  * spoken question costs one transcribe and one ask, and each is counted in
  * its own bucket.
  */
-export function checkRateLimit(ip: string, scope: "ask" | "transcribe" | "speak" = "ask"): RateLimitResult {
+export function checkRateLimit(ip: string, scope: Scope = "ask"): RateLimitResult {
   maybeCleanup();
   const now = Date.now();
   const key = `${scope}:${ip}`;
 
-  if (globalBucket.resetAt <= now) {
+  let globalBucket = globalBuckets.get(scope);
+  if (!globalBucket || globalBucket.resetAt <= now) {
     globalBucket = { count: 0, resetAt: startOfNextUtcDay() };
+    globalBuckets.set(scope, globalBucket);
   }
-  if (globalBucket.count >= GLOBAL_DAILY_LIMIT) {
+  if (globalBucket.count >= GLOBAL_DAILY_LIMITS[scope]) {
     return { allowed: false, reason: "global" };
   }
 

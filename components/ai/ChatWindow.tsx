@@ -138,7 +138,12 @@ export function ChatWindow({
   return (
     <div className="flex h-full flex-col">
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
-        <MessageList messages={messages} pending={status === "pending"} canSpeak={canSpeak} />
+        <MessageList
+          messages={messages}
+          pending={status === "pending"}
+          canSpeak={canSpeak}
+          onSpeakUnavailable={() => setCanSpeak(false)}
+        />
 
         {(status === "offline" || status === "rate_limited") && (
           <div role="alert" className="mt-3 flex gap-3">

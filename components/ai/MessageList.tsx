@@ -20,10 +20,12 @@ export function MessageList({
   messages,
   pending,
   canSpeak = false,
+  onSpeakUnavailable,
 }: {
   messages: ChatMessage[];
   pending: boolean;
   canSpeak?: boolean;
+  onSpeakUnavailable?: () => void;
 }) {
   if (messages.length === 0 && !pending) return null;
 
@@ -58,7 +60,9 @@ export function MessageList({
                   → {m.link.label}
                 </Link>
               )}
-              {canSpeak && m.role === "assistant" && <SpeakButton text={m.content} />}
+              {canSpeak && m.role === "assistant" && (
+                <SpeakButton text={m.content} onUnavailable={onSpeakUnavailable} />
+              )}
             </div>
           </div>
         </div>
