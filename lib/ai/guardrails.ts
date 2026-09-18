@@ -351,6 +351,17 @@ const COMMON_CAPITALISED_WORDS = new Set([
   "Primarily",
   "Particularly",
   "Notable",
+  // Added after a 2026-09-18 model comparison: "(See the Turbotork case...)"
+  // cost an otherwise correct answer. Sentence-opening imperatives belong to
+  // the same closed class as the connectives above.
+  "See",
+  "Read",
+  "Visit",
+  "Check",
+  "Find",
+  "Learn",
+  "Consider",
+  "Browse",
 ]);
 
 function extractNumbers(text: string): string[] {

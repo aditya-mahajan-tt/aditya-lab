@@ -12,7 +12,7 @@ import { checkRateLimit, getClientIp } from "@/lib/ai/rate-limit";
 import { recordSpend, spendCapExceeded } from "@/lib/ai/spend-cap";
 import { getCached, setCached } from "@/lib/ai/cache";
 import { callGroq, type ChatMessage } from "@/lib/ai/groq-client";
-import { suggestLink } from "@/lib/ai/link-suggestions";
+import { stripUnknownInternalPaths, suggestLink } from "@/lib/ai/link-suggestions";
 import { logQuestion } from "@/lib/ai/log";
 
 /**
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     const result = await callGroq(messages);
     // Sanitize before grounding, not after: a stray URL or citation marker
     // should clean up, not cost the visitor an otherwise correct answer.
-    let answer = sanitizeAnswer(result.text);
+    let answer = stripUnknownInternalPaths(sanitizeAnswer(result.text));
     const grounded = isGrounded(answer, knowledge.text);
     if (!grounded) {
       answer = REFUSAL_STRING;
