@@ -100,6 +100,7 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
   };
 
   return (
+    <>
     <figure>
       {/* Diagram: md and up */}
       <svg
@@ -264,6 +265,7 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
           )}
         </figcaption>
       )}
+    </figure>
 
       {/* No-JS fallback: the caption above only server-renders step 1, so the
           full trace lives here. React renders <noscript> on the server and
@@ -293,6 +295,6 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
           ))}
         </ol>
       </noscript>
-    </figure>
+    </>
   );
 }

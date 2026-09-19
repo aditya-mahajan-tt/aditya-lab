@@ -95,34 +95,51 @@ test("selecting a node updates the caption on desktop @thinking", async ({ page 
   );
 });
 
-test("arrow keys move both selection and focus, and focus is visible @thinking", async ({ page }) => {
+test("keyboard focus on an inactive node changes its rect stroke and shows an outline @thinking", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/thinking");
   const nodes = page.locator('svg [role="button"]');
-  const first = nodes.nth(0);
+  const target = nodes.nth(1); // inactive: step 0 is the selected one on load
+  await expect(target).toHaveAttribute("aria-pressed", "false");
+
+  const read = () =>
+    target.evaluate((el) => {
+      const rect = getComputedStyle(el.querySelector("rect")!);
+      return {
+        isActiveElement: document.activeElement === el,
+        outlineStyle: getComputedStyle(el).outlineStyle,
+        stroke: rect.stroke,
+        strokeWidth: rect.strokeWidth,
+      };
+    });
+
+  const before = await read();
+  expect(before.isActiveElement).toBe(false);
+
+  // Reach the node with a real Tab so :focus-visible matches (keyboard focus).
+  await nodes.nth(0).focus();
+  await page.keyboard.press("Tab");
+  await expect(target).toBeFocused();
+
+  const after = await read();
+  expect(after.isActiveElement).toBe(true);
+  // The rect itself must change to the focus colour and a heavier stroke --
+  // this does not rely on SVG outline rendering.
+  expect(after.stroke, JSON.stringify({ before, after })).toBe("rgb(93, 232, 255)");
+  expect(after.stroke).not.toBe(before.stroke);
+  expect(after.strokeWidth).not.toBe(before.strokeWidth);
+  // The global :focus-visible outline is not suppressed either.
+  expect(after.outlineStyle, JSON.stringify(after)).not.toBe("none");
+});
+
+test("arrow keys move both selection and focus @thinking", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/thinking");
+  const nodes = page.locator('svg [role="button"]');
   const second = nodes.nth(1);
 
-  await first.focus();
-  await expect(first).toBeFocused();
-  // Focus must be perceivable: either a non-none outline on the node, or the
-  // node's rect stroke differs from an unfocused node's.
-  const focusState = await page.evaluate(() => {
-    const els = Array.from(document.querySelectorAll('svg [role="button"]'));
-    const active = document.activeElement as Element;
-    const other = els.find((el) => el !== active)!;
-    return {
-      isNode: els.includes(active),
-      outlineStyle: getComputedStyle(active).outlineStyle,
-      focusedStroke: getComputedStyle(active.querySelector("rect")!).stroke,
-      otherStroke: getComputedStyle(other.querySelector("rect")!).stroke,
-    };
-  });
-  expect(focusState.isNode).toBe(true);
-  expect(
-    focusState.outlineStyle !== "none" || focusState.focusedStroke !== focusState.otherStroke,
-    JSON.stringify(focusState),
-  ).toBe(true);
-
+  await nodes.nth(0).focus();
+  await expect(nodes.nth(0)).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(second).toBeFocused();
   await expect(second).toHaveAttribute("aria-pressed", "true");
