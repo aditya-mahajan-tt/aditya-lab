@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { CORPUS_TOKEN_BUDGET, getKnowledge } from "@/lib/ai/knowledge";
+import { CORPUS_TOKEN_BUDGET, selectKnowledge } from "@/lib/ai/knowledge";
+import { SUGGESTED_QUESTIONS } from "@/lib/ai/suggested-questions";
 
 /**
  * A build-time guard on the one number that can silently kill Ask the Lab.
@@ -16,19 +17,36 @@ import { CORPUS_TOKEN_BUDGET, getKnowledge } from "@/lib/ai/knowledge";
  * unit assertion living in the e2e suite because that suite is what
  * `npm run verify` already runs with the project's TS path aliases.
  *
- * If this fails: implement AI_SPEC.md §2's per-section retrieval (score
- * sections by keyword overlap with the question, send the best three).
- * Do not raise the budget to make it pass — the budget is Groq's, not ours.
+ * Per-section retrieval is implemented (lib/ai/knowledge.ts selectKnowledge).
+ * If this fails, a single question is now selecting more than one request can
+ * spend — tighten selection, do not raise the budget.
  */
 test.describe.configure({ mode: "serial" });
 
-test("the grounding corpus fits inside one request's token budget @budget", () => {
-  const { tokenCount } = getKnowledge();
+/**
+ * Questions chosen to stress retrieval rather than flatter it: the six
+ * chips a visitor can click without typing, plus questions that legitimately
+ * pull several large sections at once, plus one that matches nothing.
+ */
+const ADVERSARIAL_QUESTIONS = [
+  "Tell me about every project he has worked on in detail.",
+  "Compare his work at Turbotork and Accordion and Kensara and Adda.",
+  "What AI, product, business, strategy, engineering and growth work has he done?",
+  "Describe his experience leading teams, raising funding and building products.",
+  "asdfghjkl",
+];
 
-  expect(
-    tokenCount,
-    `The grounding corpus is ${tokenCount} tokens against a budget of ${CORPUS_TOKEN_BUDGET}. ` +
-      `Every Ask the Lab request would exceed Groq's per-minute allowance and fail. ` +
-      `Switch to per-section retrieval (AI_SPEC.md §2) rather than raising the budget.`,
-  ).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
-});
+for (const question of [...SUGGESTED_QUESTIONS, ...ADVERSARIAL_QUESTIONS]) {
+  test(`grounding for "${question}" fits one request's token budget @budget`, () => {
+    const { tokenCount } = selectKnowledge(question);
+
+    expect(
+      tokenCount,
+      `Grounding for "${question}" is ${tokenCount} tokens against a budget of ` +
+        `${CORPUS_TOKEN_BUDGET}. This request would exceed Groq's per-minute ` +
+        `allowance and fail, surfacing to the visitor as "AI CORE TEMPORARILY ` +
+        `OFFLINE". Fix the selection in lib/ai/knowledge.ts rather than raising ` +
+        `the budget -- the budget is Groq's, not ours.`,
+    ).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
+  });
+}

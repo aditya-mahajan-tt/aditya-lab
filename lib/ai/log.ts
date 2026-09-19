@@ -16,6 +16,8 @@ export function logQuestion(entry: {
   /** Which model answered, and which were skipped getting there. */
   model?: string;
   failedOver?: string[];
+  /** Which corpus sections grounded this answer — the diagnostic for a retrieval miss. */
+  sections?: string[];
 }) {
   console.log(
     JSON.stringify({
@@ -28,6 +30,7 @@ export function logQuestion(entry: {
       // signal that one model's per-minute budget is routinely exhausted.
       ...(entry.model ? { model: entry.model } : {}),
       ...(entry.failedOver?.length ? { failedOver: entry.failedOver } : {}),
+      ...(entry.sections?.length ? { sections: entry.sections } : {}),
     }),
   );
 }

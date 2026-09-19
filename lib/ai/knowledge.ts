@@ -409,9 +409,6 @@ export const CORPUS_TOKEN_BUDGET =
   RESERVED_FOR_QUESTION -
   RESERVED_FOR_HISTORY;
 
-/** Warn while there is still room to act, rather than at the cliff edge. */
-const CORPUS_TOKEN_WARN = Math.floor(CORPUS_TOKEN_BUDGET * 0.85);
-
 export type Knowledge = {
   text: string;
   tokenCount: number;
@@ -429,17 +426,10 @@ export function getKnowledge(): Knowledge {
   const text = getKnowledgeSections().map((s) => s.text).join("\n\n");
   const tokenCount = estimateTokens(text);
 
-  if (tokenCount > CORPUS_TOKEN_WARN) {
-    // The fix at this point is AI_SPEC.md §2's own fallback: score the
-    // corpus sections by keyword overlap with the question and send the
-    // best three. Not a vector database — the corpus is far too small for
-    // embeddings to earn their infrastructure.
-    console.warn(
-      `[ask-the-lab] knowledge corpus is ${tokenCount} tokens of a ${CORPUS_TOKEN_BUDGET} budget` +
-        `${tokenCount > CORPUS_TOKEN_BUDGET ? " — OVER BUDGET: every request will be rate-limited" : ""}.` +
-        " Switch to per-section retrieval before adding more content.",
-    );
-  }
+  // No warning on total size any more: since selectKnowledge() sends only
+  // the sections a question needs, the total corpus is expected to exceed
+  // what any one request spends. The guard that matters is per-request, and
+  // it lives in e2e/knowledge-budget.spec.ts where npm run verify runs it.
 
   cached = { text, tokenCount };
   return cached;

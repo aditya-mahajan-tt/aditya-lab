@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getKnowledge } from "@/lib/ai/knowledge";
+import { selectKnowledge, selectSectionIds } from "@/lib/ai/knowledge";
 import { buildSystemPrompt, REFUSAL_STRING } from "@/lib/ai/system-prompt";
 import {
   AskRequestSchema,
@@ -86,7 +86,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     return NextResponse.json({ status: "offline" });
   }
 
-  const knowledge = getKnowledge();
+  // Grounding is now per-question (AI_SPEC.md §2): the whole corpus no
+  // longer fits one request's token allowance. isGrounded below checks
+  // against these same sections, which is the honest pairing -- the model
+  // cannot be asked to source a claim from text it was never shown.
+  const knowledge = selectKnowledge(question);
+  const sections = selectSectionIds(question);
   const messages: ChatMessage[] = [
     { role: "system", content: buildSystemPrompt(knowledge.text) },
     ...history.map((h): ChatMessage => ({ role: h.role, content: h.content })),
@@ -121,6 +126,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
       totalTokens: result.totalTokens,
       model: result.model,
       failedOver: result.failedOver,
+      sections,
     });
 
     const link = grounded ? (suggestLink(answer) ?? undefined) : undefined;
