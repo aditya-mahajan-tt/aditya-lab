@@ -138,3 +138,17 @@ test("the token budget still binds when context is supplied @retrieval", () => {
   const { tokenCount } = selectKnowledge("tell me more about that", [hugeContext, hugeContext]);
   expect(tokenCount).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
 });
+
+test("Turbotork is a retrievable project section @retrieval", () => {
+  expect(getKnowledgeSections().map((s) => s.id)).toContain("project-turbotork");
+});
+
+test("AI, leadership and founding questions retrieve Turbotork @retrieval", () => {
+  for (const question of [
+    "What AI work has he done?",
+    "Has he led a team?",
+    "Tell me about his founding experience.",
+  ]) {
+    expect(selectSectionIds(question), `question: ${question}`).toContain("project-turbotork");
+  }
+});

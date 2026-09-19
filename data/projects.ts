@@ -11,8 +11,20 @@ import { ProjectSchema } from "./schema";
  *
  * Adding a project = adding one object here. Nothing else changes.
  *
- * Turbotork moved out of this file entirely (2026-09-05) — it's work
- * experience, not a case study; see data/experience.ts.
+ * 2026-09-19: the 2026-09-05 decision to keep Turbotork out of this file is
+ * deliberately reversed. It was defensible while the only source material
+ * was six resume bullets; once the studio repo (TT Garage Portal) was
+ * supplied as source of truth, Turbotork became the deepest-evidenced work
+ * on the site and the only entry spanning all three planes. Keeping the
+ * deepest evidence on the shallowest surface was also what made it
+ * unlinkable by lib/ai/link-suggestions.ts, which only ranks projects and
+ * experiments. The /about experience entry remains, trimmed to a pointer.
+ *
+ * Product surfaces, architecture patterns and integration names are in
+ * scope; client names, invoice and revenue records, and any link to the
+ * studio repo are not — that repo holds customer exports, real invoices
+ * and a signature image.
+ * See docs/superpowers/specs/2026-09-19-turbotork-case-study-design.md §5.2.
  *
  * 2026-09-10: context/problem/thinking/approach/execution/learnings for
  * goSTOPS, Kensara AI and Adda, and the whole of Project 004 (LeadIQ,
@@ -23,6 +35,80 @@ import { ProjectSchema } from "./schema";
  * same day.
  */
 const raw = [
+  {
+    id: "005",
+    slug: "turbotork",
+    planes: ["ai", "product", "business"],
+    title: "Turbotork",
+    subtitle: "Fleet-Service SaaS, 0→1",
+    category: ["Product", "AI", "Automation"],
+    year: "2025–2026",
+    status: "SHIPPED",
+    featured: true,
+    order: 1,
+    // Ask the Lab grounds AI / leadership / founding questions here first.
+    // Moved from the data/experience.ts entry (2026-09-19) along with the
+    // content it points at. See lib/ai/system-prompt.ts rule 9.
+    leadTopics: [
+      "AI",
+      "AI product",
+      "AI agents and automation",
+      "leadership",
+      "managing or leading a team",
+      "entrepreneurship and founding",
+      "startups and 0-to-1 building",
+      "fundraising",
+      "ownership and end-to-end product",
+    ],
+
+    summary:
+      "Founding AI Product Manager at an early-stage fleet-service SaaS: owned the product end to end, led two engineers, and built the agent workflow that let a two-person team ship a multi-product platform — inspections, diagnostics, analytics, billing and customer portals — to 40+ clients.",
+
+    context:
+      "Turbotork is an early-stage fleet-service business running vehicle servicing for corporate fleets. Aditya joined out of the founder's office as its founding AI Product Manager, with the garage operation running the way most of the category still does: job cards on paper, pricing in spreadsheets, and status updates over phone calls.",
+    problem:
+      "Nothing was measurable. Without a system of record there was no turnaround time to improve, no cost leakage to find, and no way to tell a fleet customer where their vehicle was. Demand could be scaled by adding people; throughput could not — and the engineering team available to fix that was two people.",
+    role: "Founding AI Product Manager, Founder's Office — owned the product end to end, led a two-person engineering team, and helped shape the pitch that closed the pre-seed round.",
+    thinking:
+      "Two questions decided the sequence. First: what actually binds? Not demand — measurability, which meant the system of record had to exist before anything clever could run on it. Second, applied to the team itself: where does a two-person engineering team's time actually go? Not typing. Planning, rebuilding context, and review. That reframed engineering throughput as a product problem with its own users, and it is what produced the agent workflow — not an interest in agents for their own sake.",
+    approach:
+      "Two systems, built together. The platform: a strict service layer over Firestore with every mutation routed through server actions, and five distinct roles from technician to fleet driver, so the data model enforced who could do what rather than the UI hiding it. And the workflow that built it: four agents — planner, implementer, reviewer, release — with declared tool postures and explicit handoffs, backed by fourteen domain skill definitions and a short list of architectural rules the agents had to obey. Encoding the rules beat reviewing the output, because review effort scales with volume and a constraint does not.",
+    execution:
+      "The platform grew from one workflow to five. Digital job cards first, then TT Xpress — structured vehicle inspections driven by versioned templates holding their own thresholds, section weights and scoring rules, so the service standard could change without a deploy. Then OBD diagnostics with a fault-code library and health scoring, surfaced to fleet customers as a public, login-free report page. Then analytics over revenue, turnaround time and technician workload, and billing with GST-compliant invoicing and financial-year invoice counters. Payments, vehicle-registration lookup, WhatsApp and voice were integrated as the operation needed them.",
+    outcome:
+      "40+ clients and 400+ vehicles, ₹30L+ revenue in five months across 1,000+ jobs, and a $250K pre-seed round closed via Antler on a pitch Aditya helped shape as a founding team member.",
+    // learnings and reflection were drafted from the studio repo
+    // (TT Garage Portal, supplied 2026-09-19) and approved by Aditya the
+    // same day, so they carry no draft-review marker — the same
+    // handling the goSTOPS / Kensara / Adda / LeadIQ narratives got on
+    // 2026-09-10. Aditya intends to revise the wording into his own voice;
+    // that is an edit to shipped copy, not a blocked placeholder.
+    learnings: [
+      "AI multiplies structure; it cannot create it. The repair-suggestion and summarisation features only worked because the job-card workflow had already turned a paper process into clean, consistent records. Had the AI gone first, it would have had nothing to be good at — the sequencing wasn't project management, it was the bet.",
+      "With AI writing most of the code, reviewing output is the wrong lever. Review effort scales with volume, and volume was suddenly unbounded. What actually held quality was a short list of architectural rules the agents had to obey, because a constraint costs the same whether it governs ten changes or a thousand.",
+      "A two-person team's real bottleneck was never typing speed — it was planning, context-rebuilding and review. Splitting the work into named roles with explicit handoffs bought more than any individual tool did, because it attacked the coordination cost rather than the keystroke cost.",
+    ],
+    reflection:
+      "I wrote over two hundred internal documents and close to zero meaningful automated tests. At the time that felt like diligence; in hindsight it was the same instinct pointed at the wrong target. Documentation captures what I understood on the day I wrote it and then silently rots. A test captures it and keeps checking. Given how much of the code was AI-generated, tests were exactly the constraint I most needed and least built — I enforced architecture rules on the agents rigorously and left correctness to manual QA. If I ran it again, the agent rules and the test suite would go in together, on day one, because they are the same idea: make the system tell you when it is wrong instead of hoping someone notices.",
+
+    tools: [
+      "Next.js", "React", "TypeScript", "Firebase", "Firestore",
+      "Google AI / Genkit", "Twilio", "Razorpay", "GSTN", "Exotel",
+    ],
+    process: [
+      { label: "SYSTEM OF RECORD", detail: "Digitise the job-card workflow end to end, so operations produce data instead of paper." },
+      { label: "INSPECTION", detail: "Versioned inspection templates carrying their own thresholds and scoring, so the standard changes without a deploy." },
+      { label: "DIAGNOSTICS", detail: "Fault-code library and health scoring, surfaced to fleet customers as a login-free report." },
+      { label: "INTELLIGENCE", detail: "Analytics and AI workflows layered onto data the earlier steps had already made clean." },
+      { label: "LEVERAGE", detail: "Four agent roles with explicit handoffs, so a two-person team's bottleneck was coordination, not keystrokes." },
+    ],
+    metrics: [
+      { label: "clients", value: "40+", note: "400+ vehicles under service" },
+      { label: "revenue in 5 months", value: "₹30L+", note: "across 1,000+ jobs" },
+      { label: "pre-seed raised", value: "$250K", note: "via Antler" },
+    ],
+    links: [],
+  },
   {
     id: "001",
     slug: "gostops-gtm",
@@ -38,7 +124,7 @@ const raw = [
     // once goSTOPS is written.
     status: "IN PROGRESS",
     featured: true,
-    order: 3,
+    order: 4,
 
     summary:
       "Primary market research and behavioural segmentation for goSTOPS' monsoon (JAS) offsite push — a 12-variable framework, a single-survey Google Form, and a 2×2 behavioural segmentation used to pick which companies to target and how to price the offer.",
@@ -83,7 +169,7 @@ const raw = [
     // enough to earn a featured slot yet — see data/experience.ts's sibling
     // reasoning. Still a full entry in the /work archive.
     featured: false,
-    order: 2,
+    order: 3,
 
     summary:
       "Leading GTM and partnership strategy for an AI startup — Team Audax won the IIT Guwahati case competition outright, finishing first out of 120 teams.",
@@ -116,12 +202,12 @@ const raw = [
     subtitle: "D2C E-commerce Venture",
     category: ["Product", "E-commerce"],
     year: "2026",
-    // Promoted to "CASE STUDY" / order 1 — Diagnostic Report §02/§17: this
-    // is the most complete project narrative on the site, so it leads the
-    // Work list instead of goSTOPS until goSTOPS has real content.
+    // Led the Work list from 2026-09-10 as "the most complete project
+    // narrative on the site". Turbotork took that slot on 2026-09-19 — the
+    // reason for the promotion expired when a deeper narrative landed.
     status: "CASE STUDY",
     featured: true,
-    order: 1,
+    order: 2,
 
     summary:
       "Built a Shopify-based D2C e-commerce store end-to-end — product research, vendor sourcing and payment integration — as founder.",
@@ -162,7 +248,7 @@ const raw = [
     year: "2026",
     status: "SHIPPED",
     featured: true,
-    order: 4,
+    order: 5,
 
     summary:
       "A personal, single-user lead-discovery dashboard — pulls real local businesses from OpenStreetMap, audits each one's live website against a set of checkable signals, and turns the gaps it finds into a score and a specific, evidence-backed outreach angle.",
