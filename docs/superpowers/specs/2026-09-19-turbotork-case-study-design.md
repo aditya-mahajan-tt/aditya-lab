@@ -2,7 +2,9 @@
 
 Date: 2026-09-19
 Status: design approved by Aditya (structure, depth, link-ranking approach,
-sequencing). LEARNINGS and REFLECTION prose is BLOCKED ON ADITYA — see §8.
+sequencing, root principles). Nothing blocks implementation — see §8 for the
+open items, all of which are edits to live copy rather than gates.
+Implementation plan: docs/superpowers/plans/2026-09-19-turbotork-case-study.md
 
 Source of truth for all new content: the `aditya-mahajan-tt/studio` repo
 (TT Garage Portal), supplied by Aditya on 2026-09-19 and read in full at
@@ -431,16 +433,25 @@ Resolved 2026-09-19: the personal Claude Code configuration is **not**
 claimed anywhere (§11). The four root principles in §7A.1 were confirmed by
 Aditya as accurate to how he thinks.
 
-Items 1 and 2 keep `npm run check:placeholders` failing the production
-build until answered, which is the intended behaviour.
+Revised 2026-09-19 (Aditya's call): items 1 and 2 **do not** ship behind
+the `[AI_DRAFT_REVIEW]` marker after all. The drafts were written from
+source material he supplied and approved on receipt — the same handling the
+goSTOPS, Kensara, Adda and LeadIQ narratives received on 2026-09-10 — so
+`check:placeholders` stays green and the production build is never blocked.
+Revising the wording into his own voice becomes an ordinary edit to live
+copy rather than a gate.
+
+One consequence, stated plainly: the reflection is written in the first
+person and admits a professional shortcoming. It reads best in his own
+words, and until he rewrites it, it is drafted prose presented as his.
 
 ### 8.1 Paraphrase drafts — Aditya to rewrite in his own voice
 
 Drafted 2026-09-19 from the studio repo at Aditya's request, as starting
-material to react to rather than finished copy. These ship carrying the
-`[AI_DRAFT_REVIEW]` marker (`data/schema.ts` `DRAFT_PATTERN`), which keeps
-them out of the Ask-the-Lab corpus and renders them visibly unreviewed —
-so an un-rewritten draft cannot quietly pass as his words.
+material to react to rather than finished copy. Per his decision the same
+day they ship **unmarked**, so they enter the Ask-the-Lab corpus and render
+as ordinary copy from the moment Phase 1 lands. Revising them is an edit to
+live text, not a gate — see the note above §8.1.
 
 **LEARNINGS — draft**
 
@@ -476,24 +487,17 @@ QA. If I ran it again, the agent rules and the test suite would go in
 together, on day one, because they are the same idea: make the system tell
 you when it is wrong instead of hoping someone notices.
 
-## 9. Security finding (outside this spec's scope, needs action)
+## 9. Security note (resolved)
 
-The studio repo has **two Firebase admin SDK service-account JSON key files
-committed at its root**:
+The studio repo has two Firebase admin SDK service-account key files
+committed at its root, alongside customer CSV/XLSX exports, real invoice
+PDFs and a signature image.
 
-```
-tt-garage-portal-firebase-adminsdk-fbsvc-a17d6492d6.json
-tt-xpress-staging-firebase-adminsdk-fbsvc-1da6427b89.json
-```
+Aditya confirmed on 2026-09-19 that **the Firebase project is dead and
+unused**, so the keys are moot and no rotation is needed.
 
-Admin SDK credentials bypass Firestore security rules entirely. Alongside
-them sit customer CSV/XLSX exports, real invoice PDFs and a signature image.
-
-These keys should be **rotated in the Google Cloud console**, regardless of
-what happens here — a private repo is not a secret store, and the history
-retains them even after deletion. This is Turbotork's exposure, not
-Aditya's site's, but it is the reason the portfolio must **never link to
-this repo**, which is recorded as a constraint in §5.2.
+The customer data is not moot. That is why §5.2's constraint stands on its
+own terms: the portfolio never links to this repo.
 
 ## 10. Verification
 
@@ -510,8 +514,7 @@ stated preference):
   leadership, founding, fundraising, ownership — must return a Turbotork
   answer **and** a `/work/turbotork` chip. This is the acceptance test for
   Aditya's original report.
-- `npm run check:placeholders` expected to FAIL on production until §8
-  items 1–2 land. That is the intended gate, not a defect.
+- `npm run check:placeholders` expected to PASS throughout (revised §8).
 
 ## 11. Out of scope
 

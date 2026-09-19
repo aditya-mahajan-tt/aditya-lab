@@ -13,11 +13,11 @@
 - **No new dependencies.** Adding one requires Aditya's approval (CLAUDE.md §8). Everything here uses Zod, React and Playwright, all already present.
 - **Content lives in `/data`,** never hardcoded in a component (CLAUDE.md §4).
 - **Placeholder tokens are `[UPPER_SNAKE_REQUIRED]`,** written as literal inline strings. `scripts/check-placeholders.mjs` plain-text-scans `data/*.ts` source, so a token built from a constant is invisible to it (`data/schema.ts` `DRAFT_PATTERN` comment).
-- **Draft marker is the literal string `"[AI_DRAFT_REVIEW] "` prefixed inline,** same reason.
+- **Do not introduce any `[AI_DRAFT_REVIEW]` markers.** The Turbotork narrative ships unmarked by Aditya's decision (2026-09-19), matching how the other four case studies were handled. `npm run verify` must stay green at the `placeholders` step throughout this plan.
 - **Green is a signal, not decoration.** `DESIGN_SYSTEM.md` §2: ~5% signal colour; "if a section is tinted green, that is a bug, not a style."
 - **`prefers-reduced-motion: reduce` must lose no information** (CLAUDE.md §4).
 - **Renders correctly at 375 / 768 / 1280 / 1920px.**
-- **Never name Turbotork clients, reproduce invoice/revenue records, or link the studio repo** — it has live Firebase admin credentials committed (spec §5.2, §9).
+- **Never name Turbotork clients, reproduce invoice/revenue records, or link the studio repo.** The repo holds customer CSV exports, real invoice PDFs and a signature image. (Its committed Firebase admin keys are moot — that project is dead, per Aditya 2026-09-19 — but the customer data stands on its own.)
 - **Batch verification.** Do not run full `npm run verify` after every step. Run the targeted Playwright spec per task; run `npm run verify` at each phase boundary (Aditya's stated preference).
 - **Commit messages end with:** `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`
 - **Branch:** `phase/turbotork-case-study` (already created and checked out).
@@ -755,7 +755,8 @@ In `data/projects.ts`, replace the paragraph reading "Turbotork moved out of thi
  *
  * Product surfaces, architecture patterns and integration names are in
  * scope; client names, invoice and revenue records, and any link to the
- * studio repo are not — it has live Firebase admin credentials committed.
+ * studio repo are not — that repo holds customer exports, real invoices
+ * and a signature image.
  * See docs/superpowers/specs/2026-09-19-turbotork-case-study-design.md §5.2.
 ```
 
@@ -821,13 +822,19 @@ Insert as the **first** element of the `raw` array in `data/projects.ts`:
       "The platform grew from one workflow to five. Digital job cards first, then TT Xpress — structured vehicle inspections driven by versioned templates holding their own thresholds, section weights and scoring rules, so the service standard could change without a deploy. Then OBD diagnostics with a fault-code library and health scoring, surfaced to fleet customers as a public, login-free report page. Then analytics over revenue, turnaround time and technician workload, and billing with GST-compliant invoicing and financial-year invoice counters. Payments, vehicle-registration lookup, WhatsApp and voice were integrated as the operation needed them.",
     outcome:
       "40+ clients and 400+ vehicles, ₹30L+ revenue in five months across 1,000+ jobs, and a $250K pre-seed round closed via Antler on a pitch Aditya helped shape as a founding team member.",
+    // learnings and reflection were drafted from the studio repo
+    // (TT Garage Portal, supplied 2026-09-19) and approved by Aditya the
+    // same day, so they carry no [AI_DRAFT_REVIEW] marker — the same
+    // handling the goSTOPS / Kensara / Adda / LeadIQ narratives got on
+    // 2026-09-10. Aditya intends to revise the wording into his own voice;
+    // that is an edit to shipped copy, not a blocked placeholder.
     learnings: [
-      "[AI_DRAFT_REVIEW] AI multiplies structure; it cannot create it. The repair-suggestion and summarisation features only worked because the job-card workflow had already turned a paper process into clean, consistent records. Had the AI gone first, it would have had nothing to be good at — the sequencing wasn't project management, it was the bet.",
-      "[AI_DRAFT_REVIEW] With AI writing most of the code, reviewing output is the wrong lever. Review effort scales with volume, and volume was suddenly unbounded. What actually held quality was a short list of architectural rules the agents had to obey, because a constraint costs the same whether it governs ten changes or a thousand.",
-      "[AI_DRAFT_REVIEW] A two-person team's real bottleneck was never typing speed — it was planning, context-rebuilding and review. Splitting the work into named roles with explicit handoffs bought more than any individual tool did, because it attacked the coordination cost rather than the keystroke cost.",
+      "AI multiplies structure; it cannot create it. The repair-suggestion and summarisation features only worked because the job-card workflow had already turned a paper process into clean, consistent records. Had the AI gone first, it would have had nothing to be good at — the sequencing wasn't project management, it was the bet.",
+      "With AI writing most of the code, reviewing output is the wrong lever. Review effort scales with volume, and volume was suddenly unbounded. What actually held quality was a short list of architectural rules the agents had to obey, because a constraint costs the same whether it governs ten changes or a thousand.",
+      "A two-person team's real bottleneck was never typing speed — it was planning, context-rebuilding and review. Splitting the work into named roles with explicit handoffs bought more than any individual tool did, because it attacked the coordination cost rather than the keystroke cost.",
     ],
     reflection:
-      "[AI_DRAFT_REVIEW] I wrote over two hundred internal documents and close to zero meaningful automated tests. At the time that felt like diligence; in hindsight it was the same instinct pointed at the wrong target. Documentation captures what I understood on the day I wrote it and then silently rots. A test captures it and keeps checking. Given how much of the code was AI-generated, tests were exactly the constraint I most needed and least built — I enforced architecture rules on the agents rigorously and left correctness to manual QA. If I ran it again, the agent rules and the test suite would go in together, on day one, because they are the same idea: make the system tell you when it is wrong instead of hoping someone notices.",
+      "I wrote over two hundred internal documents and close to zero meaningful automated tests. At the time that felt like diligence; in hindsight it was the same instinct pointed at the wrong target. Documentation captures what I understood on the day I wrote it and then silently rots. A test captures it and keeps checking. Given how much of the code was AI-generated, tests were exactly the constraint I most needed and least built — I enforced architecture rules on the agents rigorously and left correctness to manual QA. If I ran it again, the agent rules and the test suite would go in together, on day one, because they are the same idea: make the system tell you when it is wrong instead of hoping someone notices.",
 
     tools: [
       "Next.js", "React", "TypeScript", "Firebase", "Firestore",
@@ -859,13 +866,15 @@ npx playwright test e2e/knowledge-retrieval.spec.ts --project=desktop
 
 Expected: all passed, including the two new Turbotork assertions.
 
-- [ ] **Step 7: Confirm the placeholder gate behaves as designed**
+- [ ] **Step 7: Confirm the placeholder gate is clean**
 
 ```bash
 node scripts/check-placeholders.mjs
 ```
 
-Expected: reports the three `[AI_DRAFT_REVIEW]` learnings and the reflection in `data/projects.ts`, and **exits non-zero**. This is correct — the drafts are Aditya's to rewrite (spec §8) and must not ship unreviewed. `npm run verify` will fail at the `placeholders` step until he replaces them.
+Expected: **exit 0**, and `CONTENT_TODO.md` regenerated still reading "No outstanding placeholders or unreviewed drafts. Content is complete."
+
+The Turbotork narrative carries no `[AI_DRAFT_REVIEW]` marker (Aditya's call, 2026-09-19): it was drafted from source material he supplied and approved on receipt, exactly as the other four case studies were on 2026-09-10. If this step exits non-zero, a marker was left in by mistake — remove it rather than raising the check.
 
 - [ ] **Step 8: Commit**
 
@@ -878,8 +887,8 @@ Defensible when the source was six resume bullets; not once the studio
 repo landed as source of truth. Takes the Work lead slot from Adda, whose
 promotion reason -- most complete narrative on the site -- expired.
 
-Learnings and reflection ship behind [AI_DRAFT_REVIEW] for Aditya to
-rewrite; check-placeholders fails production until he does, by design.
+Narrative drafted from the studio repo and approved by Aditya on receipt,
+same handling as the other four case studies got on 2026-09-10.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
@@ -1223,7 +1232,7 @@ Expected: all passed.
 npm run verify
 ```
 
-Expected: green except the `placeholders` step, which fails on the Task 4 `[AI_DRAFT_REVIEW]` drafts. That failure is expected until Aditya rewrites them.
+Expected: all steps green, including `placeholders`.
 
 - [ ] **Step 7: Commit**
 
@@ -1932,9 +1941,13 @@ npx playwright test e2e/link-suggestions.spec.ts --project=desktop
 
 Expected: FAIL — the goSTOPS chip is still present.
 
-- [ ] **Step 3: Swap the chip**
+- [ ] **Step 3: Swap the chip — in both places**
 
-In `lib/ai/suggested-questions.ts`, replace `"Tell me about the goSTOPS project."` with `"Tell me about Turbotork."` and add a one-line comment above the array:
+The question list exists **twice**: in `lib/ai/suggested-questions.ts` and, hardcoded, in `scripts/generate-canned-answers.mjs:23-30`. The script cannot import the project's `.ts` files without a bundler, so its own doc comment says "keep the two in sync by hand." Missing the second copy means Step 7 regenerates a canned answer for the goSTOPS question you just removed.
+
+In **`scripts/generate-canned-answers.mjs`**, change the `SUGGESTED_QUESTIONS` array entry `"Tell me about the goSTOPS project."` to `"Tell me about Turbotork."`.
+
+In **`lib/ai/suggested-questions.ts`**, make the same replacement and add a comment above the array:
 
 ```ts
 /**
@@ -1993,13 +2006,25 @@ That is the only edit to this file. Every fact in the paragraph stays as written
 
 - [ ] **Step 7: Regenerate the canned answers**
 
-The six cached answers were generated against the old chip set and the old corpus.
+The six cached answers were generated against the old chip set and the old corpus, so they are now stale twice over.
+
+The script does **not** call Groq itself — it calls the running server's `/api/ask`, so the answers come through the exact guarded, grounded path a visitor gets. That means the API key is read by Next from `.env.local` (already configured, which is why Ask the Lab works today); the script needs no key of its own. What it needs is a server.
+
+In one terminal:
+
+```bash
+npm run build && npm run start
+```
+
+In another:
 
 ```bash
 npm run ai:generate-canned-answers
 ```
 
-Expected: `lib/ai/canned-answers.generated.ts` rewritten with six entries, including one for "Tell me about Turbotork." If the script requires `AI_PROVIDER_API_KEY` and it is unset, stop and report — this step needs Aditya's key and must not be faked.
+**Expect this to take about six minutes.** `PACE_MS` defaults to 62 seconds between questions to stay under Groq's per-minute token ceiling — it has not hung. (Phase 0's retrieval cuts per-request tokens well below the ~5k that pacing was tuned for, so it could likely be lowered via `ASK_LAB_PACE_MS`; leave that to a separate change rather than tuning it blind here.)
+
+Expected: `lib/ai/canned-answers.generated.ts` rewritten with six entries, including one for "Tell me about Turbotork." If any entry comes back as the refusal string or an offline status, re-run — do not hand-write the file, which is the one thing its header forbids.
 
 - [ ] **Step 8: Run the tests**
 
@@ -2016,7 +2041,7 @@ npm run verify
 npm run shot
 ```
 
-`verify` is expected to fail only at the `placeholders` step, on the Task 4 `[AI_DRAFT_REVIEW]` drafts, until Aditya rewrites them.
+`verify` is expected fully green.
 
 **Then read the screenshots with the Read tool** — `.screenshots/` at 375, 768, 1280 and 1920. Do not describe a UI you have not looked at (CLAUDE.md §5). Check specifically: the new `/work/turbotork` page at 375px, `/thinking` with the principles grid and the framework stack at 375px, and `/systems` with two diagrams.
 
@@ -2048,9 +2073,9 @@ After Task 12, with `AI_PROVIDER_API_KEY` set and `npm run dev` running, ask Ask
 
 Each must return a Turbotork-led answer **and** a link chip reading "Turbotork case study" pointing at `/work/turbotork`. That is the acceptance criterion for Aditya's original observation — content and links now rank on the same signal.
 
-## Still blocked on Aditya (spec §8)
+## Open items — none of them block execution
 
-1. Rewrite the three `[AI_DRAFT_REVIEW]` learnings and the reflection in `data/projects.ts`. Until then `npm run verify` fails at `placeholders`, by design, and production cannot build.
-2. Confirm the basis for the "~70%" productivity figure, or the claim stays out of `workedExample` (Task 10 already states the mechanism rather than the number).
-3. Confirm that describing Turbotork's product surfaces publicly is acceptable given his exit terms.
-4. **Rotate the two Firebase admin service-account keys committed in the studio repo** (spec §9). Independent of this plan.
+1. **Revise the learnings and reflection into Aditya's own voice.** These now ship unmarked, so nothing gates on it; it is an edit to live copy whenever he wants it. Worth doing — the reflection is written in first person and admits a professional shortcoming, which reads best in his own words.
+2. **The "~70%" figure's basis.** Task 10 already rewrote `workedExample` to state the mechanism rather than the number, so the claim is defensible as it stands. Confirming how it was measured would let the number come back.
+3. **Exit-terms confirmation** for describing Turbotork's product surfaces publicly.
+4. **The studio repo is still never linked from the site** (Global Constraints). The Firebase project is dead and its committed admin keys are moot (Aditya, 2026-09-19), but the repo also holds customer CSV exports, real invoice PDFs and a signature image — that is reason enough on its own.
