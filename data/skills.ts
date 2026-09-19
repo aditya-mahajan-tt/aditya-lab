@@ -29,7 +29,7 @@ const raw = [
     id: "BUILD",
     planes: ["product"],
     description:
-      "Shipping working products with a small team — from a fleet-service SaaS MVP to a D2C storefront, built rather than just specified.",
+      "Shipping working products with a small team — a multi-product fleet-service platform and a D2C storefront, built rather than just specified.",
     items: [
       { name: "Websites", depth: "comfortable" },
       { name: "Apps", depth: "working knowledge" },
@@ -57,10 +57,10 @@ const raw = [
     id: "INTELLIGENCE",
     planes: ["ai"],
     description:
-      "Layering AI agent workflows onto already-digitized processes, where it's a genuine productivity multiplier rather than a bolt-on.",
+      "Designing agent workflows that earn their place — where the constraint is coordination rather than typing, and encoded rules beat reviewing output.",
     items: [
       { name: "LLMs", depth: "comfortable" },
-      { name: "AI agents", depth: "working knowledge" },
+      { name: "AI agents", depth: "comfortable" },
       { name: "AI interfaces", depth: "comfortable" },
       { name: "RAG", depth: "working knowledge" },
     ],

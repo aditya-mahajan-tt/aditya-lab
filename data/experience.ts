@@ -15,13 +15,12 @@ const raw = [
     location: "Gurugram",
     start: "2025-07",
     end: "2026-05",
+    // Trimmed 2026-09-19: the full narrative moved to /work/turbotork. Two
+    // bullets and the highlights are what the /about timeline needs; the
+    // corpus should not carry the same story twice.
     bullets: [
-      "Scaled fleet-service SaaS to 40+ clients and 400+ vehicles, generating ₹30L+ revenue in 5 months.",
-      "Raised $250K pre-seed via Antler, shaping investor narrative and pitch as a founding team member.",
-      "Built the MVP digitizing end-to-end service workflows across 1,000+ jobs using Next.js, React and Firebase.",
-      "Enabled faster decisions by building finance, operations and inventory dashboards that identified cost leakages.",
-      "Led a 2-member engineering team integrating Razorpay, GSTN, Twilio and Exotel across workflows.",
-      "Boosted team productivity by roughly 70% by deploying AI agent workflows across planning and execution.",
+      "Founding AI Product Manager out of the founder's office — owned the product end to end and led a two-person engineering team.",
+      "Scaled the platform to 40+ clients and ₹30L+ revenue in 5 months, and helped close a $250K pre-seed via Antler. Full case study at /work/turbotork.",
     ],
     tools: ["Next.js", "React", "Firebase", "Razorpay", "GSTN", "Twilio", "Exotel"],
     highlights: [
