@@ -167,7 +167,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   const page = await context.newPage();
   await page.goto("/");
 
-  // 5 skill groups + 4 projects + 1 experiment + 1 selected experience entry.
+  // 5 skill groups + 5 projects (Turbotork included) + 1 experiment.
   const links = page.locator("h2:has-text('What Aditya works on, by discipline') ~ * a, h2:has-text('What Aditya works on, by discipline') + * a");
   const hrefs = await page.evaluate(() => {
     const heading = [...document.querySelectorAll("h2")].find((h) => h.textContent === "What Aditya works on, by discipline");
@@ -188,7 +188,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   expect(hrefs).toContain("/work/adda-d2c");
   expect(hrefs).toContain("/work/leadiq");
   expect(hrefs).toContain("/experiments/ai-lead-generation-engine");
-  expect(hrefs).toContain("/about#experience-turbotork");
+  expect(hrefs).toContain("/work/turbotork");
 
   await context.close();
 });
@@ -210,7 +210,7 @@ test("the SVG orbital hero renders 11 real, focusable, distinctly-positioned bod
   // Turbotork spans all three planes — layoutBodyAngles lands it at 0°,
   // the point equidistant from AI (-90°), PRODUCT (30°) and BUSINESS
   // (150°). Confirm its aria-label marks it as spanning.
-  const turbotorkLink = page.locator('.core-dom a[href="/about#experience-turbotork"]');
+  const turbotorkLink = page.locator('.core-dom a[href="/work/turbotork"]');
   await expect(turbotorkLink).toHaveAttribute("aria-label", /spans multiple planes/);
 
   // Hovering the Kensara AI body (business+product) updates the caption row.
@@ -283,7 +283,7 @@ test("every multi-plane body stays undimmed and tabbable on all three mobile tab
   await page.goto("/", { waitUntil: "networkidle" });
 
   const spanningHrefs = [
-    "/about#experience-turbotork", // ai + product + business
+    "/work/turbotork", // ai + product + business
     "/work/kensara-ai-gtm", // business + product
     "/work/adda-d2c", // product + business
     "/experiments/ai-lead-generation-engine", // ai + product

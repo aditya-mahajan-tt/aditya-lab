@@ -1,7 +1,6 @@
 import { projects } from "./projects";
 import { experiments } from "./experiments";
 import { skillGroups } from "./skills";
-import { experience } from "./experience";
 import { stripDraftMarker, type Experiment, type PlaneValue, type Project } from "./schema";
 
 /** The orbital hero's two ring depths (spec §3.2). */
@@ -63,11 +62,11 @@ export const getExperimentsByStatus = (status: Experiment["status"]): Experiment
 
 /**
  * Every body the orbital hero renders, across both rings, from all three
- * sources spec §3.2/§6 requires — projects.ts and experiments.ts alone
- * would leave the AI plane almost empty; Turbotork (the only selected
- * experience.ts entry, via its optional `planes` field) is what gives it
- * real weight. Order is stable (insertion order of the source arrays) so
- * every consumer lays bodies out identically without re-sorting.
+ * sources spec §3.2/§6 requires. Turbotork carried the AI plane via a
+ * hardcoded experience-entry special case until 2026-09-19; it is now an
+ * ordinary project (data/projects.ts) and needs none. Order is stable
+ * (insertion order of the source arrays) so every consumer lays bodies out
+ * identically without re-sorting.
  */
 export const getHeroBodies = (): HeroBody[] => {
   const inner: HeroBody[] = skillGroups.map((group) => ({
@@ -101,22 +100,5 @@ export const getHeroBodies = (): HeroBody[] => {
     href: `/experiments/${experiment.slug}`,
   }));
 
-  const outerExperience: HeroBody[] = experience
-    .filter((entry): entry is typeof entry & { planes: PlaneValue[] } => Boolean(entry.planes?.length))
-    .map((entry) => ({
-      id: `experience-${entry.id}`,
-      // A short display label, not `entry.company`: data/experience.ts holds
-      // the full legal name ("Turbotork Technologies Pvt. Ltd.") because the
-      // /about timeline needs it, but in the hero it towers over the other
-      // bodies' names ("goSTOPS", "Kensara AI") and reflows the caption row.
-      // Hardcoded rather than generalised: exactly one experience entry is
-      // ever selected into the hero.
-      label: "Turbotork",
-      detail: entry.role,
-      ring: "outer",
-      planes: entry.planes,
-      href: `/about#experience-${entry.id}`,
-    }));
-
-  return [...inner, ...outerProjects, ...outerExperiments, ...outerExperience];
+  return [...inner, ...outerProjects, ...outerExperiments];
 };

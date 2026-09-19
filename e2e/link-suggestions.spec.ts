@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { suggestLink } from "@/lib/ai/link-suggestions";
+import { getHeroBodies } from "@/data/queries";
 
 /**
  * The defect this pins: suggestLink used to iterate getAllProjects() in
@@ -85,4 +86,13 @@ test("a question naming Turbotork links to it even when Kensara is mentioned fir
 
   expect(link).not.toBeNull();
   expect(link!.href).toBe("/work/turbotork");
+});
+
+test("the hero reaches Turbotork through its case study, not /about @links", () => {
+  const bodies = getHeroBodies();
+  const turbotork = bodies.filter((b) => b.label === "Turbotork");
+
+  expect(turbotork).toHaveLength(1);
+  expect(turbotork[0]!.href).toBe("/work/turbotork");
+  expect(bodies.some((b) => b.id.startsWith("experience-"))).toBe(false);
 });
