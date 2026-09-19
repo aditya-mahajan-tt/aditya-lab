@@ -1,0 +1,258 @@
+/**
+ * Geometry for the /thinking brain: a neural mesh inside a side-view brain
+ * silhouette (front = left), plus the loop of step hubs and the eight-way
+ * (N-way) division of the mesh into sections.
+ *
+ * Pure and deterministic. It runs on the server and again on the client, and
+ * the two results must serialise identically or React will report a hydration
+ * mismatch. So: no Math.random (a small seeded PRNG instead) and every
+ * emitted coordinate rounded to one decimal. This is geometry, not content;
+ * the words on the page still come from /data.
+ */
+
+export type BrainNode = { x: number; y: number; section: number };
+export type BrainEdge = { a: number; b: number; section: number | null };
+export type BrainHub = { x: number; y: number; node: number };
+
+export type BrainMesh = {
+  outlinePath: string;
+  cerebellumPath: string;
+  stemPath: string;
+  gyriPaths: string[];
+  nodes: BrainNode[];
+  edges: BrainEdge[];
+  hubs: BrainHub[];
+  ringPath: string;
+  blinkNodes: number[];
+  /** The outline flattened to a polygon: what "inside the brain" means. */
+  outlinePolygon: Array<[number, number]>;
+};
+
+type Pt = [number, number];
+
+/** Control points of the silhouette (viewBox 640 x 440). */
+const POLY: Pt[] = [
+  [92, 232], [84, 180], [106, 130], [150, 86], [215, 58], [290, 42], [365, 38], [440, 50],
+  [505, 80], [556, 122], [584, 178], [588, 236], [566, 286], [528, 318], [478, 332], [440, 346],
+  [400, 352], [362, 372], [318, 378], [270, 360], [222, 352], [170, 328], [122, 290],
+];
+const CEREBELLUM = "M 452,346 C 480,384 548,378 562,326";
+const STEM = "M 384,366 C 388,398 398,424 412,438 L 446,432 C 436,404 430,380 424,358";
+const GYRI = [
+  "M 150,120 C 190,90 230,140 270,100",
+  "M 300,70 C 340,110 380,60 430,96",
+  "M 470,110 C 500,150 540,120 560,170",
+  "M 120,200 C 160,170 190,230 240,190",
+  "M 270,170 C 320,220 370,150 420,200",
+  "M 470,200 C 500,240 540,210 572,250",
+  "M 150,280 C 200,250 240,310 290,270",
+  "M 330,290 C 380,330 430,270 480,310",
+];
+
+/** Hub loop: an ellipse, starting at the back and going over the top. */
+const RING_CX = 340;
+const RING_CY = 210;
+const RING_RX = 190;
+const RING_RY = 105;
+
+const NODE_TARGET = 70;
+const NODE_MIN_DIST = 32;
+const NODE_EDGE_MARGIN = 8;
+const EDGE_K = 3;
+const EDGE_MAX_LEN = 68;
+const BLINK_COUNT = 7;
+const SEED = 7;
+
+const r1 = (n: number) => Number(n.toFixed(1));
+const fmt = (n: number) => n.toFixed(1);
+
+/** Small seeded PRNG (mulberry32). Integer maths only, so identical everywhere. */
+function mulberry32(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+type Cubic = { p0: Pt; c1: Pt; c2: Pt; p1: Pt };
+
+/** Closed Catmull-Rom spline through `pts`, as cubic Bezier segments. */
+function catmullClosed(pts: Pt[]): Cubic[] {
+  const n = pts.length;
+  return pts.map((_, i) => {
+    const p0 = pts[(i - 1 + n) % n]!;
+    const p1 = pts[i]!;
+    const p2 = pts[(i + 1) % n]!;
+    const p3 = pts[(i + 2) % n]!;
+    return {
+      p0: p1,
+      c1: [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6] as Pt,
+      c2: [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6] as Pt,
+      p1: p2,
+    };
+  });
+}
+
+function cubicsToPath(segs: Cubic[]): string {
+  const first = segs[0]!;
+  const body = segs
+    .map((s) => `C ${fmt(s.c1[0])},${fmt(s.c1[1])} ${fmt(s.c2[0])},${fmt(s.c2[1])} ${fmt(s.p1[0])},${fmt(s.p1[1])}`)
+    .join(" ");
+  return `M ${fmt(first.p0[0])},${fmt(first.p0[1])} ${body} Z`;
+}
+
+function flatten(segs: Cubic[], steps = 12): Pt[] {
+  const out: Pt[] = [];
+  for (const s of segs) {
+    for (let k = 0; k < steps; k++) {
+      const t = k / steps;
+      const u = 1 - t;
+      out.push([
+        u * u * u * s.p0[0] + 3 * u * u * t * s.c1[0] + 3 * u * t * t * s.c2[0] + t * t * t * s.p1[0],
+        u * u * u * s.p0[1] + 3 * u * u * t * s.c1[1] + 3 * u * t * t * s.c2[1] + t * t * t * s.p1[1],
+      ]);
+    }
+  }
+  return out;
+}
+
+export function pointInPolygon(x: number, y: number, poly: ReadonlyArray<readonly [number, number]>): boolean {
+  let inside = false;
+  for (let i = 0, n = poly.length; i < n; i++) {
+    const [x1, y1] = poly[i]!;
+    const [x2, y2] = poly[(i + 1) % n]!;
+    if (y1 > y !== y2 > y && x < ((x2 - x1) * (y - y1)) / (y2 - y1) + x1) inside = !inside;
+  }
+  return inside;
+}
+
+function distToSegment(px: number, py: number, a: Pt, b: Pt): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - a[0]) * dx + (py - a[1]) * dy) / len2));
+  return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
+}
+
+function distToPolygon(x: number, y: number, poly: Pt[]): number {
+  let best = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    best = Math.min(best, distToSegment(x, y, poly[i]!, poly[(i + 1) % poly.length]!));
+  }
+  return best;
+}
+
+/** Builds the mesh from scratch. Exported for the determinism test; the app uses `buildBrainMesh`. */
+export function computeBrainMesh(stepCount: number): BrainMesh {
+  const outlineSegs = catmullClosed(POLY);
+  const polygon = flatten(outlineSegs);
+  const rand = mulberry32(SEED);
+
+  // Poisson-style rejection sampling: keep a candidate if it is inside the
+  // brain, clear of the outline, and far enough from every neuron so far.
+  const pts: Pt[] = [];
+  for (let tries = 0; pts.length < NODE_TARGET && tries < 40000; tries++) {
+    const x = r1(90 + rand() * 500);
+    const y = r1(42 + rand() * 336);
+    if (!pointInPolygon(x, y, polygon)) continue;
+    if (distToPolygon(x, y, polygon) < NODE_EDGE_MARGIN) continue;
+    if (pts.every(([qx, qy]) => Math.hypot(x - qx, y - qy) >= NODE_MIN_DIST)) pts.push([x, y]);
+  }
+
+  // Step hubs on an ellipse, starting at the back (right) and going up and
+  // over the top, each snapped to the nearest neuron not already a hub.
+  const hubNodes: number[] = [];
+  const hubs: BrainHub[] = [];
+  for (let i = 0; i < stepCount; i++) {
+    const angle = (-2 * Math.PI * i) / stepCount;
+    const tx = RING_CX + RING_RX * Math.cos(angle);
+    const ty = RING_CY + RING_RY * Math.sin(angle);
+    let best = -1;
+    let bestD = Infinity;
+    pts.forEach(([x, y], j) => {
+      if (hubNodes.includes(j)) return;
+      const d = Math.hypot(x - tx, y - ty);
+      if (d < bestD) {
+        bestD = d;
+        best = j;
+      }
+    });
+    hubNodes.push(best);
+    hubs.push({ x: pts[best]![0], y: pts[best]![1], node: best });
+  }
+
+  // Sections: every neuron belongs to its nearest hub.
+  const nodes: BrainNode[] = pts.map(([x, y]) => {
+    let section = 0;
+    let bestD = Infinity;
+    hubs.forEach((h, i) => {
+      const d = Math.hypot(x - h.x, y - h.y);
+      if (d < bestD) {
+        bestD = d;
+        section = i;
+      }
+    });
+    return { x, y, section };
+  });
+
+  // k-nearest-neighbour edges, deduplicated, in a stable order.
+  const seen = new Set<string>();
+  const edges: BrainEdge[] = [];
+  pts.forEach(([x, y], i) => {
+    const near = pts
+      .map(([qx, qy], j) => ({ j, d: Math.hypot(x - qx, y - qy) }))
+      .filter((c) => c.j !== i)
+      .sort((p, q) => p.d - q.d || p.j - q.j)
+      .slice(0, EDGE_K);
+    for (const { j, d } of near) {
+      if (d > EDGE_MAX_LEN) continue;
+      const a = Math.min(i, j);
+      const b = Math.max(i, j);
+      const key = `${a}-${b}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      edges.push({ a, b, section: nodes[a]!.section === nodes[b]!.section ? nodes[a]!.section : null });
+    }
+  });
+  edges.sort((p, q) => p.a - q.a || p.b - q.b);
+
+  // Neurons that blink while nothing is hovered: seeded shuffle of non-hubs.
+  const pool = nodes.map((_, i) => i).filter((i) => !hubNodes.includes(i));
+  const shuffle = mulberry32(SEED + 3);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(shuffle() * (i + 1));
+    [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+  }
+  const blinkNodes = pool.slice(0, BLINK_COUNT);
+
+  const ringPath = hubs.length >= 3 ? cubicsToPath(catmullClosed(hubs.map((h): Pt => [h.x, h.y]))) : "";
+
+  return {
+    outlinePath: cubicsToPath(outlineSegs),
+    cerebellumPath: CEREBELLUM,
+    stemPath: STEM,
+    gyriPaths: GYRI,
+    nodes,
+    edges,
+    hubs,
+    ringPath,
+    blinkNodes,
+    outlinePolygon: polygon.map(([x, y]): Pt => [r1(x), r1(y)]),
+  };
+}
+
+const cache = new Map<number, BrainMesh>();
+
+/** Memoised per step count. Callers must treat the result as read-only. */
+export function buildBrainMesh(stepCount: number): BrainMesh {
+  let mesh = cache.get(stepCount);
+  if (!mesh) {
+    mesh = computeBrainMesh(stepCount);
+    cache.set(stepCount, mesh);
+  }
+  return mesh;
+}
