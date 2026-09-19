@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { thinking } from "@/data/thinking";
 import { Fill } from "@/components/ui/Placeholder";
 import { ThinkingFramework } from "@/components/thinking/ThinkingFramework";
@@ -56,6 +57,36 @@ export default function ThinkingPage() {
             </div>
           </section>
         </RevealText>
+
+        {thinking.principles.length > 0 && (
+          <RevealText className="mt-16">
+            <section aria-labelledby="principles">
+              <p className="label mb-4">PRINCIPLES</p>
+              <h2 id="principles" className="text-[length:var(--text-2xl)]">
+                What I believe about systems.
+              </h2>
+              <ul className="mt-12 grid gap-10 md:grid-cols-2">
+                {thinking.principles.map((principle) => (
+                  <li key={principle.title} className="border-t border-border pt-6">
+                    <h3 className="text-[length:var(--text-lg)]">{principle.title}</h3>
+                    <p className="prose-lab mt-3 text-text-muted">{principle.body}</p>
+                    {principle.evidence.length > 0 && (
+                      <ul className="mt-4 flex flex-col gap-2">
+                        {principle.evidence.map((e) => (
+                          <li key={e.url}>
+                            <Link href={e.url} className="label text-accent hover:underline">
+                              {e.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </RevealText>
+        )}
       </div>
     </section>
   );

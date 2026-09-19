@@ -185,7 +185,21 @@ export const ThinkingSchema = z.object({
   intro: Fillable,
   steps: z.array(ThinkingStepSchema).min(3),
   workedExample: Fillable,
-  principles: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
+  /**
+   * What Aditya believes about systems, as distinct from `steps`, which is
+   * how he attacks a problem. Each principle cites the work it comes from —
+   * a principle naming three projects is categorically more credible than
+   * one stated as belief.
+   */
+  principles: z
+    .array(
+      z.object({
+        title: z.string(),
+        body: z.string(),
+        evidence: z.array(LinkSchema).default([]),
+      }),
+    )
+    .default([]),
 });
 
 /* ------------------------------------------------------------- timeline */
