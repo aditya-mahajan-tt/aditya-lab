@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { buildBrainMesh, computeBrainMesh, pointInPolygon } from "@/components/thinking/brainMesh";
+import { buildBrainMesh, computeBrainMesh, labelBox, pointInPolygon } from "@/components/thinking/brainMesh";
 
 /**
  * Geometry of the /thinking brain. Node-run assertions in the Playwright
@@ -27,12 +27,13 @@ test("every coordinate is rounded to one decimal @brain", () => {
 });
 
 for (const count of [5, 8]) {
-  test(`${count} steps divide the brain into ${count} non-empty sections @brain`, () => {
+  test(`${count} steps divide the brain into ${count} substantial sections @brain`, () => {
     const mesh = buildBrainMesh(count);
     expect(mesh.hubs).toHaveLength(count);
     for (let s = 0; s < count; s++) {
       const size = mesh.nodes.filter((n) => n.section === s).length;
-      expect(size, `section ${s} of ${count}`).toBeGreaterThanOrEqual(3);
+      // Big enough to read as a region, not a corner.
+      expect(size, `section ${s} of ${count}`).toBeGreaterThanOrEqual(8);
     }
     // No neuron falls outside every section.
     for (const n of mesh.nodes) {
@@ -42,11 +43,13 @@ for (const count of [5, 8]) {
   });
 }
 
-test("the mesh is roughly 70 neurons with blinkers that are not hubs @brain", () => {
+test("the mesh is dense (~150 neurons) with a few sparse blinkers that are not hubs @brain", () => {
   const mesh = buildBrainMesh(8);
-  expect(mesh.nodes.length).toBeGreaterThanOrEqual(60);
-  expect(mesh.nodes.length).toBeLessThanOrEqual(80);
-  expect(mesh.blinkNodes.length).toBeGreaterThanOrEqual(5);
+  expect(mesh.nodes.length).toBeGreaterThanOrEqual(135);
+  expect(mesh.nodes.length).toBeLessThanOrEqual(170);
+  // Green stays a small fraction of the picture while idle.
+  expect(mesh.blinkNodes.length).toBeGreaterThanOrEqual(9);
+  expect(mesh.blinkNodes.length).toBeLessThanOrEqual(11);
   const hubNodes = new Set(mesh.hubs.map((h) => h.node));
   for (const b of mesh.blinkNodes) {
     expect(mesh.nodes[b], `blink node ${b} exists`).toBeDefined();
@@ -124,4 +127,46 @@ test("hubs run from the back, up and over the top, like the approved mockup @bra
   expect(hubs[3]!.x).toBeLessThan(340);
   expect(hubs[4]!.x).toBeLessThan(hubs[3]!.x + 1);
   expect(hubs[4]!.x).toBeLessThan(340);
+});
+
+test("no neuron or edge sits under a hub's label @brain", () => {
+  // Violations are collected, not asserted per sample: this checks thousands of points.
+  const violations: string[] = [];
+  for (const count of [5, 8]) {
+    const mesh = buildBrainMesh(count);
+    const hubNodes = new Set(mesh.hubs.map((h) => h.node));
+    for (const hub of mesh.hubs) {
+      const box = labelBox(hub);
+      const inside = (x: number, y: number) => x >= box.x0 && x <= box.x1 && y >= box.y0 && y <= box.y1;
+      mesh.nodes.forEach((n, i) => {
+        if (hubNodes.has(i)) return;
+        if (inside(n.x, n.y)) violations.push(`N=${count}: neuron ${i} at ${n.x},${n.y} under label of hub ${hub.x},${hub.y}`);
+        if (Math.hypot(n.x - hub.x, n.y - hub.y) < 16) violations.push(`N=${count}: neuron ${i} within 16 of hub ${hub.x},${hub.y}`);
+      });
+      for (const e of mesh.edges) {
+        const a = mesh.nodes[e.a]!;
+        const b = mesh.nodes[e.b]!;
+        for (let k = 0; k <= 40; k++) {
+          if (inside(a.x + ((b.x - a.x) * k) / 40, a.y + ((b.y - a.y) * k) / 40)) {
+            violations.push(`N=${count}: edge ${e.a}-${e.b} crosses label of hub ${hub.x},${hub.y}`);
+            break;
+          }
+        }
+      }
+    }
+  }
+  expect(violations).toEqual([]);
+});
+
+test("the brainstem and cerebellum are attached to the cerebrum @brain", () => {
+  const { stemPath, cerebellumPath, outlinePolygon } = buildBrainMesh(8);
+  // Every "M" and "C" anchor: the shapes must START inside the cerebrum (so its
+  // fill hides the join) and reach outside it (so they are visible).
+  const anchors = (d: string) =>
+    [...d.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)].map((m): [number, number] => [Number(m[1]), Number(m[2])]);
+  for (const [name, d] of [["stem", stemPath], ["cerebellum", cerebellumPath]] as const) {
+    const pts = anchors(d);
+    expect(pointInPolygon(pts[0]![0], pts[0]![1], outlinePolygon), `${name} starts inside the cerebrum`).toBe(true);
+    expect(pts.some(([x, y]) => !pointInPolygon(x, y, outlinePolygon)), `${name} emerges below/behind it`).toBe(true);
+  }
 });

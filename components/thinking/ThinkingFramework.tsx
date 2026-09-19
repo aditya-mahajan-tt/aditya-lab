@@ -89,11 +89,16 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
         aria-label={`The framework as a loop through a brain: ${steps.map((s) => s.label).join(" → ")} → back to ${first?.label ?? ""}. Hover or focus a step to light its region.`}
         className="mx-auto hidden w-full max-w-[880px] md:block"
       >
-        {/* Silhouette. Decorative. */}
+        {/* Silhouette. Decorative. The cerebellum and brainstem are drawn
+            first and start inside the cerebrum's lower outline; its opaque
+            fill then hides the joins, so nothing floats free. */}
         <g aria-hidden="true" data-brain-shape>
+          <path d={mesh.cerebellumPath} fill="var(--color-surface)" stroke="var(--color-border-strong)" strokeWidth={1.2} />
+          {mesh.cerebellumFoldPaths.map((d) => (
+            <path key={d} d={d} fill="none" stroke="var(--color-border)" strokeWidth={1} />
+          ))}
+          <path d={mesh.stemPath} fill="var(--color-surface)" stroke="var(--color-border-strong)" strokeWidth={1.2} strokeLinejoin="round" />
           <path d={mesh.outlinePath} fill="var(--color-surface)" stroke="var(--color-border-strong)" strokeWidth={1.2} />
-          <path d={mesh.cerebellumPath} fill="none" stroke="var(--color-border-strong)" strokeWidth={1.2} />
-          <path d={mesh.stemPath} fill="var(--color-surface)" stroke="var(--color-border-strong)" strokeWidth={1.2} />
           {mesh.gyriPaths.map((d) => (
             <path key={d} d={d} fill="none" stroke="var(--color-border)" strokeWidth={1} />
           ))}
@@ -116,7 +121,7 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
                 x2={b.x}
                 y2={b.y}
                 stroke={isLit ? "var(--color-accent-dim)" : "var(--color-border)"}
-                strokeWidth={0.9}
+                strokeWidth={isLit ? 1.2 : 0.9}
               />
             );
           })}
@@ -136,13 +141,13 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
                 data-lit={isLit ? "true" : "false"}
                 cx={n.x}
                 cy={n.y}
-                r={2}
+                r={isLit ? 2.2 : 1.8}
                 fill={isLit ? "var(--color-accent)" : "var(--color-border-strong)"}
               >
                 {isLit && !reduceMotion && (
                   <>
                     <animate attributeName="opacity" values="0.45;1;0.45" dur="2.4s" begin={`${((order * 0.31) % 2.4).toFixed(2)}s`} repeatCount="indefinite" />
-                    <animate attributeName="r" values="2;3.2;2" dur="2.4s" begin={`${((order * 0.31) % 2.4).toFixed(2)}s`} repeatCount="indefinite" />
+                    <animate attributeName="r" values="2.2;3.4;2.2" dur="2.4s" begin={`${((order * 0.31) % 2.4).toFixed(2)}s`} repeatCount="indefinite" />
                   </>
                 )}
               </circle>
@@ -165,12 +170,12 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
                   className="brain-blink"
                   cx={n.x}
                   cy={n.y}
-                  r={2.4}
+                  r={2.2}
                   fill="var(--color-accent)"
                   opacity={0}
                 >
                   <animate attributeName="opacity" values="0;1;0" dur={dur} begin={begin} repeatCount="indefinite" />
-                  <animate attributeName="r" values="2.4;4;2.4" dur={dur} begin={begin} repeatCount="indefinite" />
+                  <animate attributeName="r" values="2.2;3.8;2.2" dur={dur} begin={begin} repeatCount="indefinite" />
                 </circle>
               );
             })}
