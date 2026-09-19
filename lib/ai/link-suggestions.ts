@@ -92,12 +92,18 @@ function linkCandidates(): Candidate[] {
  * could not win at all before it became a project (2026-09-19), because
  * only projects and experiments were ever candidates.
  *
- * Now: a candidate whose leadTopics share a word with the question wins;
- * otherwise the one mentioned earliest in the answer wins, because that is
- * what the answer actually led with. Matching is whole-word, on the same
- * tokenizer retrieval uses (retrievalWords): "team" in the question matches
- * the topic "managing or leading a team", while "AI" matches only the word
- * "ai" and never the substring inside "explain" or "detail".
+ * Now the pool is chosen in three tiers, and the candidate mentioned
+ * earliest in the answer wins within it (that is what the answer actually
+ * led with):
+ *   1. candidates whose own title appears in the question - a visitor who
+ *      names a project ("Tell me about Kensara AI") wants that project, not
+ *      one that merely claims the word "AI" as a leadTopic;
+ *   2. else candidates whose leadTopics share a word with the question;
+ *   3. else every candidate the answer mentions.
+ * Topic matching is whole-word, on the same tokenizer retrieval uses
+ * (retrievalWords): "team" in the question matches the topic "managing or
+ * leading a team", while "AI" matches only the word "ai" and never the
+ * substring inside "explain" or "detail".
  */
 export function suggestLink(answer: string, question: string): LinkSuggestion | null {
   const mentioned = linkCandidates()
@@ -106,12 +112,16 @@ export function suggestLink(answer: string, question: string): LinkSuggestion | 
 
   if (mentioned.length === 0) return null;
 
+  const named = mentioned.filter((m) =>
+    question.toLowerCase().includes(m.candidate.title.toLowerCase()),
+  );
+
   const asked = new Set(retrievalWords(question));
   const byTopic = mentioned.filter((m) =>
     retrievalWords(m.candidate.leadTopics.join(" ")).some((word) => asked.has(word)),
   );
 
-  const pool = byTopic.length > 0 ? byTopic : mentioned;
+  const pool = named.length > 0 ? named : byTopic.length > 0 ? byTopic : mentioned;
   const best = pool.reduce((a, b) => (a.at <= b.at ? a : b));
 
   return { label: best.candidate.label, href: best.candidate.href };

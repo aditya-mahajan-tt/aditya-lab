@@ -59,3 +59,30 @@ test("'ai' inside 'explain' or 'detail' is not a topic match @links", () => {
   expect(link).not.toBeNull();
   expect(link!.href).toBe("/work/kensara-ai-gtm");
 });
+
+test("a question naming a project outranks the leadTopics word 'AI' @links", () => {
+  const answer = "Kensara AI was a case competition. Turbotork is where he builds AI agents.";
+
+  const link = suggestLink(answer, "Tell me about Kensara AI");
+
+  expect(link).not.toBeNull();
+  expect(link!.href).toBe("/work/kensara-ai-gtm");
+});
+
+test("earliest mention in the answer beats declaration order @links", () => {
+  const answer = "Turbotork is a fleet-service SaaS. Kensara AI was a case competition.";
+
+  const link = suggestLink(answer, "what did he do in 2026");
+
+  expect(link).not.toBeNull();
+  expect(link!.href).toBe("/work/turbotork");
+});
+
+test("a question naming Turbotork links to it even when Kensara is mentioned first @links", () => {
+  const answer = "Kensara AI was a case competition. Turbotork is a fleet-service SaaS.";
+
+  const link = suggestLink(answer, "Tell me about Turbotork.");
+
+  expect(link).not.toBeNull();
+  expect(link!.href).toBe("/work/turbotork");
+});
