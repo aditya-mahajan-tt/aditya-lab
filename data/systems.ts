@@ -22,9 +22,21 @@ const raw = [
       { label: "DECISION", detail: "Planning and execution overhead — the real bottleneck — gets automated." },
       { label: "OUTPUT", detail: "A team that runs on the system instead of around it." },
     ],
-    // Turbotork is work experience, not a /work case study (see
-    // data/experience.ts) — links to its section on /about instead.
-    relatedLink: { label: "Turbotork", url: "/about#experience-turbotork" },
+    relatedProjectSlug: "turbotork",
+  },
+  {
+    id: "agent-pipeline",
+    title: "AGENT PIPELINE",
+    description:
+      "How a two-person engineering team's work was split so the bottleneck stopped being coordination.",
+    nodes: [
+      { label: "PLAN", detail: "Turn a request into an implementation-ready plan. Reads the codebase; writes nothing." },
+      { label: "IMPLEMENT", detail: "Make the smallest safe change against the approved plan." },
+      { label: "REVIEW", detail: "Findings first, summary second — correctness, regression risk, architecture compliance, test gaps." },
+      { label: "RELEASE", detail: "Deployment readiness and the regression coverage that has to pass before it ships." },
+      { label: "RULES", detail: "A short list of architectural constraints every stage obeys — cheaper than reviewing every diff." },
+    ],
+    relatedProjectSlug: "turbotork",
   },
   {
     id: "strategy-wall",

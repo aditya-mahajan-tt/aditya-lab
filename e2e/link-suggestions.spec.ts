@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { suggestLink } from "@/lib/ai/link-suggestions";
 import { getHeroBodies } from "@/data/queries";
+import { systemDiagrams } from "@/data/systems";
 
 /**
  * The defect this pins: suggestLink used to iterate getAllProjects() in
@@ -95,4 +96,15 @@ test("the hero reaches Turbotork through its case study, not /about @links", () 
   expect(turbotork).toHaveLength(1);
   expect(turbotork[0]!.href).toBe("/work/turbotork");
   expect(bodies.some((b) => b.id.startsWith("experience-"))).toBe(false);
+});
+
+test("system diagrams point at the Turbotork case study @links", () => {
+  const automation = systemDiagrams.find((d) => d.id === "automation-engine");
+  expect(automation?.relatedProjectSlug).toBe("turbotork");
+  expect(automation?.relatedLink).toBeUndefined();
+
+  const agents = systemDiagrams.find((d) => d.id === "agent-pipeline");
+  expect(agents).toBeDefined();
+  expect(agents!.nodes.length).toBeGreaterThanOrEqual(4);
+  expect(agents!.relatedProjectSlug).toBe("turbotork");
 });
