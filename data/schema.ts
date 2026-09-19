@@ -70,6 +70,18 @@ export const ProjectStatus = z.enum([
   "IN PROGRESS",
 ]);
 
+/**
+ * Topics this entry is the canonical answer for. Ask the Lab surfaces these
+ * into the grounding corpus (lib/ai/knowledge.ts), scores retrieval against
+ * them, and is instructed by system-prompt.ts rule 9 to ground a matching
+ * question here first. lib/ai/link-suggestions.ts ranks link chips on the
+ * same signal, so content and links cannot disagree.
+ *
+ * Ordering preference only — it never licenses a claim the entry does not
+ * already make in its own fields.
+ */
+const LeadTopics = z.array(z.string()).default([]);
+
 export const ProjectSchema = z.object({
   id: z.string(),
   slug: z.string().regex(/^[a-z0-9-]+$/, "Slug must be lowercase-kebab-case"),
@@ -81,6 +93,7 @@ export const ProjectSchema = z.object({
   status: ProjectStatus,
   featured: z.boolean().default(false),
   order: z.number(),
+  leadTopics: LeadTopics,
 
   summary: Fillable,
 
@@ -130,6 +143,7 @@ export const ExperimentSchema = z.object({
   planes: z.array(Plane).min(1),
   year: z.string(),
   order: z.number(),
+  leadTopics: LeadTopics,
   summary: Fillable,
   type: z.enum(["AI", "AUTOMATION", "PRODUCT", "GROWTH", "TECHNICAL", "CREATIVE"]),
   status: ExperimentStatus,
@@ -216,14 +230,7 @@ export const ExperienceEntrySchema = z.object({
   highlights: z.array(HighlightSchema).default([]),
   /** Only set on entries the orbital hero's outer ring reads (spec §3.2/§6). */
   planes: z.array(Plane).min(1).optional(),
-  /**
-   * Topics this role is the canonical answer for. Ask the Lab surfaces these
-   * into the grounding corpus and is instructed to ground a matching question
-   * in this entry first, rather than picking whichever entry happens to share
-   * the most words with the question. Ordering preference only — it never
-   * licenses a claim that isn't already in `bullets` or `highlights`.
-   */
-  leadTopics: z.array(z.string()).default([]),
+  leadTopics: LeadTopics,
 });
 
 /* ------------------------------------------------------------ education */

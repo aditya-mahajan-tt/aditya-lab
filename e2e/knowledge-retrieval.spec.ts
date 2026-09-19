@@ -50,13 +50,14 @@ test("a question about a named project selects that project's section @retrieval
 });
 
 test("a question naming a leadTopics term ranks the entry that claims it first @retrieval", () => {
-  // data/experience.ts gives Turbotork leadTopics including "fundraising".
+  // data/projects.ts gives the Turbotork case study leadTopics including
+  // "fundraising" (the experience entry no longer claims them).
   // The question's word matches the topic verbatim, so this is a topic hit
   // rather than a chance body match.
   const firstMatch = selectSectionIds("fundraising").find(
     (id) => !getKnowledgeSections().find((s) => s.id === id)?.pinned,
   );
-  expect(firstMatch).toBe("experience-turbotork");
+  expect(firstMatch).toBe("project-turbotork");
 });
 
 test("a topic match outranks body-only matches, not just ties broken by id @retrieval", () => {
@@ -151,4 +152,11 @@ test("AI, leadership and founding questions retrieve Turbotork @retrieval", () =
   ]) {
     expect(selectSectionIds(question), `question: ${question}`).toContain("project-turbotork");
   }
+});
+
+test("a project's leadTopics reach the corpus as a PRIMARY REFERENCE line @retrieval", () => {
+  const turbotork = getKnowledgeSections().find((s) => s.id === "project-turbotork");
+  expect(turbotork).toBeDefined();
+  expect(turbotork!.text).toContain("PRIMARY REFERENCE for questions about:");
+  expect(turbotork!.text).toContain("fundraising");
 });

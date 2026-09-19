@@ -109,6 +109,9 @@ function buildProjectSections(): KnowledgeSection[] {
         `Category: ${p.category.join(", ")}`,
         `Year: ${p.year}`,
         `Status: ${p.status}`,
+        p.leadTopics.length > 0
+          ? `PRIMARY REFERENCE for questions about: ${p.leadTopics.join(", ")}.`
+          : null,
         field(p.summary) && `Summary: ${field(p.summary)}`,
         field(p.context) && `Context: ${field(p.context)}`,
         field(p.problem) && `Problem: ${field(p.problem)}`,
@@ -124,7 +127,7 @@ function buildProjectSections(): KnowledgeSection[] {
       return {
         id: `project-${p.slug}`,
         text,
-        topics: [title, ...p.category, ...p.tools],
+        topics: [title, ...p.category, ...p.tools, ...p.leadTopics],
         pinned: false,
       };
     })
@@ -140,6 +143,9 @@ function buildExperimentSections(): KnowledgeSection[] {
         `Type: ${e.type}`,
         `Status: ${e.status}`,
         `Year: ${e.year}`,
+        e.leadTopics.length > 0
+          ? `PRIMARY REFERENCE for questions about: ${e.leadTopics.join(", ")}.`
+          : null,
         field(e.summary) && `Summary: ${field(e.summary)}`,
         field(e.hypothesis) && `Hypothesis: ${field(e.hypothesis)}`,
         field(e.result) && `Result: ${field(e.result)}`,
@@ -151,7 +157,7 @@ function buildExperimentSections(): KnowledgeSection[] {
       return {
         id: `experiment-${e.slug}`,
         text,
-        topics: [title, e.type, ...e.tools],
+        topics: [title, e.type, ...e.tools, ...e.leadTopics],
         pinned: false,
       };
     })
