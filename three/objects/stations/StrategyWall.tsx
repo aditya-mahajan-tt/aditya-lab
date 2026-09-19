@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { Color, MathUtils, MeshBasicMaterial } from "three";
-import { createMetalMaterial } from "@/three/materials/MetalMaterial";
+import { createStationMaterial } from "@/three/materials/MetalMaterial";
 import { readTokens } from "@/three/materials/tokens";
 
 /**
@@ -50,8 +50,8 @@ const THREAD_Z = BOARD_Z + 0.01;
 
 export function StrategyWall({ label, hovered, focused, onHoverChange, onSelect }: Props) {
   const tokens = useMemo(readTokens, []);
-  const metal = useMemo(() => createMetalMaterial(tokens), [tokens]);
-  const card = useMemo(() => createMetalMaterial(tokens, tokens.accentDim), [tokens]);
+  const metal = useMemo(() => createStationMaterial(tokens), [tokens]);
+  const card = useMemo(() => createStationMaterial(tokens, tokens.accentDim), [tokens]);
   const threadMaterials = useMemo(
     () => THREADS.map(() => new MeshBasicMaterial({ color: new Color(tokens.accentDim), toneMapped: false })),
     [tokens],

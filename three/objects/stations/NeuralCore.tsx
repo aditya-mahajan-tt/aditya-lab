@@ -5,7 +5,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { MathUtils, type Mesh, type MeshStandardMaterial } from "three";
 import { createCoreMaterial } from "@/three/materials/CoreMaterial";
-import { createMetalMaterial } from "@/three/materials/MetalMaterial";
+import { createStationMaterial } from "@/three/materials/MetalMaterial";
 import { readTokens } from "@/three/materials/tokens";
 
 /**
@@ -33,7 +33,7 @@ const NODES = [
 
 export function NeuralCore({ label, hovered, focused, onHoverChange, onSelect }: Props) {
   const tokens = useMemo(readTokens, []);
-  const metal = useMemo(() => createMetalMaterial(tokens), [tokens]);
+  const metal = useMemo(() => createStationMaterial(tokens), [tokens]);
   const node = useMemo(() => createCoreMaterial(tokens), [tokens]);
 
   useEffect(() => {

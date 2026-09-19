@@ -176,8 +176,9 @@ export function LabEnvironmentStage() {
 
           <div
             ref={canvasBoxRef}
-            className="relative h-[52vh] w-full overflow-hidden border border-border bg-surface"
+            className="relative h-[52vh] w-full overflow-hidden border border-border"
           >
+            <div aria-hidden="true" className="lab-stage-backdrop absolute inset-0" />
             <CanvasBoundary onError={() => abandon("runtime-error")}>
               <div
                 className="absolute inset-0 opacity-0 transition-opacity duration-[var(--duration-slow)] ease-[var(--ease-out-lab)] data-[ready=true]:opacity-100"
@@ -196,6 +197,8 @@ export function LabEnvironmentStage() {
                 />
               </div>
             </CanvasBoundary>
+
+            <div aria-hidden="true" className="lab-stage-vignette pointer-events-none absolute inset-0" />
 
             {focusedStation && (
               <div className="absolute bottom-4 left-1/2 w-[min(360px,90%)] -translate-x-1/2 border border-border-strong bg-surface p-4">

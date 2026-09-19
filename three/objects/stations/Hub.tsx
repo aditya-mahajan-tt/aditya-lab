@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { QualityTier } from "@/lib/quality";
-import { createMetalMaterial } from "@/three/materials/MetalMaterial";
+import { createStationMaterial } from "@/three/materials/MetalMaterial";
 import { readTokens } from "@/three/materials/tokens";
 
 /**
@@ -14,7 +14,7 @@ const RING_SEGMENTS: Record<Exclude<QualityTier, "low">, number> = { high: 96, m
 
 export function Hub({ tier }: { tier: Exclude<QualityTier, "low"> }) {
   const tokens = useMemo(readTokens, []);
-  const material = useMemo(() => createMetalMaterial(tokens), [tokens]);
+  const material = useMemo(() => createStationMaterial(tokens), [tokens]);
   const segments = RING_SEGMENTS[tier];
 
   return (

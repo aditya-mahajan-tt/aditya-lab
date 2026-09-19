@@ -24,7 +24,7 @@ export default function HomePage() {
       <Hero />
 
       <div id="lab">
-        <section className="border-t border-border" aria-labelledby="lab-env-heading">
+        <section className="section border-t border-border" aria-labelledby="lab-env-heading">
           <LabEnvironmentStage />
         </section>
 

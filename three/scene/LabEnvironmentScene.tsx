@@ -15,6 +15,7 @@ import { OrbitalCameraController } from "@/three/systems/OrbitalCameraController
 import { PerformanceManager } from "@/three/systems/PerformanceManager";
 import { stationAngleDeg } from "@/lib/stationLayout";
 import { Environment } from "./Environment";
+import { LabFloor } from "./LabFloor";
 import { Lighting } from "./Lighting";
 
 const STATION_RING_RADIUS = 2.6;
@@ -81,6 +82,7 @@ export function LabEnvironmentScene({
     <>
       <Environment />
       <Lighting />
+      <LabFloor />
       <OrbitalCameraController progressRef={progressRef} angles={layout.angles} focusedId={focusedId} />
       <PerformanceManager tier={tier} onDowngrade={onDowngrade} onGiveUp={onGiveUp} />
 
