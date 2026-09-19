@@ -3,6 +3,7 @@ import {
   CORPUS_TOKEN_BUDGET,
   estimateTokens,
   getKnowledgeSections,
+  selectKnowledge,
   selectSectionIds,
 } from "@/lib/ai/knowledge";
 
@@ -48,10 +49,41 @@ test("a question about a named project selects that project's section @retrieval
   expect(ids).toContain("project-kensara-ai-gtm");
 });
 
-test("a leadTopics question selects the entry that claims the topic @retrieval", () => {
+test("a question naming a leadTopics term ranks the entry that claims it first @retrieval", () => {
   // data/experience.ts gives Turbotork leadTopics including "fundraising".
-  const ids = selectSectionIds("Has he ever raised funding?");
+  // The question's word matches the topic verbatim, so this is a topic hit
+  // rather than a chance body match.
+  const firstMatch = selectSectionIds("fundraising").find(
+    (id) => !getKnowledgeSections().find((s) => s.id === id)?.pinned,
+  );
+  expect(firstMatch).toBe("experience-turbotork");
+});
+
+test("a topic match outranks body-only matches, not just ties broken by id @retrieval", () => {
+  // Several project sections mention "thinking" in their body, and their ids
+  // sort BEFORE "thinking". Only the 3x topic weighting puts the section
+  // whose topics contain the word ahead of them; without it the id tiebreak
+  // would put project-adda-d2c first.
+  const firstMatch = selectSectionIds("thinking").find(
+    (id) => !getKnowledgeSections().find((s) => s.id === id)?.pinned,
+  );
+  expect(firstMatch).toBe("thinking");
+});
+
+test("short topic words like AI are searchable and match whole words only @retrieval", () => {
+  const ids = selectSectionIds("AI");
+
+  // "AI" is a leadTopic / title word on these three.
   expect(ids).toContain("experience-turbotork");
+  expect(ids).toContain("project-kensara-ai-gtm");
+  expect(ids).toContain("experiment-ai-lead-generation-engine");
+
+  // These contain "ai" only inside other words (e.g. "maintain", "detail").
+  // Substring matching a 2-letter word would select them.
+  expect(ids).not.toContain("education");
+  expect(ids).not.toContain("project-adda-d2c");
+  expect(ids).not.toContain("project-gostops-gtm");
+  expect(ids).not.toContain("experience-accordion");
 });
 
 test("pinned sections are always selected, even for an unmatched question @retrieval", () => {
@@ -77,4 +109,9 @@ test("selection is deterministic for the same question @retrieval", () => {
   const a = selectSectionIds("What has he built?");
   const b = selectSectionIds("What has he built?");
   expect(a).toEqual(b);
+});
+
+test("a broad question still fits the token budget @retrieval", () => {
+  const { tokenCount } = selectKnowledge("Tell me about every project and every job he has had");
+  expect(tokenCount).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
 });

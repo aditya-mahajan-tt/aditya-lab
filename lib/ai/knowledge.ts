@@ -274,11 +274,23 @@ const RETRIEVAL_STOP_WORDS = new Set([
   "what", "when", "where", "which", "who", "why", "how", "about", "tell",
   "can", "could", "would", "should", "from", "into", "over", "than", "then",
   "any", "all", "some", "more", "most", "much", "many", "him", "she", "they",
+  // Two-letter function words. Two-letter tokens are kept (see retrievalWords),
+  // so the noise has to be stoplisted here rather than dropped by length.
+  "is", "he", "of", "to", "in", "on", "do", "it", "me", "my", "we", "be",
+  "an", "at", "by", "as", "or", "if", "so", "up", "us", "am", "no",
 ]);
 
+/**
+ * Two-letter tokens are kept: "AI", "PM" and "ML" are the corpus's most
+ * discriminating words, and a length filter would silently drop them.
+ */
 function retrievalWords(text: string): string[] {
   const matched = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
-  return [...new Set(matched.filter((w) => w.length > 2 && !RETRIEVAL_STOP_WORDS.has(w)))];
+  return [...new Set(matched.filter((w) => w.length >= 2 && !RETRIEVAL_STOP_WORDS.has(w)))];
+}
+
+function wordSet(text: string): Set<string> {
+  return new Set(text.toLowerCase().match(/[a-z0-9]+/g) ?? []);
 }
 
 /**
@@ -292,10 +304,16 @@ function retrievalWords(text: string): string[] {
 function scoreSection(candidate: KnowledgeSection, questionWords: string[]): number {
   const topics = candidate.topics.join(" ").toLowerCase();
   const body = candidate.text.toLowerCase();
+  const topicWords = wordSet(topics);
+  const bodyWords = wordSet(body);
+  // Short words match whole words only: as a substring, "ai" would hit
+  // "maintain" and "detail" and select nearly every section.
+  const hit = (haystack: string, words: Set<string>, word: string) =>
+    word.length <= 3 ? words.has(word) : haystack.includes(word);
   let score = 0;
   for (const word of questionWords) {
-    if (topics.includes(word)) score += 3;
-    else if (body.includes(word)) score += 1;
+    if (hit(topics, topicWords, word)) score += 3;
+    else if (hit(body, bodyWords, word)) score += 1;
   }
   return score;
 }
