@@ -210,7 +210,7 @@ fits them:
 | CONTEXT | Early-stage fleet-service SaaS, founder's office; garage operations running on paper |
 | PROBLEM | No system of record; two engineers; demand scaling against manual throughput |
 | ROLE | Founding AI Product Manager — owned product end to end, led two engineers |
-| THINKING | Two bets: digitise the system of record *before* layering AI on it; and treat the engineering team's own throughput as a product problem in its own right |
+| THINKING | The §7A.2 derivation: ask where the team's time actually went (planning and review, not typing), structure before leverage, encode the rules rather than review every diff. The agent system arrives as the *consequence* of that reasoning, never as a credential |
 | APPROACH | The platform (strict service layer over Firestore, all mutations through server actions, five roles) **and** the workflow that built it (four agents with typed handoffs, 14 domain skills, PM-language change explanations enforced) |
 | EXECUTION | TT Xpress versioned inspection templates · OBD code library and health scoring · public `/health-report/[uuid]` · analytics · billing and FY invoice counters · Twilio / SendGrid / Surepass / Vaahan / Razorpay / GSTN |
 | OUTCOME | 40+ clients, 400+ vehicles, ₹30L+ revenue in 5 months, 1,000+ jobs, $250K pre-seed via Antler |
@@ -293,10 +293,120 @@ case study over `/about#experience-turbotork`.
   the site. Regenerate `lib/ai/canned-answers.generated.ts` afterwards.
 - **`data/about.ts`** — tighten the Turbotork clause in the long bio and
   point it at the case study.
-- **`data/schema.ts`** — `strategy` is declared on `ProjectSchema` and
-  rendered nowhere (`app/work/[slug]/page.tsx` omits it from the sections
-  array). Delete it, or wire it in as a section. Deleting is preferred;
-  nothing populates it.
+- **`data/schema.ts`** — two dead fields. `strategy` is declared on
+  `ProjectSchema` and rendered nowhere (`app/work/[slug]/page.tsx` omits it
+  from the sections array). `media` is worse: `MediaSchema` is fully
+  defined, every project carries `media: []`, and **no component consumes
+  it anywhere in the codebase**. Delete both. `media` returns only if and
+  when Aditya supplies a real, scrubbed product image — the asset justifies
+  the component, not the reverse (CLAUDE.md §3.1).
+
+## 7A. Phase 3 — the thinking layer
+
+This is the largest content addition after the case study itself, and it is
+what makes the Turbotork material pay off on pages other than `/work`.
+
+### 7A.1 `thinking.principles[]` — four root principles
+
+`ThinkingSchema.principles` (`data/schema.ts`) is declared as
+`{title, body}[]` and has been empty since it was written. It is the
+intended home for this.
+
+An earlier draft derived five principles that were really *principles about
+working with AI*. Aditya rejected them as too niche (2026-09-19): they read
+as tooling opinions, they date badly, and they describe the workflow rather
+than the thinking that produces it. Replaced with four domain-independent
+principles, each evidenced in at least three places, **none AI-specific**:
+
+1. **Measure the thing that decides, not the thing that's easy to
+   measure.** goSTOPS (12 behavioural variables defined before a single
+   survey question was written) · LeadIQ (score is sellable opportunity,
+   not polish — a slick site scores low) · Kensara (sell the regulatory
+   trigger, not the category) · Accordion (churn cut 8% by isolating the
+   variable that actually moved retention).
+2. **Structure before leverage — you cannot multiply what isn't there.**
+   Turbotork (digitise the system of record, *then* run AI on clean data) ·
+   Accordion (scale the data infrastructure, then the reporting on it) ·
+   Adda (store, payments and brand standing before selling) · this site
+   (Zod-parsed `/data` → motion → 3D, in that order).
+3. **Pay for a check once, not forever.** Accordion (30+ hrs/month
+   automating workflows; 60+ hrs/month scaling reporting infra) · Turbotork
+   (integrity audits and architecture rules that cost the same whether they
+   govern ten changes or a thousand) · this site (`verify.mjs`; placeholder
+   tokens that fail the production build). Vigilance is a recurring cost;
+   encoding is one-time.
+4. **The risk is rarely where the interesting work is.** LeadIQ, in
+   Aditya's existing copy: *"the riskiest part wasn't the lead-scoring
+   logic — it was the plumbing"* · Adda (the risk was COD reconciliation,
+   with 10% RTO priced into the model, not the SKU) · Turbotork
+   (architecture was heavily governed; correctness was left to manual QA,
+   and that is what bit — see the §8.1 reflection draft).
+
+Requires a small schema addition: optional `evidence: LinkSchema[]` on the
+principle object, so each principle cites the work it comes from. A
+principle that names three projects is categorically more credible than one
+stated as belief.
+
+### 7A.2 The derivation — why this ordering matters
+
+The agent workflow is presented as an **output of the four principles, not
+as a credential**:
+
+> P1 → where did a two-person team's time actually go? Not typing —
+> planning, context-rebuilding, review. More hands would have optimised the
+> measurable, irrelevant thing.
+> P2 → so don't point AI at a codebase and hope. Roles and rules first; AI
+> multiplies structure and there wasn't any.
+> P3 → encode those rules as constraints the agents obey rather than
+> reviewing every diff. Review scales with volume; a rule doesn't.
+> P4 → and what bit anyway was correctness, because the rules governed
+> architecture and nothing governed behaviour.
+
+Turbotork's THINKING section (§5) leads with this reasoning and lets the
+agent system arrive as the consequence. P4 sets up the reflection rather
+than contradicting it.
+
+### 7A.3 `ThinkingFramework` — one traveling pulse, and nodes that carry content
+
+`components/thinking/ThinkingFramework.tsx` already renders the eight steps
+as a serpentine SVG with an accent-green feedback arrow. It is static, its
+nodes carry labels only, and it is `hidden md:block`. Three changes:
+
+1. **One traveling pulse.** A single accent-green signal travels OBSERVE →
+   … → ITERATE → back to OBSERVE along the existing paths. It communicates
+   the one thing a static diagram cannot — that this is a continuously
+   running cycle with feedback.
+
+   The brief Aditya proposed was a 2D brain with many pulsing green
+   neurons mapped to brain regions. Rejected, with the instinct kept:
+   - The **colour is exactly right**. DESIGN_SYSTEM.md §2 already defines
+     green as the signal for "activates, connects, succeeds, is selected,
+     is online" — a neuron firing is a precise semantic match.
+   - The **quantity is the problem**. The same section sets ~5% signal
+     colour and states that "if a section is tinted green, that is a bug,
+     not a style." Many pulsing neurons inverts that ratio; one traveling
+     pulse honours it.
+   - **The metaphor is already spent.** `components/systems/NeuralCore.tsx`
+     is a neural hub-and-spoke on `/systems`. A second neural diagram on
+     `/thinking` would make the site look like it had one idea.
+   - **The anatomy would be invented.** There is no brain region for FRAME
+     or ITERATE. On a page titled HOW I THINK, fabricated neuroscience
+     undermines the content it decorates — CLAUDE.md §4 in a different
+     category.
+   - **Ambient pulsing carries no information**, which CLAUDE.md §3.3
+     forbids on its own.
+
+2. **Nodes carry the worked example.** Today nodes are labels and
+   `workedExample` is one paragraph below. Activating a node reveals that
+   step's body text *plus a real moment from a real project* — Turbotork
+   now supplies eight. The diagram becomes a trace of real work through the
+   loop rather than an illustration of it. This needs `ThinkingStepSchema`
+   to gain an optional `moment: { body, link }`.
+
+3. **Earn mobile.** Once nodes carry content, `hidden md:block` is a real
+   loss. Stacked, tappable nodes below `md`; arrow-key traversal above it;
+   `prefers-reduced-motion` drops the travel and keeps the arrow, losing no
+   information.
 
 ## 8. Blocked on Aditya
 
@@ -310,6 +420,16 @@ tokens until supplied:
    §7's rewrite states a mechanism rather than restating a number.
 4. **Permission check** — confirmation that describing Turbotork's product
    surfaces and architecture publicly is acceptable given his exit terms.
+5. **Optional: one scrubbed product image.** Not blocking. `media` is being
+   deleted as a dead field (§7); if Aditya can supply a legitimately
+   sanitised screenshot — the public health report is the natural
+   candidate, since it is already designed to be shown to people outside
+   the company and carries no dashboard chrome — then `media` is restored
+   and rendered for Turbotork. Asset first, component second.
+
+Resolved 2026-09-19: the personal Claude Code configuration is **not**
+claimed anywhere (§11). The four root principles in §7A.1 were confirmed by
+Aditya as accurate to how he thinks.
 
 Items 1 and 2 keep `npm run check:placeholders` failing the production
 build until answered, which is the intended behaviour.
@@ -403,3 +523,15 @@ stated preference):
 - Any change to the 3D layer, the hero's visual design, or navigation.
 - Anything in the studio repo itself. Key rotation (§9) is Aditya's to do
   in Google Cloud, not a code change here.
+- **Any claim about Aditya's personal Claude Code configuration.**
+  Considered and rejected on 2026-09-19. `.claude/` in this repo is empty;
+  `~/.claude/skills/` is dominated by the third-party gstack suite and the
+  plugins are superpowers, claude-mem and Anthropic's own. Aditya confirmed
+  he did not author the ten agent files in `~/.claude/agents/`. The studio
+  `.github/` system is unaffected — it is repo-specific and his — but it is
+  described as a workflow he *introduced and owned*, not one he hand-wrote
+  file by file, which stays true either way. The general claim "I use AI
+  agents" is both unremarkable and unverifiable here; a reviewer who asks
+  to see it finds an empty directory.
+- A 2D brain / neuroanatomy element. Rejected with reasons in §7A.3; the
+  instinct behind it is carried by the traveling pulse instead.
