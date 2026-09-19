@@ -314,6 +314,48 @@ tokens until supplied:
 Items 1 and 2 keep `npm run check:placeholders` failing the production
 build until answered, which is the intended behaviour.
 
+### 8.1 Paraphrase drafts — Aditya to rewrite in his own voice
+
+Drafted 2026-09-19 from the studio repo at Aditya's request, as starting
+material to react to rather than finished copy. These ship carrying the
+`[AI_DRAFT_REVIEW]` marker (`data/schema.ts` `DRAFT_PATTERN`), which keeps
+them out of the Ask-the-Lab corpus and renders them visibly unreviewed —
+so an un-rewritten draft cannot quietly pass as his words.
+
+**LEARNINGS — draft**
+
+1. *AI multiplies structure; it cannot create it.* The repair-suggestion
+   and summarisation flows only worked because the job-card workflow had
+   already turned a paper process into clean, consistent records. Had the
+   AI gone first, it would have had nothing to be good at. The sequencing
+   wasn't project management — it was the bet.
+
+2. *With AI writing the code, reviewing output is the wrong lever.* Review
+   effort scales with volume, and volume was suddenly unbounded. What
+   actually held quality was a short list of architectural rules the agents
+   had to obey — never touch Firestore from a component, every mutation
+   through a server action — because a constraint costs the same whether it
+   governs ten changes or a thousand.
+
+3. *A two-person team's real bottleneck was never typing speed.* It was
+   planning, context-rebuilding and review. Splitting the work into
+   named roles with explicit handoffs — plan, implement, review, release —
+   bought more than any individual tool did, because it attacked the
+   coordination cost rather than the keystroke cost.
+
+**REFLECTION — draft**
+
+I wrote 204 internal markdown documents and close to zero meaningful
+automated tests. At the time that felt like diligence; in hindsight it was
+the same instinct pointed at the wrong target. Documentation captures what
+I understood on the day I wrote it, and then silently rots. A test captures
+it and keeps checking. Given how much of the code was AI-generated, tests
+were exactly the constraint I most needed and least built — I enforced
+architecture rules on the agents rigorously and left correctness to manual
+QA. If I ran it again, the agent rules and the test suite would go in
+together, on day one, because they are the same idea: make the system tell
+you when it is wrong instead of hoping someone notices.
+
 ## 9. Security finding (outside this spec's scope, needs action)
 
 The studio repo has **two Firebase admin SDK service-account JSON key files
