@@ -27,3 +27,23 @@ export function createMetalMaterial(tokens: LabTokens, color: string = tokens.bo
     envMapIntensity: 1.6,
   });
 }
+
+/**
+ * Structural material for the Lab stations' desks, walls, pedestals and
+ * arms. createMetalMaterial's 0.92 metalness leaves almost no diffuse
+ * response, so on this scene's near-black environment a neutral steel base
+ * renders as a black cutout whatever the lights do (the hero avoids that by
+ * tinting its metal accent-green; the stations want to stay neutral). Half
+ * metal, lighter base: the two scene lights now shade the form, and the
+ * environment still adds a soft sheen.
+ */
+export function createStationMaterial(tokens: LabTokens, color?: string): MeshStandardMaterial {
+  const base = color ? new Color(color) : new Color(tokens.borderStrong).lerp(new Color(tokens.text), 0.35);
+
+  return new MeshStandardMaterial({
+    color: base,
+    metalness: 0.5,
+    roughness: 0.42,
+    envMapIntensity: 1.6,
+  });
+}

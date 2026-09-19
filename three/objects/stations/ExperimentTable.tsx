@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { Color, MeshStandardMaterial, type Mesh } from "three";
-import { createMetalMaterial } from "@/three/materials/MetalMaterial";
+import { createStationMaterial } from "@/three/materials/MetalMaterial";
 import { readTokens, type LabTokens } from "@/three/materials/tokens";
 
 /**
@@ -36,7 +36,7 @@ const VIAL_X = [-0.24, -0.08, 0.08, 0.24];
 
 export function ExperimentTable({ label, hovered, focused, onHoverChange, onSelect }: Props) {
   const tokens = useMemo(readTokens, []);
-  const metal = useMemo(() => createMetalMaterial(tokens), [tokens]);
+  const metal = useMemo(() => createStationMaterial(tokens), [tokens]);
   const statuses = useMemo(() => statusColors(tokens), [tokens]);
   const vialMaterials = useMemo(
     () =>

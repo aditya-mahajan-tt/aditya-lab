@@ -5,7 +5,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import type { Mesh } from "three";
 import { createCoreMaterial } from "@/three/materials/CoreMaterial";
-import { createMetalMaterial } from "@/three/materials/MetalMaterial";
+import { createStationMaterial } from "@/three/materials/MetalMaterial";
 import { readTokens } from "@/three/materials/tokens";
 
 /**
@@ -29,7 +29,7 @@ type Props = {
 
 export function AutomationEngine({ label, hovered, focused, onHoverChange, onSelect }: Props) {
   const tokens = useMemo(readTokens, []);
-  const metal = useMemo(() => createMetalMaterial(tokens), [tokens]);
+  const metal = useMemo(() => createStationMaterial(tokens), [tokens]);
   const packetMaterials = useMemo(() => PACKET_PHASES.map(() => createCoreMaterial(tokens)), [tokens]);
 
   useEffect(() => {
