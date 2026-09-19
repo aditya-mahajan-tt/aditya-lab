@@ -90,8 +90,13 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
   // longer fits one request's token allowance. isGrounded below checks
   // against these same sections, which is the honest pairing -- the model
   // cannot be asked to source a claim from text it was never shown.
-  const knowledge = selectKnowledge(question);
-  const sections = selectSectionIds(question);
+  //
+  // The last two turns (both roles: the assistant turn is what names the
+  // entity) join the question as retrieval context, so a follow-up such as
+  // "tell me more about that" is grounded in what it refers to.
+  const context = history.slice(-2).map((h) => h.content);
+  const knowledge = selectKnowledge(question, context);
+  const sections = selectSectionIds(question, context);
   const messages: ChatMessage[] = [
     { role: "system", content: buildSystemPrompt(knowledge.text) },
     ...history.map((h): ChatMessage => ({ role: h.role, content: h.content })),

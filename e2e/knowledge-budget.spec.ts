@@ -1,14 +1,18 @@
 import { test, expect } from "@playwright/test";
-import { CORPUS_TOKEN_BUDGET, selectKnowledge } from "@/lib/ai/knowledge";
+import {
+  CORPUS_TOKEN_BUDGET,
+  estimateTokens,
+  getKnowledgeSections,
+  selectKnowledge,
+} from "@/lib/ai/knowledge";
 import { SUGGESTED_QUESTIONS } from "@/lib/ai/suggested-questions";
 
 /**
  * A build-time guard on the one number that can silently kill Ask the Lab.
  *
- * The grounding corpus is sent in full on every question, so it is charged
- * against Groq's per-minute token allowance on every question. Push the
- * corpus past what one request can spend and the assistant does not get
- * slower or vaguer — it fails outright, on every question, and reports
+ * Each request's grounding is charged against Groq's per-minute token
+ * allowance. Push a single request past what it can spend and the assistant
+ * does not get slower or vaguer — it fails outright, and reports
  * itself to the visitor as "AI CORE TEMPORARILY OFFLINE". Nothing in that
  * message points at the content edit that caused it, which is exactly why
  * this belongs in `npm run verify` and not in a log line.
@@ -50,3 +54,30 @@ for (const question of [...SUGGESTED_QUESTIONS, ...ADVERSARIAL_QUESTIONS]) {
     ).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
   });
 }
+
+/**
+ * The per-question test above is bounded by selectKnowledge's own fill loop,
+ * so content growth alone can never turn it red. This one can: if the pinned
+ * sections plus the single largest retrievable section no longer fit, that
+ * section could never be delivered whole and answers about it would be
+ * grounded in a truncated or missing case study.
+ */
+test("pinned sections plus the largest single section fit one request @budget", () => {
+  const sections = getKnowledgeSections();
+  const pinnedTokens = sections
+    .filter((s) => s.pinned)
+    .reduce((total, s) => total + estimateTokens(s.text) + 1, 0);
+  const largest = sections
+    .filter((s) => !s.pinned)
+    .map((s) => ({ id: s.id, tokens: estimateTokens(s.text) + 1 }))
+    .sort((a, b) => b.tokens - a.tokens)[0];
+  const needed = pinnedTokens + largest.tokens;
+
+  expect(
+    needed,
+    `Pinned sections (${pinnedTokens} tokens) plus the largest section ` +
+      `"${largest.id}" (${largest.tokens} tokens) is ${needed} against a budget of ` +
+      `${CORPUS_TOKEN_BUDGET}. That section can no longer be delivered whole. ` +
+      `Shrink the section or tighten pinned content; do not raise the budget.`,
+  ).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
+});

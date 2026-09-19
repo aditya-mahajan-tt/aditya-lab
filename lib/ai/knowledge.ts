@@ -326,10 +326,13 @@ function scoreSection(candidate: KnowledgeSection, questionWords: string[]): num
  * three" either wastes most of the allowance or blows straight past it
  * depending on which three.
  */
-function rankSections(question: string): KnowledgeSection[] {
+function rankSections(question: string, context: string[]): KnowledgeSection[] {
   const all = getKnowledgeSections();
   const pinned = all.filter((s) => s.pinned);
-  const words = retrievalWords(question);
+  // A follow-up ("tell me more about that") names nothing itself; the entity
+  // is in the prior turn. Scoring the question alone would ground it in
+  // pinned sections only, and isGrounded would then refuse a correct answer.
+  const words = retrievalWords([question, ...context].join(" "));
 
   const scored = all
     .filter((s) => !s.pinned)
@@ -353,14 +356,18 @@ function rankSections(question: string): KnowledgeSection[] {
   return chosen;
 }
 
-/** The section ids a question selects. Exported for logging and tests. */
-export function selectSectionIds(question: string): string[] {
-  return rankSections(question).map((s) => s.id);
+/**
+ * The section ids a question selects. Exported for logging and tests.
+ * `context` is recent conversation text (prior turns) used as extra
+ * retrieval signal; the budget bounds the result regardless of its length.
+ */
+export function selectSectionIds(question: string, context: string[] = []): string[] {
+  return rankSections(question, context).map((s) => s.id);
 }
 
 /** The grounding text for one question — what actually goes in the prompt. */
-export function selectKnowledge(question: string): Knowledge {
-  const text = rankSections(question)
+export function selectKnowledge(question: string, context: string[] = []): Knowledge {
+  const text = rankSections(question, context)
     .map((s) => s.text)
     .join("\n\n");
   return { text, tokenCount: estimateTokens(text) };
@@ -372,14 +379,15 @@ export function estimateTokens(text: string): number {
 }
 
 /**
- * The corpus is sent in full on EVERY question, so its size is not a
- * storage concern — it is a per-request cost, and the binding limit is
- * Groq's tokens-per-minute ceiling, not the model's context window. The
+ * Each request sends the pinned sections plus the best-scoring sections
+ * for that question (selectKnowledge), so grounding size is a per-request
+ * cost, not a storage concern — and the binding limit is Groq's
+ * tokens-per-minute ceiling, not the model's context window. The
  * models here hold 131,072 tokens; the free tier allows 8,000 per minute.
  * The context window is ~4% used and irrelevant.
  *
  * AI_SPEC.md §2 set the trigger for section retrieval at 20,000 tokens,
- * reasoning about context size. That number is unreachable: a request
+ * reasoning about context size. That number was unreachable: a request
  * whose prompt alone exceeds the per-minute allowance fails EVERY time,
  * with no slow degradation to warn anyone first — and it surfaces to the
  * visitor as "AI CORE TEMPORARILY OFFLINE", which points at the API, not

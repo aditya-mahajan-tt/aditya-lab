@@ -115,3 +115,26 @@ test("a broad question still fits the token budget @retrieval", () => {
   const { tokenCount } = selectKnowledge("Tell me about every project and every job he has had");
   expect(tokenCount).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
 });
+
+/**
+ * Follow-ups ("tell me more about that") carry no scoring words of their own;
+ * the entity is in the prior assistant turn. Selecting on the question alone
+ * grounds the follow-up in pinned sections only, and isGrounded then refuses
+ * an answer that correctly names what the previous turn discussed.
+ */
+const PRIOR_TURN = "Aditya built the Kensara AI go-to-market system, which automated outreach.";
+
+test("conversation context grounds a follow-up that names nothing itself @retrieval", () => {
+  const followUp = "tell me more about that";
+  expect(selectSectionIds(followUp)).not.toContain("project-kensara-ai-gtm");
+  expect(selectSectionIds(followUp, [PRIOR_TURN])).toContain("project-kensara-ai-gtm");
+});
+
+test("the token budget still binds when context is supplied @retrieval", () => {
+  const hugeContext = getKnowledgeSections()
+    .map((s) => s.text)
+    .join(" ")
+    .repeat(3);
+  const { tokenCount } = selectKnowledge("tell me more about that", [hugeContext, hugeContext]);
+  expect(tokenCount).toBeLessThanOrEqual(CORPUS_TOKEN_BUDGET);
+});
