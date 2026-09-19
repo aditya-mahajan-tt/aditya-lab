@@ -178,6 +178,14 @@ export const SkillGroupSchema = z.object({
 export const ThinkingStepSchema = z.object({
   label: z.string(),
   body: Fillable,
+  /**
+   * Where this step actually happened, in real work. The diagram is a trace
+   * of a project through the loop, not an illustration of one — a step with
+   * no moment is a step Aditya has not yet evidenced.
+   */
+  moment: z
+    .object({ body: Fillable, link: LinkSchema.optional() })
+    .optional(),
 });
 
 export const ThinkingSchema = z.object({
@@ -328,6 +336,7 @@ export type Project = z.infer<typeof ProjectSchema>;
 export type Experiment = z.infer<typeof ExperimentSchema>;
 export type SkillGroup = z.infer<typeof SkillGroupSchema>;
 export type Thinking = z.infer<typeof ThinkingSchema>;
+export type ThinkingStep = z.infer<typeof ThinkingStepSchema>;
 export type TimelineEntry = z.infer<typeof TimelineEntrySchema>;
 export type About = z.infer<typeof AboutSchema>;
 export type Site = z.infer<typeof SiteSchema>;

@@ -9,34 +9,66 @@ export const thinking = ThinkingSchema.parse({
     {
       label: "OBSERVE",
       body: "Start by watching how people actually work today, not how the process document says they should.",
+      moment: {
+        body: "Watched where a two-person engineering team's time actually went before proposing anything. It wasn't typing — it was planning, rebuilding context and review.",
+        link: { label: "Turbotork", url: "/work/turbotork" },
+      },
     },
     {
       label: "QUESTION",
       body: "Ask why the current way exists before assuming it's wrong — most inefficiencies have a reason, and that reason is the real constraint.",
+      moment: {
+        body: "Asked why a garage still ran on paper before assuming it shouldn't. The answer — nothing downstream depended on the record being digital yet — was the actual constraint to attack.",
+        link: { label: "Turbotork", url: "/work/turbotork" },
+      },
     },
     {
       label: "UNDERSTAND",
       body: "Dig into the data and the edge cases until the problem is concrete enough to state in one sentence.",
+      moment: {
+        body: "Defined twelve behavioural variables, each tied to a hypothesis about what drives an offsite booking, before writing a single survey question.",
+        link: { label: "goSTOPS", url: "/work/gostops-gtm" },
+      },
     },
     {
       label: "FRAME",
       body: "Turn the problem into a testable bet — what would prove this right or wrong, and how cheaply can I find out.",
+      moment: {
+        body: "Reframed a compliance product's go-to-market as a bet on a regulatory deadline rather than a software category — a claim that could be tested against real practitioners inside a month.",
+        link: { label: "Kensara AI", url: "/work/kensara-ai-gtm" },
+      },
     },
     {
       label: "BUILD",
       body: "Ship the smallest version that tests the real risk, not the version that looks most impressive.",
+      moment: {
+        body: "Shipped digital job cards first, not the AI features. The inspection, diagnostic and analytics layers only worked later because this one made the data clean.",
+        link: { label: "Turbotork", url: "/work/turbotork" },
+      },
     },
     {
       label: "TEST",
       body: "Put it in front of real usage or real data before trusting my own read of whether it works.",
+      moment: {
+        body: "Put the GTM strategy in front of practitioner communities as a live voice-of-customer channel, rather than trusting the deck's own logic about what buyers cared about.",
+        link: { label: "Kensara AI", url: "/work/kensara-ai-gtm" },
+      },
     },
     {
       label: "LEARN",
       body: "Separate what the result says about the idea from what it says about the execution — they're not the same failure.",
+      moment: {
+        body: "The lead scorer worked; the plumbing didn't. An open redirect and an SSRF hole said nothing about the scoring idea and everything about where I hadn't looked.",
+        link: { label: "LeadIQ", url: "/work/leadiq" },
+      },
     },
     {
       label: "ITERATE",
       body: "Fix one variable at a time and re-test, rather than rebuilding from scratch.",
+      moment: {
+        body: "Chose a payment gateway on cash-on-delivery reconciliation rather than checkout speed, after the unit-economics model showed a 10% return-to-origin rate was the variable that actually moved.",
+        link: { label: "Adda", url: "/work/adda-d2c" },
+      },
     },
   ],
   workedExample:

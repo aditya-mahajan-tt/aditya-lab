@@ -367,4 +367,10 @@ html.custom-cursor-active * {
   .ask-lab-spinner-dot {
     animation-delay: 0ms !important;
   }
+
+  /* The /thinking loop's traveling pulse is SVG SMIL, which the blanket
+     animation rules above do not touch — it has to be hidden outright. */
+  .framework-pulse {
+    display: none;
+  }
 }

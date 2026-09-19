@@ -27,25 +27,6 @@ export default function ThinkingPage() {
           <ThinkingFramework steps={thinking.steps} />
         </RevealText>
 
-        {/* Phase 11 replaces this with an animated, interactive version. */}
-        <ol className="mt-16 divide-y divide-border border-y border-border">
-          {thinking.steps.map((step, i) => (
-            <li key={step.label}>
-              <RevealText className="flex flex-col gap-3 py-8 md:flex-row md:gap-10">
-                <div className="flex items-baseline gap-4 md:w-56 md:shrink-0">
-                  <span className="label">{String(i + 1).padStart(2, "0")}</span>
-                  <h2 className="font-mono text-sm uppercase tracking-widest text-text">
-                    {step.label}
-                  </h2>
-                </div>
-                <div className="prose-lab text-text-muted">
-                  <Fill value={step.body} as="p" />
-                </div>
-              </RevealText>
-            </li>
-          ))}
-        </ol>
-
         <RevealText className="mt-16">
           <section aria-labelledby="worked-example">
             <p className="label mb-4">WORKED EXAMPLE</p>
