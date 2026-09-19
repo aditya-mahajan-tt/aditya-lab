@@ -368,9 +368,10 @@ html.custom-cursor-active * {
     animation-delay: 0ms !important;
   }
 
-  /* The /thinking loop's traveling pulse is SVG SMIL, which the blanket
+  /* The /thinking brain's traveling pulse and blinking neurons are SVG SMIL, which the blanket
      animation rules above do not touch — it has to be hidden outright. */
-  .framework-pulse {
+  .framework-pulse,
+  .brain-blink {
     display: none;
   }
 }
