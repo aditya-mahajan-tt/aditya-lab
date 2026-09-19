@@ -82,6 +82,13 @@ export const ProjectStatus = z.enum([
  */
 const LeadTopics = z.array(z.string()).default([]);
 
+/**
+ * `strategy` and `media` were removed from projects on 2026-09-19: both were
+ * declared, both were carried by every project, and neither was read by any
+ * component. `media` returns to projects when a real, publishable product
+ * image exists to justify it -- the asset first, then the surface
+ * (CLAUDE.md section 3.1).
+ */
 export const ProjectSchema = z.object({
   id: z.string(),
   slug: z.string().regex(/^[a-z0-9-]+$/, "Slug must be lowercase-kebab-case"),
@@ -102,7 +109,6 @@ export const ProjectSchema = z.object({
   role: Fillable,
   thinking: Fillable,
   approach: Fillable,
-  strategy: z.string().optional(),
   execution: Fillable,
   outcome: z.string().optional(),
   learnings: z.array(z.string()),
@@ -118,7 +124,6 @@ export const ProjectSchema = z.object({
     .array(z.object({ label: z.string(), value: z.string(), note: z.string().optional() }))
     .optional(),
 
-  media: z.array(MediaSchema).default([]),
   links: z.array(LinkSchema).default([]),
   confidential: z.boolean().default(false),
 });
