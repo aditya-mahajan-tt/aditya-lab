@@ -181,6 +181,34 @@ p {
   padding-block: var(--space-24, 6rem);
 }
 
+/* Lab stage backdrop (components/lab/LabEnvironmentStage): sits behind the
+   transparent 3D canvas so the stage is never a flat grey box — a dot grid
+   fading out from the centre, plus a soft accent glow where the hub is. The
+   vignette sits above the canvas and darkens the edges into the page. */
+.lab-stage-backdrop {
+  background:
+    radial-gradient(ellipse 55% 50% at 50% 68%, var(--color-accent-glow), transparent 72%),
+    var(--color-bg);
+}
+
+.lab-stage-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, var(--color-border-strong) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, #000, transparent 75%);
+  mask-image: radial-gradient(ellipse at 50% 45%, #000, transparent 75%);
+}
+
+.lab-stage-vignette {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 55%,
+    color-mix(in srgb, var(--color-bg) 90%, transparent) 100%
+  );
+}
+
 @media (min-width: 768px) {
   .section {
     padding-block: 8rem;
