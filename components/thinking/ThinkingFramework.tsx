@@ -239,7 +239,13 @@ export function ThinkingFramework({ steps }: { steps: ThinkingStep[] }) {
               onFocus={(e) => {
                 // Only keyboard focus lights a section; a mouse click also
                 // focuses the <g>, and that must not pin the section lit.
-                if (e.currentTarget.matches(":focus-visible")) setFocused(i);
+                let keyboard = true;
+                try {
+                  keyboard = e.currentTarget.matches(":focus-visible");
+                } catch {
+                  // Safari < 15.4 throws on the selector: treat focus as keyboard focus.
+                }
+                if (keyboard) setFocused(i);
               }}
               onBlur={() => setFocused((f) => (f === i ? null : f))}
               onKeyDown={(e) => {

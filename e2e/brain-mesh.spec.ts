@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { buildBrainMesh, computeBrainMesh, labelBox, pointInPolygon } from "@/components/thinking/brainMesh";
 
 /**
@@ -169,4 +171,13 @@ test("the brainstem and cerebellum are attached to the cerebrum @brain", () => {
     expect(pointInPolygon(pts[0]![0], pts[0]![1], outlinePolygon), `${name} starts inside the cerebrum`).toBe(true);
     expect(pts.some(([x, y]) => !pointInPolygon(x, y, outlinePolygon)), `${name} emerges below/behind it`).toBe(true);
   }
+});
+
+test("the geometry module cannot depend on engine-specific maths or randomness @brain", () => {
+  // The mesh is computed on the server and again in the browser; it must be
+  // identical in every JS engine. Math.hypot's precision is implementation-defined
+  // and Math.random is nondeterministic, so neither may appear -- not even in a comment.
+  const source = readFileSync(join(process.cwd(), "components/thinking/brainMesh.ts"), "utf8");
+  expect(source).not.toContain("Math.hypot");
+  expect(source).not.toContain("Math.random");
 });

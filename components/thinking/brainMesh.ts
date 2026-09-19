@@ -5,7 +5,7 @@
  *
  * Pure and deterministic. It runs on the server and again on the client, and
  * the two results must serialise identically or React will report a hydration
- * mismatch. So: no Math.random (a small seeded PRNG instead) and every
+ * mismatch. So: no built-in random (a small seeded PRNG instead) and every
  * emitted coordinate rounded to one decimal. This is geometry, not content;
  * the words on the page still come from /data.
  */
@@ -64,6 +64,19 @@ const RING_CY = 210;
 const RING_RX = 190;
 const RING_RY = 105;
 
+/*
+ * HYDRATION DETERMINISM. This module runs on the server and again in the
+ * visitor's browser, and both must produce byte-identical markup or React
+ * reports a mismatch it cannot patch. Node placement is chaotic: one flipped
+ * comparison moves every later neuron. So every decision below uses only
+ * IEEE-754 basic arithmetic (+ - * /), which is exact and identical in every
+ * JS engine, on squared distances against squared thresholds. The built-in
+ * hypotenuse helper is deliberately not used: its precision is
+ * implementation-defined and can differ between V8, JavaScriptCore and
+ * SpiderMonkey. (Math.cos/sin only feed
+ * the hub targets and are rounded to 0.1.) e2e/brain-mesh.spec.ts greps this
+ * file to keep both the hypotenuse helper and the built-in random out.
+ */
 const NODE_TARGET = 150;
 const NODE_MIN_DIST = 20;
 const NODE_EDGE_MARGIN = 8;
@@ -74,6 +87,8 @@ const BLINK_COUNT = 10;
 const SEED = 7;
 /** Neurons keep clear of each hub by at least this much. */
 const HUB_CLEARANCE = 16;
+const sq = (n: number) => n * n;
+const dist2 = (ax: number, ay: number, bx: number, by: number) => sq(ax - bx) + sq(ay - by);
 /** Widest step label ("UNDERSTAND") at 12px mono with tracking, plus its halo. */
 const LABEL_WIDTH = 88;
 
@@ -88,14 +103,27 @@ export function labelBox(hub: { x: number; y: number }, pad = 0) {
 
 const inBox = (x: number, y: number, b: ReturnType<typeof labelBox>) => x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1;
 
-/** True if the segment passes through the box (sampled every ~2 units). */
+/** True if the segment touches the box (exact slab test, basic arithmetic only). */
 function segmentHitsBox(ax: number, ay: number, bx: number, by: number, b: ReturnType<typeof labelBox>) {
-  const steps = Math.max(2, Math.ceil(Math.hypot(bx - ax, by - ay) / 2));
-  for (let k = 0; k <= steps; k++) {
-    const t = k / steps;
-    if (inBox(ax + (bx - ax) * t, ay + (by - ay) * t, b)) return true;
+  let t0 = 0;
+  let t1 = 1;
+  const d: Pt = [bx - ax, by - ay];
+  const lo: Pt = [b.x0 - ax, b.y0 - ay];
+  const hi: Pt = [b.x1 - ax, b.y1 - ay];
+  for (let axis = 0; axis < 2; axis++) {
+    const dv = d[axis]!;
+    if (dv === 0) {
+      if (lo[axis]! > 0 || hi[axis]! < 0) return false;
+      continue;
+    }
+    let ta = lo[axis]! / dv;
+    let tb = hi[axis]! / dv;
+    if (ta > tb) [ta, tb] = [tb, ta];
+    t0 = Math.max(t0, ta);
+    t1 = Math.min(t1, tb);
+    if (t0 > t1) return false;
   }
-  return false;
+  return true;
 }
 
 const r1 = (n: number) => Number(n.toFixed(1));
@@ -165,18 +193,20 @@ export function pointInPolygon(x: number, y: number, poly: ReadonlyArray<readonl
   return inside;
 }
 
-function distToSegment(px: number, py: number, a: Pt, b: Pt): number {
+/** Squared distance from a point to a segment. */
+function distToSegment2(px: number, py: number, a: Pt, b: Pt): number {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
   const len2 = dx * dx + dy * dy;
   const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - a[0]) * dx + (py - a[1]) * dy) / len2));
-  return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
+  return dist2(px, py, a[0] + t * dx, a[1] + t * dy);
 }
 
-function distToPolygon(x: number, y: number, poly: Pt[]): number {
+/** Squared distance from a point to the polygon's boundary. */
+function distToPolygon2(x: number, y: number, poly: Pt[]): number {
   let best = Infinity;
   for (let i = 0; i < poly.length; i++) {
-    best = Math.min(best, distToSegment(x, y, poly[i]!, poly[(i + 1) % poly.length]!));
+    best = Math.min(best, distToSegment2(x, y, poly[i]!, poly[(i + 1) % poly.length]!));
   }
   return best;
 }
@@ -215,12 +245,12 @@ export function computeBrainMesh(stepCount: number): BrainMesh {
       const x = r1(90 + rand() * 500);
       const y = r1(42 + rand() * 336);
       if (!pointInPolygon(x, y, polygon)) continue;
-      if (distToPolygon(x, y, polygon) < NODE_EDGE_MARGIN) continue;
+      if (distToPolygon2(x, y, polygon) < sq(NODE_EDGE_MARGIN)) continue;
       if (boxes.some((b) => inBox(x, y, b))) continue;
-      if (hubs.some((h) => Math.hypot(x - h.x, y - h.y) < HUB_CLEARANCE)) continue;
+      if (hubs.some((h) => dist2(x, y, h.x, h.y) < sq(HUB_CLEARANCE))) continue;
       let nearest = Infinity;
-      for (const [qx, qy] of pts) nearest = Math.min(nearest, Math.hypot(x - qx, y - qy));
-      if (nearest >= NODE_MIN_DIST && nearest > bestD) {
+      for (const [qx, qy] of pts) nearest = Math.min(nearest, dist2(x, y, qx, qy));
+      if (nearest >= sq(NODE_MIN_DIST) && nearest > bestD) {
         bestD = nearest;
         bestPt = [x, y];
       }
@@ -238,7 +268,7 @@ export function computeBrainMesh(stepCount: number): BrainMesh {
     let section = 0;
     let bestD = Infinity;
     hubs.forEach((h, i) => {
-      const d = Math.hypot(x - h.x, y - h.y);
+      const d = dist2(x, y, h.x, h.y);
       if (d < bestD) {
         bestD = d;
         section = i;
@@ -254,12 +284,12 @@ export function computeBrainMesh(stepCount: number): BrainMesh {
   const edges: BrainEdge[] = [];
   pts.forEach(([x, y], i) => {
     const near = pts
-      .map(([qx, qy], j) => ({ j, d: Math.hypot(x - qx, y - qy) }))
+      .map(([qx, qy], j) => ({ j, d: dist2(x, y, qx, qy) }))
       .filter((c) => c.j !== i)
       .sort((p, q) => p.d - q.d || p.j - q.j)
       .slice(0, EDGE_K);
     for (const { j, d } of near) {
-      if (d > EDGE_MAX_LEN) continue;
+      if (d > sq(EDGE_MAX_LEN)) continue;
       if (textBoxes.some((lb) => segmentHitsBox(x, y, pts[j]![0], pts[j]![1], lb))) continue;
       const a = Math.min(i, j);
       const b = Math.max(i, j);
