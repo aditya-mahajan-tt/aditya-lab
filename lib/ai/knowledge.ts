@@ -82,13 +82,30 @@ function buildSkillsSection(): string | null {
   return groups ? `## Skills\n\n${groups}` : null;
 }
 
-function buildProjectsSection(): string | null {
-  const entries = getAllProjects()
+/**
+ * One independently retrievable unit of the corpus.
+ *
+ * Granularity is the whole point: buildProjectsSection() used to join every
+ * project into a single string, which made "send the best sections" and
+ * "send everything" the same operation. One section per entry is what lets
+ * scoring prefer Turbotork over Kensara for a question about leadership.
+ */
+export type KnowledgeSection = {
+  id: string;
+  text: string;
+  /** Title, category, tools and leadTopics — weighted above body text when scoring. */
+  topics: string[];
+  /** Identity and contact. Always sent, never scored. */
+  pinned: boolean;
+};
+
+function buildProjectSections(): KnowledgeSection[] {
+  return getAllProjects()
     .filter((p) => !p.confidential)
-    .map((p) => {
+    .map((p): KnowledgeSection | null => {
       const title = field(p.title);
       if (!title) return null; // an unnamed project is worse than useless as grounding
-      return section(`Project: ${title}${p.subtitle ? ` — ${p.subtitle}` : ""}`, [
+      const text = section(`Project: ${title}${p.subtitle ? ` — ${p.subtitle}` : ""}`, [
         `Category: ${p.category.join(", ")}`,
         `Year: ${p.year}`,
         `Status: ${p.status}`,
@@ -103,17 +120,23 @@ function buildProjectsSection(): string | null {
         p.tools.length > 0 ? `Tools: ${p.tools.join(", ")}` : null,
         `Case study page: /work/${p.slug}`,
       ]);
+      if (!text) return null;
+      return {
+        id: `project-${p.slug}`,
+        text,
+        topics: [title, ...p.category, ...p.tools],
+        pinned: false,
+      };
     })
-    .filter((e): e is string => !!e);
-  return entries.length > 0 ? entries.join("\n\n") : null;
+    .filter((s): s is KnowledgeSection => s !== null);
 }
 
-function buildExperimentsSection(): string | null {
-  const entries = getAllExperiments()
-    .map((e) => {
+function buildExperimentSections(): KnowledgeSection[] {
+  return getAllExperiments()
+    .map((e): KnowledgeSection | null => {
       const title = field(e.title);
       if (!title) return null;
-      return section(`Experiment: ${title}`, [
+      const text = section(`Experiment: ${title}`, [
         `Type: ${e.type}`,
         `Status: ${e.status}`,
         `Year: ${e.year}`,
@@ -124,23 +147,25 @@ function buildExperimentsSection(): string | null {
         e.tools.length > 0 ? `Tools: ${e.tools.join(", ")}` : null,
         `Experiment page: /experiments/${e.slug}`,
       ]);
+      if (!text) return null;
+      return {
+        id: `experiment-${e.slug}`,
+        text,
+        topics: [title, e.type, ...e.tools],
+        pinned: false,
+      };
     })
-    .filter((e): e is string => !!e);
-  return entries.length > 0 ? entries.join("\n\n") : null;
+    .filter((s): s is KnowledgeSection => s !== null);
 }
 
-function buildExperienceSection(): string | null {
-  const entries = [...experience]
-    // Entries carrying leadTopics go first. Position in the corpus is a weak
-    // signal on its own, but it costs nothing and points the same way as the
-    // explicit PRIMARY REFERENCE line rather than fighting it.
-    .sort((a, b) => Number(b.leadTopics.length > 0) - Number(a.leadTopics.length > 0))
-    .map((e) => {
+function buildExperienceSections(): KnowledgeSection[] {
+  return [...experience]
+    .map((e): KnowledgeSection | null => {
       const bullets = e.bullets.map((b) => field(b)).filter((b): b is string => !!b);
       const highlights = e.highlights
         .map((h) => field(h.label) && `${h.value} — ${field(h.label)}`)
         .filter((h): h is string => !!h);
-      return section(`Experience: ${e.role} at ${e.company}`, [
+      const text = section(`Experience: ${e.role} at ${e.company}`, [
         `Dates: ${formatDate(e.start)} to ${e.end ? formatDate(e.end) : "Present"}`,
         e.location ? `Location: ${e.location}` : null,
         // Read by system-prompt.ts rule 9. Emitted first so it frames the
@@ -152,9 +177,15 @@ function buildExperienceSection(): string | null {
         e.tools.length > 0 ? `Tools: ${e.tools.join(", ")}` : null,
         ...highlights,
       ]);
+      if (!text) return null;
+      return {
+        id: `experience-${e.id}`,
+        text,
+        topics: [e.company, e.role, ...e.tools, ...e.leadTopics],
+        pinned: false,
+      };
     })
-    .filter((e): e is string => !!e);
-  return entries.length > 0 ? entries.join("\n\n") : null;
+    .filter((s): s is KnowledgeSection => s !== null);
 }
 
 function buildEducationSection(): string | null {
@@ -193,24 +224,46 @@ function buildContactSection(): string | null {
   ]);
 }
 
-function buildKnowledgeText(): string {
-  const sections = [
-    section("Site", [`Name: ${site.name}`, `Title: ${site.title}`, `Description: ${site.description}`]),
-    buildAboutSection(),
-    buildSkillsSection(),
-    buildExperienceSection(),
-    buildEducationSection(),
-    buildProjectsSection(),
-    buildExperimentsSection(),
-    buildThinkingSection(),
-    buildContactSection(),
-  ].filter((s): s is string => s !== null);
+function buildKnowledgeSections(): KnowledgeSection[] {
+  const single = (
+    id: string,
+    text: string | null,
+    topics: string[],
+    pinned = false,
+  ): KnowledgeSection[] => (text ? [{ id, text, topics, pinned }] : []);
 
-  return sections.join("\n\n");
+  return [
+    ...single(
+      "site",
+      section("Site", [
+        `Name: ${site.name}`,
+        `Title: ${site.title}`,
+        `Description: ${site.description}`,
+      ]),
+      [site.name, site.title],
+      true,
+    ),
+    ...single("about", buildAboutSection(), ["about", "background", "bio", "aditya"], true),
+    ...single("skills", buildSkillsSection(), skillGroups.map((g) => g.id)),
+    ...buildExperienceSections(),
+    ...single("education", buildEducationSection(), ["education", "degree", "university"]),
+    ...buildProjectSections(),
+    ...buildExperimentSections(),
+    ...single("thinking", buildThinkingSection(), ["thinking", "process", "framework"]),
+    ...single("contact", buildContactSection(), ["contact", "email", "resume", "hire"], true),
+  ];
+}
+
+let cachedSections: KnowledgeSection[] | null = null;
+
+/** Built once per server lifetime, same reasoning as getKnowledge() below. */
+export function getKnowledgeSections(): KnowledgeSection[] {
+  if (!cachedSections) cachedSections = buildKnowledgeSections();
+  return cachedSections;
 }
 
 /** ~4 characters per token is a standard rough estimate for English text. */
-function estimateTokens(text: string): number {
+export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
@@ -269,7 +322,7 @@ let cached: Knowledge | null = null;
 export function getKnowledge(): Knowledge {
   if (cached) return cached;
 
-  const text = buildKnowledgeText();
+  const text = getKnowledgeSections().map((s) => s.text).join("\n\n");
   const tokenCount = estimateTokens(text);
 
   if (tokenCount > CORPUS_TOKEN_WARN) {
