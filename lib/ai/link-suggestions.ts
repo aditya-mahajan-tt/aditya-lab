@@ -1,5 +1,6 @@
 import { getAllProjects, getAllExperiments } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
+import { retrievalWords } from "@/lib/ai/knowledge";
 
 /** Static routes that exist in /app. Kept beside the dynamic slugs below. */
 const STATIC_ROUTES = [
@@ -56,22 +57,62 @@ export function stripUnknownInternalPaths(answer: string): string {
 
 export type LinkSuggestion = { label: string; href: string };
 
+type Candidate = LinkSuggestion & { title: string; leadTopics: string[] };
+
+function linkCandidates(): Candidate[] {
+  return [
+    ...getAllProjects()
+      .filter((p) => !isPlaceholder(p.title))
+      .map((p) => ({
+        title: p.title,
+        leadTopics: p.leadTopics,
+        label: `${p.title} case study`,
+        href: `/work/${p.slug}`,
+      })),
+    ...getAllExperiments()
+      .filter((e) => !isPlaceholder(e.title))
+      .map((e) => ({
+        title: e.title,
+        leadTopics: e.leadTopics,
+        label: `${e.title} experiment`,
+        href: `/experiments/${e.slug}`,
+      })),
+  ];
+}
+
 /**
  * Deterministic, not model-generated: AI_SPEC.md §4 requires internal links
  * come only from an allowlist of the site's own routes, never a URL the
- * model produces. If the grounded answer text mentions a real project or
- * experiment title, offer one link chip to that page.
+ * model produces.
+ *
+ * Ranking uses the same signal as content ranking. Previously this returned
+ * the first project whose title appeared in the answer, in data/projects.ts
+ * array order — so an answer covering both Kensara AI and Turbotork linked
+ * to whichever was declared first, no matter what was asked. Turbotork
+ * could not win at all before it became a project (2026-09-19), because
+ * only projects and experiments were ever candidates.
+ *
+ * Now: a candidate whose leadTopics share a word with the question wins;
+ * otherwise the one mentioned earliest in the answer wins, because that is
+ * what the answer actually led with. Matching is whole-word, on the same
+ * tokenizer retrieval uses (retrievalWords): "team" in the question matches
+ * the topic "managing or leading a team", while "AI" matches only the word
+ * "ai" and never the substring inside "explain" or "detail".
  */
-export function suggestLink(answer: string): LinkSuggestion | null {
-  for (const p of getAllProjects()) {
-    if (!isPlaceholder(p.title) && answer.includes(p.title)) {
-      return { label: `${p.title} case study`, href: `/work/${p.slug}` };
-    }
-  }
-  for (const e of getAllExperiments()) {
-    if (!isPlaceholder(e.title) && answer.includes(e.title)) {
-      return { label: `${e.title} experiment`, href: `/experiments/${e.slug}` };
-    }
-  }
-  return null;
+export function suggestLink(answer: string, question: string): LinkSuggestion | null {
+  const mentioned = linkCandidates()
+    .map((c) => ({ candidate: c, at: answer.indexOf(c.title) }))
+    .filter((m) => m.at !== -1);
+
+  if (mentioned.length === 0) return null;
+
+  const asked = new Set(retrievalWords(question));
+  const byTopic = mentioned.filter((m) =>
+    retrievalWords(m.candidate.leadTopics.join(" ")).some((word) => asked.has(word)),
+  );
+
+  const pool = byTopic.length > 0 ? byTopic : mentioned;
+  const best = pool.reduce((a, b) => (a.at <= b.at ? a : b));
+
+  return { label: best.candidate.label, href: best.candidate.href };
 }

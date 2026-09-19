@@ -290,7 +290,7 @@ const RETRIEVAL_STOP_WORDS = new Set([
  * Two-letter tokens are kept: "AI", "PM" and "ML" are the corpus's most
  * discriminating words, and a length filter would silently drop them.
  */
-function retrievalWords(text: string): string[] {
+export function retrievalWords(text: string): string[] {
   const matched = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
   return [...new Set(matched.filter((w) => w.length >= 2 && !RETRIEVAL_STOP_WORDS.has(w)))];
 }

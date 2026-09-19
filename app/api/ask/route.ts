@@ -134,7 +134,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
       sections,
     });
 
-    const link = grounded ? (suggestLink(answer) ?? undefined) : undefined;
+    const link = grounded ? (suggestLink(answer, question) ?? undefined) : undefined;
     return NextResponse.json({ status: "answered", message: answer, link });
   } catch (err) {
     console.error("[ask-the-lab] Groq call failed:", err);
