@@ -262,6 +262,92 @@ export function getKnowledgeSections(): KnowledgeSection[] {
   return cachedSections;
 }
 
+/**
+ * Words too common to carry retrieval signal. Deliberately short: this is a
+ * ~5,000-token corpus of one person's work, not a web index, so almost every
+ * content word is discriminating. Over-stoplisting is the bigger risk —
+ * dropping "AI" or "team" would break exactly the questions this exists for.
+ */
+const RETRIEVAL_STOP_WORDS = new Set([
+  "the", "and", "for", "with", "you", "your", "his", "her", "their", "was",
+  "are", "were", "has", "have", "had", "did", "does", "doing", "this", "that",
+  "what", "when", "where", "which", "who", "why", "how", "about", "tell",
+  "can", "could", "would", "should", "from", "into", "over", "than", "then",
+  "any", "all", "some", "more", "most", "much", "many", "him", "she", "they",
+]);
+
+function retrievalWords(text: string): string[] {
+  const matched = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  return [...new Set(matched.filter((w) => w.length > 2 && !RETRIEVAL_STOP_WORDS.has(w)))];
+}
+
+/**
+ * Topic matches score 3x a body match. Topics are the title, category,
+ * tools and leadTopics — the same leadTopics signal system-prompt.ts rule 9
+ * uses to order content, so a question that makes Turbotork the primary
+ * reference for content also makes it the top-scoring section, and
+ * link-suggestions.ts (Phase 2) ranks it first too. One signal, three
+ * consumers, no disagreement.
+ */
+function scoreSection(candidate: KnowledgeSection, questionWords: string[]): number {
+  const topics = candidate.topics.join(" ").toLowerCase();
+  const body = candidate.text.toLowerCase();
+  let score = 0;
+  for (const word of questionWords) {
+    if (topics.includes(word)) score += 3;
+    else if (body.includes(word)) score += 1;
+  }
+  return score;
+}
+
+/**
+ * Pinned sections plus the best-scoring remainder that fits the budget.
+ *
+ * Fills to a token budget rather than taking a fixed top-N: sections vary
+ * from ~40 tokens (education) to ~700 (a full case study), so "the best
+ * three" either wastes most of the allowance or blows straight past it
+ * depending on which three.
+ */
+function rankSections(question: string): KnowledgeSection[] {
+  const all = getKnowledgeSections();
+  const pinned = all.filter((s) => s.pinned);
+  const words = retrievalWords(question);
+
+  const scored = all
+    .filter((s) => !s.pinned)
+    .map((s) => ({ section: s, score: scoreSection(s, words) }))
+    .filter((r) => r.score > 0)
+    // Tiebreak on id so selection is deterministic, which the answer cache
+    // and these tests both rely on.
+    .sort((a, b) => b.score - a.score || a.section.id.localeCompare(b.section.id));
+
+  const chosen = [...pinned];
+  let remaining =
+    CORPUS_TOKEN_BUDGET - pinned.reduce((total, s) => total + estimateTokens(s.text), 0);
+
+  for (const { section: candidate } of scored) {
+    const cost = estimateTokens(candidate.text) + 1; // +1 for the joining newlines
+    if (cost > remaining) continue; // skip, don't stop — a smaller section may still fit
+    chosen.push(candidate);
+    remaining -= cost;
+  }
+
+  return chosen;
+}
+
+/** The section ids a question selects. Exported for logging and tests. */
+export function selectSectionIds(question: string): string[] {
+  return rankSections(question).map((s) => s.id);
+}
+
+/** The grounding text for one question — what actually goes in the prompt. */
+export function selectKnowledge(question: string): Knowledge {
+  const text = rankSections(question)
+    .map((s) => s.text)
+    .join("\n\n");
+  return { text, tokenCount: estimateTokens(text) };
+}
+
 /** ~4 characters per token is a standard rough estimate for English text. */
 export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
