@@ -108,5 +108,37 @@ export const thinking = ThinkingSchema.parse({
         { label: "Turbotork — rules governed architecture, nothing governed correctness", url: "/work/turbotork" },
       ],
     },
+    {
+      title: "Dissociate analysis from anxiety — focus on the present constraint",
+      body: "Analysis looks forward into facts; anxiety loops backward into regret or forward into imagined failure. Decisions clear up the moment you separate them and focus only on the present, controllable constraint.",
+      evidence: [
+        { label: "Turbotork — attacking the coordination constraint, not the fear of output", url: "/work/turbotork" },
+        { label: "LeadIQ — isolating security vulnerabilities from core scoring logic", url: "/work/leadiq" },
+      ],
+    },
+    {
+      title: "Division of labor beats heroics — leverage is non-zero-sum",
+      body: "High-performing teams aren't built on individual heroics, but on Adlerian division of labor: clear roles aligned to distinct strengths, collective ownership, and continuous marginal improvement.",
+      evidence: [
+        { label: "Turbotork — multi-agent role separation and handoffs", url: "/work/turbotork" },
+        { label: "Adda — decoupling payments, storefront and logistics handoffs", url: "/work/adda-d2c" },
+      ],
+    },
+    {
+      title: "Technical solutions are binary; market adoption is behavioral",
+      body: "You can engineer a flawless system and still fail if you ignore the ecosystem around it. Software solves technical constraints, but market intelligence and distribution decide whether anyone cares.",
+      evidence: [
+        { label: "goSTOPS — demand hypotheses defined before writing software", url: "/work/gostops-gtm" },
+        { label: "Turbotork — building for garage reality, not just clean architecture", url: "/work/turbotork" },
+      ],
+    },
+    {
+      title: "Lead by conviction over consensus when navigating ambiguity",
+      body: "Consensus averages out variance to find comfort; conviction forms an explicit, falsifiable bet from first principles. In zero-to-one problem spaces with incomplete data, the job is to form an explicit point of view and expose it to reality as cheaply as possible.",
+      evidence: [
+        { label: "Kensara AI — testing a regulatory trigger directly with practitioners", url: "/work/kensara-ai-gtm" },
+        { label: "Turbotork — system of record first before AI features", url: "/work/turbotork" },
+      ],
+    },
   ],
 });
