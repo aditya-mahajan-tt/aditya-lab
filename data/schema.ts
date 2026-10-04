@@ -80,7 +80,7 @@ export const ProjectStatus = z.enum([
  * Ordering preference only — it never licenses a claim the entry does not
  * already make in its own fields.
  */
-const LeadTopics = z.array(z.string()).default([]);
+export const LeadTopics = z.array(z.string()).default([]);
 
 /**
  * `strategy` and `media` were removed from projects on 2026-09-19: both were

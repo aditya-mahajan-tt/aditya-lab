@@ -70,7 +70,7 @@ aditya-lab/
 │   ├── thinking/               # ThinkingFramework, FrameworkStep
 │   ├── about/                  # AboutSection, SkillSystem, Progression
 │   ├── contact/                # ContactSection, ContactForm
-│   ├── systems/                # AutomationEngine, NeuralCore, ProcessDiagram, StrategyWall
+│   ├── systems/                # AutomationEngine, AgentPipeline, NeuralCore, ProcessDiagram, StrategyWall, WorkflowDiagram, WorkflowStepList
 │   ├── ai/                     # AskTheLab, ChatWindow, MessageList, SuggestedQuestions
 │   ├── build/                  # BuildMode, ArchitectureDiagram, StackList
 │   ├── log/                    # LabLog, LogEntry
@@ -96,6 +96,7 @@ aditya-lab/
 │   ├── schema.ts               # Zod schemas — validated at module load
 │   ├── projects.ts
 │   ├── experiments.ts
+│   ├── workflows.ts            # workflow content: flowchart nodes, checks, integrations
 │   ├── skills.ts
 │   ├── timeline.ts
 │   ├── about.ts

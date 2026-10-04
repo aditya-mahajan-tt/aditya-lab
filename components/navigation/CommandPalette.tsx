@@ -18,7 +18,7 @@ import { playTone } from "@/lib/sound";
  * Escape, and constrains Tab focus for free (see ARCHITECTURE.md's decision
  * to skip the `cmdk` dependency).
  */
-export function CommandPalette() {
+export function CommandPalette({ extraItems = [] }: { extraItems?: CommandItem[] }) {
   const open = useLabStore((s) => s.commandPaletteOpen);
   const setOpen = useLabStore((s) => s.setCommandPaletteOpen);
   const setAiOpen = useLabStore((s) => s.setAiOpen);
@@ -30,7 +30,7 @@ export function CommandPalette() {
 
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const results = searchCommands(query);
+  const results = searchCommands(query, 8, extraItems);
   const activeItem = results[activeIndex];
   const soundEnabled = useLabStore((s) => s.soundEnabled);
 

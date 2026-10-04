@@ -44,7 +44,7 @@ export const stations: Station[] = [
     order: 2,
     label: "Automation Engine",
     route: "/systems",
-    description: "Input → data → enrich → AI → decision → automation → output, animated end to end.",
+    description: "Input → data → enrich → AI → decision → output, animated end to end, with running workflows beside it.",
     built: true,
   },
   {
@@ -52,7 +52,7 @@ export const stations: Station[] = [
     order: 3,
     label: "Strategy Wall",
     route: "/systems",
-    description: "Segmentation, GTM, positioning and customer-journey work laid out visually.",
+    description: "Market, segmentation, ICP, positioning and channel, sequenced into a launch and laid out visually.",
     built: true,
   },
   {

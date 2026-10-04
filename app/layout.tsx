@@ -5,6 +5,7 @@ import "./globals.css";
 import { site } from "@/data/site";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { Header } from "@/components/layout/Header";
+import { workflowCommandItems } from "@/lib/workflowCommands";
 import { Footer } from "@/components/layout/Footer";
 import { CustomCursor } from "@/components/effects/CustomCursor";
 import { PageTransition } from "@/components/effects/PageTransition";
@@ -69,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PersonJsonLd />
         <SkipLink />
         <CustomCursor />
-        <Header />
+        <Header commandItems={workflowCommandItems()} />
         <main id="main">
           <PageTransition>{children}</PageTransition>
         </main>

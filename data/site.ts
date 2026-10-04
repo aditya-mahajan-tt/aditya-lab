@@ -4,17 +4,26 @@ import { SiteSchema } from "./schema";
  * CONTENT_INTAKE.md §A — supply the real values, then delete the placeholders.
  *
  * `NEXT_PUBLIC_SITE_URL` is meant to be set explicitly in the Vercel
- * project's production environment — that's the source of truth and should
- * still be set there. This fallback chain exists only so a missing/unset
- * env var degrades to Vercel's own deployment URL instead of silently
- * resolving to `localhost` in production, which is what broke every shared
- * link's OG preview and the sitemap (Diagnostic Report §13). `VERCEL_URL`
- * is set automatically by the platform on every deployment and has no
- * protocol prefix, unlike `NEXT_PUBLIC_SITE_URL`.
+ * project's production environment: that's the source of truth and should
+ * still be set there. The fallback chain exists so an unset variable degrades
+ * to something sensible instead of `localhost` in production, which is what
+ * broke every shared link's OG preview and the sitemap (Diagnostic Report
+ * 13). The chain is:
+ *   1. NEXT_PUBLIC_SITE_URL (has a protocol)
+ *   2. VERCEL_PROJECT_PRODUCTION_URL, the stable production domain
+ *   3. VERCEL_URL, the per-deployment host
+ *   4. localhost
+ * Step 2 was added 2026-10-04: without it an unset NEXT_PUBLIC_SITE_URL sent
+ * canonicals, the sitemap and OG images to a per-deployment host. Both
+ * Vercel variables have no protocol prefix and are documented at
+ * vercel.com/docs/environment-variables/system-environment-variables.
  */
-const resolveSiteUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+type Env = Record<string, string | undefined>;
+
+export const resolveSiteUrl = (env: Env = process.env): string => {
+  if (env.NEXT_PUBLIC_SITE_URL) return env.NEXT_PUBLIC_SITE_URL;
+  if (env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (env.VERCEL_URL) return `https://${env.VERCEL_URL}`;
   return "http://localhost:3000";
 };
 

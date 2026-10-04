@@ -7,6 +7,7 @@ import { useHideOnScroll } from "@/lib/utils/useHideOnScroll";
 import { NavOverlay } from "@/components/navigation/NavOverlay";
 import { CommandPalette } from "@/components/navigation/CommandPalette";
 import { AskTheLab } from "@/components/ai/AskTheLab";
+import type { CommandItem } from "@/lib/search";
 
 /**
  * PLAN.md Phase 3. Wordmark, MENU (the full-screen overlay in NavOverlay)
@@ -20,7 +21,7 @@ import { AskTheLab } from "@/components/ai/AskTheLab";
  * `position: fixed` descendants, which would trap NavOverlay's full-screen
  * panel inside the header's own (short) box instead of the viewport.
  */
-export function Header() {
+export function Header({ commandItems = [] }: { commandItems?: CommandItem[] }) {
   const menuOpen = useLabStore((s) => s.menuOpen);
   const commandPaletteOpen = useLabStore((s) => s.commandPaletteOpen);
   const hidden = useHideOnScroll(menuOpen || commandPaletteOpen);
@@ -60,7 +61,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <AskTheLab />
           <NavOverlay />
-          <CommandPalette />
+          <CommandPalette extraItems={commandItems} />
         </div>
       </nav>
     </header>

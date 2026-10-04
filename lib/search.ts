@@ -2,7 +2,7 @@ import { navigation } from "@/data/navigation";
 import { getAllProjects, getAllExperiments } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
-export type CommandGroup = "Navigate" | "Work" | "Experiments" | "AI";
+export type CommandGroup = "Navigate" | "Work" | "Experiments" | "Systems" | "AI";
 
 /** Sentinel href CommandPalette special-cases to open Ask the Lab instead of navigating. */
 export const ASK_THE_LAB_COMMAND_HREF = "#ask-the-lab";
@@ -81,12 +81,16 @@ function fuzzyScore(query: string, text: string): number | null {
   return 2 + (lastMatch - firstMatch);
 }
 
-/** Fuzzy-searches routes, projects and experiments. Empty query returns the top of the index. */
-export function searchCommands(query: string, limit = 8): CommandItem[] {
+/**
+ * Fuzzy-searches routes, projects and experiments, plus any `extra` items the
+ * caller supplies (workflows arrive this way so the client bundle does not
+ * carry their data). Empty query returns the top of the index.
+ */
+export function searchCommands(query: string, limit = 8, extra: CommandItem[] = []): CommandItem[] {
   const trimmed = query.trim();
   if (!trimmed) return index.slice(0, limit);
 
-  return index
+  return [...index, ...extra]
     .map((item) => {
       const haystack = `${item.label} ${item.detail ?? ""}`;
       const score = fuzzyScore(trimmed, haystack);

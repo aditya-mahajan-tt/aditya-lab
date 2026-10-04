@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { site } from "@/data/site";
 import { navigation } from "@/data/navigation";
 import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllWorkflows } from "@/data/workflowQueries";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -19,6 +20,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...getAllExperiments().map((e) => ({
       url: `${site.url}/experiments/${e.slug}`,
+      lastModified: now,
+      priority: 0.6,
+    })),
+    ...getAllWorkflows().map((w) => ({
+      url: `${site.url}/systems/${w.slug}`,
       lastModified: now,
       priority: 0.6,
     })),
