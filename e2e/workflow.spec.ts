@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { workflows } from "@/data/workflows";
 import { getAllWorkflows, getWorkflow } from "@/data/queries";
+import { stepChips, phaseSteps, nodeLabel, KIND_TAG } from "@/components/systems/workflowSteps";
 import { layoutSwimlane, routeSwimlaneEdge, SWIMLANE } from "@/components/systems/diagramLayout";
 
 /**
@@ -125,5 +126,38 @@ test.describe("swimlane layout @workflow-layout", () => {
         }
       }
     }
+  });
+});
+
+test.describe("step list helpers @workflow-list", () => {
+  test("phaseSteps keeps array order and skips store nodes", () => {
+    const w = orbit();
+    const a = phaseSteps(w, "A");
+    expect(a.every((n) => n.kind !== "store")).toBe(true);
+    expect(a[0]!.id).toBe("a-trigger");
+    const total = w.phases.reduce((n, p) => n + phaseSteps(w, p.id).length, 0);
+    expect(total).toBe(w.nodes.filter((n) => n.kind !== "store").length);
+  });
+
+  test("a step reads from and writes to stores and surfaces via data edges", () => {
+    const w = orbit();
+    const get = (id: string) => w.nodes.find((n) => n.id === id)!;
+    expect(stepChips(w, get("a-apply")).reads).toEqual(["TAP QUEUE"]);
+    expect(stepChips(w, get("a-write")).writes).toEqual(["ONE STATE FILE", "NOW VIEW"]);
+    expect(stepChips(w, get("c-ingest")).writes).toEqual(["LOCAL DATABASE"]);
+  });
+
+  test("a gate lists one line per labelled outgoing edge", () => {
+    const w = orbit();
+    const gate = w.nodes.find((n) => n.id === "a-gate")!;
+    expect(stepChips(w, gate).branches).toEqual([
+      "YES → FLAG IT SMALLEST NEXT STEP",
+      "NO → WEEKLY REVIEW",
+    ]);
+  });
+
+  test("tags and labels", () => {
+    expect(KIND_TAG.gate).toBe("CHECK");
+    expect(nodeLabel(orbit().nodes.find((n) => n.id === "a-propose")!)).toBe("PROPOSE ONE COMMITMENT");
   });
 });
