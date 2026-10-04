@@ -34,6 +34,7 @@
 | R5 | Retrieval risk: for "Tell me about his AI agent work", ORBIT's leadTopics ("scheduled agents", "workflow") score on substrings "agent" and "work". It could outrank Turbotork. | The §8 test asserts Turbotork stays first. If it fails, **stop and ask Aditya**: changing `leadTopics` changes validated data. |
 | R6 | `buildWorkflowSections` still emits `Status: WORKING` and the unmarked `subtitle` to Ask the Lab even while narrative fields are drafts; Aditya has not confirmed the status (spec §11 #2). | Acceptable pre-merge (deploy is blocked on Aditya removing markers). Called out in Checkpoint C. |
 | R7 | Spec §6.4 needs the list at `<xl` (visible) and in a `<details>` at `xl`+. One DOM node can't be both. | Render `WorkflowStepList` twice (`xl:hidden` div, `hidden xl:block` details). No `id` attributes inside it, so no duplicate ids. |
+| R9 | The spec treats Tailwind `xl` as 1280px. This repo sets `--breakpoint-xl: 1440px` in `app/globals.css`, so `xl:` classes do not apply at 1280 (found when the 1280px browser tests failed). | `WorkflowDiagram` uses the arbitrary variant `min-[1280px]:` everywhere the spec says `xl`. The design-system breakpoint is untouched (changing it needs Aditya). |
 | R8 | e2e `mobile` project is Pixel 7 (isMobile). Viewport-specific tests would be skewed. | Browser tests in `workflow.spec.ts` are desktop-project only. |
 
 ## File Structure

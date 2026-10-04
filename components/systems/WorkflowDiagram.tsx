@@ -68,9 +68,10 @@ function Shape({
 }
 
 /**
- * Spec 6: one combined swimlane. `xl` and up: the SVG, a sticky detail
+ * Spec 6: one combined swimlane. 1280px and up: the SVG, a sticky detail
  * caption, a skip link, and the same data as a closed <details> list. Below
- * `xl`: the list alone. Both come from the same workflow object. No
+ * 1280px: the list alone. (`min-[1280px]:` rather than `xl:` because this
+ * repo sets --breakpoint-xl to 1440px; see the plan's R9.) Both come from the same workflow object. No
  * role="img" on the svg: it has focusable descendants (see ProcessDiagram).
  */
 export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
@@ -113,12 +114,12 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
     <div>
       <a
         href={`#${after}`}
-        className="sr-only xl:focus:not-sr-only xl:focus:inline-flex xl:focus:min-h-11 xl:focus:items-center focus:rounded-sm focus:border focus:border-accent focus:bg-bg focus:px-4 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest focus:text-accent"
+        className="sr-only min-[1280px]:focus:not-sr-only min-[1280px]:focus:inline-flex min-[1280px]:focus:min-h-11 min-[1280px]:focus:items-center focus:rounded-sm focus:border focus:border-accent focus:bg-bg focus:px-4 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest focus:text-accent"
       >
         Skip the diagram
       </a>
 
-      <figure className="hidden xl:block" onKeyDown={(e) => e.key === "Escape" && setActive(null)}>
+      <figure className="hidden min-[1280px]:block" onKeyDown={(e) => e.key === "Escape" && setActive(null)}>
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full"
@@ -325,8 +326,8 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
 
       <div id={after} tabIndex={-1} />
 
-      {/* xl+: the text equivalent, closed by default. */}
-      <details className="mt-8 hidden border-t border-border pt-4 xl:block">
+      {/* 1280px and up: the text equivalent, closed by default. */}
+      <details className="mt-8 hidden border-t border-border pt-4 min-[1280px]:block">
         <summary className="label flex min-h-11 cursor-pointer items-center hover:text-accent">
           READ AS A LIST
         </summary>
@@ -335,8 +336,8 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
         </div>
       </details>
 
-      {/* Below xl: the whole diagram. */}
-      <div className="mt-8 xl:hidden">
+      {/* Below 1280px: the whole diagram. */}
+      <div className="mt-8 min-[1280px]:hidden">
         <WorkflowStepList workflow={workflow} />
       </div>
     </div>
