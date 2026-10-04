@@ -1,7 +1,14 @@
 import { projects } from "./projects";
 import { experiments } from "./experiments";
 import { skillGroups } from "./skills";
-import { stripDraftMarker, type Experiment, type PlaneValue, type Project } from "./schema";
+import { workflows } from "./workflows";
+import {
+  stripDraftMarker,
+  type Experiment,
+  type PlaneValue,
+  type Project,
+  type Workflow,
+} from "./schema";
 
 /** The orbital hero's two ring depths (spec §3.2). */
 export type HeroRing = "inner" | "outer";
@@ -57,6 +64,13 @@ export const getExperiment = (slug: string): Experiment | undefined =>
 
 export const getExperimentsByStatus = (status: Experiment["status"]): Experiment[] =>
   getAllExperiments().filter((e) => e.status === status);
+
+/* ------------------------------------------------------------ workflows */
+
+export const getAllWorkflows = (): Workflow[] => [...workflows];
+
+export const getWorkflow = (slug: string): Workflow | undefined =>
+  workflows.find((w) => w.slug === slug);
 
 /* ------------------------------------------------------------- hero */
 
