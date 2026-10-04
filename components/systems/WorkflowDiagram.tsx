@@ -22,7 +22,23 @@ const KIND_STYLE: Record<Kind, { fill: string; stroke: string; dash?: string }> 
   end: { fill: "var(--color-bg)", stroke: "var(--color-border)" },
 };
 
-const LEGEND_KINDS: Kind[] = ["trigger", "step", "gate", "human", "surface", "store", "end"];
+/** Reference render: lane header band is 46px tall, labels centred at y=26; rows still start at y=72. */
+const HEADER_RULE_Y = 46;
+const HEADER_LABEL_Y = 26;
+
+const LEGEND: Array<{ kind: Kind; text: string }> = [
+  { kind: "trigger", text: "a schedule starts a run" },
+  { kind: "step", text: "a step a Claude run performs" },
+  { kind: "gate", text: "a rule that can stop or reroute" },
+  { kind: "human", text: "a decision only Aditya makes" },
+  { kind: "surface", text: "the Command Centre" },
+  { kind: "store", text: "a file, feed or record" },
+  { kind: "end", text: "a terminal outcome" },
+];
+const LEGEND_EDGES = [
+  { kind: "flow", text: "control passes to the next step" },
+  { kind: "data", text: "data is read or written" },
+] as const;
 
 function Shape({
   kind,
@@ -106,9 +122,11 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
   const after = `wf-after-${workflow.slug}`;
   const toggle = (id: string) => setActive((a) => (a === id ? null : id));
 
-  // Legend sits bottom-left, in the empty block under Phase B (lanes 1-2, rows 14-16).
-  const legendRow = 26;
-  const legendTop = height - SWIMLANE.pad - (20 + (LEGEND_KINDS.length + 2) * legendRow);
+  // Legend sits bottom-left, in the empty block under Phase B (lanes 1-2, rows 14-16),
+  // spaced as in the reference render: 30px per shape, 22px per edge sample.
+  const legendTop = height - 282;
+  const shapeY = (i: number) => legendTop + 32 + i * 30;
+  const edgeY = (i: number) => shapeY(LEGEND.length - 1) + 28 + i * 22;
 
   return (
     <div>
@@ -146,7 +164,7 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
           </defs>
 
           {/* Lane headers and dividers */}
-          <line x1={0} x2={width} y1={SWIMLANE.head} y2={SWIMLANE.head} stroke="var(--color-border)" />
+          <line x1={0} x2={width} y1={HEADER_RULE_Y} y2={HEADER_RULE_Y} stroke="var(--color-border)" />
           {workflow.lanes.map((lane, i) => (
             <g key={lane.id}>
               {i > 0 && (
@@ -160,7 +178,7 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
               )}
               <text
                 x={i * SWIMLANE.laneW + SWIMLANE.laneW / 2}
-                y={SWIMLANE.head / 2}
+                y={HEADER_LABEL_Y}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 className="label"
@@ -262,46 +280,42 @@ export function WorkflowDiagram({ workflow }: { workflow: Workflow }) {
 
           {/* Legend: seven shapes, two edge styles */}
           <g aria-hidden="true">
-            <text x={24} y={legendTop} className="fill-text-faint font-mono text-[10px] tracking-[0.08em]">
+            <text x={20} y={legendTop} className="fill-text-faint font-mono text-[10px] tracking-[0.08em]">
               LEGEND
             </text>
-            {LEGEND_KINDS.map((k, i) => (
-              <g key={k}>
-                <Shape kind={k} x={24 + 22} y={legendTop + 20 + i * legendRow} w={44} h={18} />
+            {LEGEND.map(({ kind, text }, i) => (
+              <g key={kind}>
+                <Shape kind={kind} x={20 + 22} y={shapeY(i)} w={44} h={20} />
                 <text
-                  x={24 + 56}
-                  y={legendTop + 20 + i * legendRow}
+                  x={76}
+                  y={shapeY(i)}
                   dominantBaseline="middle"
-                  className="fill-text-muted font-mono text-[10px] tracking-[0.08em]"
+                  className="fill-text font-mono text-[10px] tracking-[0.08em]"
                 >
-                  {KIND_TAG[k]}
+                  {KIND_TAG[kind]}
+                </text>
+                <text x={160} y={shapeY(i)} dominantBaseline="middle" className="fill-text-muted text-[11px]">
+                  {text}
                 </text>
               </g>
             ))}
-            {(["flow", "data"] as const).map((k, i) => {
-              const y = legendTop + 20 + (LEGEND_KINDS.length + i) * legendRow;
-              return (
-                <g key={k}>
-                  <line
-                    x1={24}
-                    x2={24 + 44}
-                    y1={y}
-                    y2={y}
-                    stroke="var(--color-border-strong)"
-                    strokeWidth={1.5}
-                    strokeDasharray={k === "data" ? "3 4" : undefined}
-                  />
-                  <text
-                    x={24 + 56}
-                    y={y}
-                    dominantBaseline="middle"
-                    className="fill-text-muted font-mono text-[10px] tracking-[0.08em]"
-                  >
-                    {k === "flow" ? "FLOW" : "DATA READ / WRITE"}
-                  </text>
-                </g>
-              );
-            })}
+            {LEGEND_EDGES.map(({ kind, text }, i) => (
+              <g key={kind}>
+                <line
+                  x1={20}
+                  x2={64}
+                  y1={edgeY(i)}
+                  y2={edgeY(i)}
+                  stroke="var(--color-border-strong)"
+                  strokeWidth={1.5}
+                  strokeDasharray={kind === "data" ? "3 4" : undefined}
+                  markerEnd={`url(#${arrow})`}
+                />
+                <text x={76} y={edgeY(i)} dominantBaseline="middle" className="fill-text-muted text-[11px]">
+                  {text}
+                </text>
+              </g>
+            ))}
           </g>
         </svg>
 
