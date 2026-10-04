@@ -271,7 +271,7 @@ const raw = [
       { label: "SCORE", detail: "Turn the gaps found into a score, an opportunity category, and a specific outreach angle grounded in what was actually found on the page." },
       { label: "PIPELINE", detail: "Work leads through a real status lifecycle — Discovered through Client — in a filterable grid or a Kanban board." },
     ],
-    links: [{ label: "Live App", url: "https://leadiq-o2qtusay3-aditya-mahajan-tt.vercel.app" }],
+    links: [{ label: "Live App", url: "https://leadiq-tan.vercel.app" }],
   },
 ];
 
