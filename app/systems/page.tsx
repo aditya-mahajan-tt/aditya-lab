@@ -9,7 +9,7 @@ import { NeuralCore } from "@/components/systems/NeuralCore";
 import { StrategyWall } from "@/components/systems/StrategyWall";
 import { WorkflowDiagram } from "@/components/systems/WorkflowDiagram";
 import { Fill } from "@/components/ui/Placeholder";
-import { getAllWorkflows } from "@/data/queries";
+import { getAllWorkflows } from "@/data/workflowQueries";
 import { workflowsIntro } from "@/data/workflows";
 
 export const metadata: Metadata = {

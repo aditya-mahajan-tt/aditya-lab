@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/data/site";
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
+import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllWorkflows } from "@/data/workflowQueries";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

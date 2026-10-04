@@ -4,7 +4,8 @@ import { skillGroups } from "@/data/skills";
 import { thinking } from "@/data/thinking";
 import { experience } from "@/data/experience";
 import { education } from "@/data/education";
-import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
+import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllWorkflows } from "@/data/workflowQueries";
 import { isPlaceholder, isDraft } from "@/data/schema";
 
 /**

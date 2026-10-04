@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WorkflowSchema } from "./schema";
+import { WorkflowSchema } from "./workflowSchema";
 
 /**
  * Workflows: systems Aditya runs for himself, shown as flowcharts.

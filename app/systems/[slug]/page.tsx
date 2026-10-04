@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { getAllWorkflows, getWorkflow } from "@/data/queries";
+import { getAllWorkflows, getWorkflow } from "@/data/workflowQueries";
 import { stripDraftMarker } from "@/data/schema";
 import { Fill } from "@/components/ui/Placeholder";
 import { RevealText } from "@/components/effects/RevealText";

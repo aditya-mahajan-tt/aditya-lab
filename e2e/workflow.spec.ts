@@ -2,8 +2,9 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import sitemap from "@/app/sitemap";
 import { searchCommands } from "@/lib/search";
+import { workflowCommandItems } from "@/lib/workflowCommands";
 import { workflows } from "@/data/workflows";
-import { getAllWorkflows, getWorkflow } from "@/data/queries";
+import { getAllWorkflows, getWorkflow } from "@/data/workflowQueries";
 import { stepChips, phaseSteps, nodeLabel, KIND_TAG } from "@/components/systems/workflowSteps";
 import { layoutSwimlane, routeSwimlaneEdge, SWIMLANE } from "@/components/systems/diagramLayout";
 
@@ -304,7 +305,7 @@ test.describe("workflow wiring @workflow-wiring", () => {
   });
 
   test("the command palette finds ORBIT under a Systems group", () => {
-    const hit = searchCommands("orbit").find((i) => i.href === "/systems/orbit");
+    const hit = searchCommands("orbit", 8, workflowCommandItems()).find((i) => i.href === "/systems/orbit");
     expect(hit?.group).toBe("Systems");
     expect(hit?.label).toBe("ORBIT");
   });

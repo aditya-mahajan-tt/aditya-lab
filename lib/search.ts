@@ -1,5 +1,5 @@
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
+import { getAllProjects, getAllExperiments } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
 export type CommandGroup = "Navigate" | "Work" | "Experiments" | "Systems" | "AI";
@@ -51,15 +51,7 @@ function buildIndex(): CommandItem[] {
     href: `/experiments/${e.slug}`,
   }));
 
-  const systems: CommandItem[] = getAllWorkflows().map((w) => ({
-    id: `workflow-${w.slug}`,
-    group: "Systems",
-    label: titleOf(w.title, `WORKFLOW_${w.id}`),
-    detail: w.subtitle,
-    href: `/systems/${w.slug}`,
-  }));
-
-  return [askTheLab, ...routes, ...projects, ...experiments, ...systems];
+  return [askTheLab, ...routes, ...projects, ...experiments];
 }
 
 /** Built once per module load — the corpus is static build-time content. */
@@ -89,12 +81,16 @@ function fuzzyScore(query: string, text: string): number | null {
   return 2 + (lastMatch - firstMatch);
 }
 
-/** Fuzzy-searches routes, projects, experiments and workflows. Empty query returns the top of the index. */
-export function searchCommands(query: string, limit = 8): CommandItem[] {
+/**
+ * Fuzzy-searches routes, projects and experiments, plus any `extra` items the
+ * caller supplies (workflows arrive this way so the client bundle does not
+ * carry their data). Empty query returns the top of the index.
+ */
+export function searchCommands(query: string, limit = 8, extra: CommandItem[] = []): CommandItem[] {
   const trimmed = query.trim();
   if (!trimmed) return index.slice(0, limit);
 
-  return index
+  return [...index, ...extra]
     .map((item) => {
       const haystack = `${item.label} ${item.detail ?? ""}`;
       const score = fuzzyScore(trimmed, haystack);

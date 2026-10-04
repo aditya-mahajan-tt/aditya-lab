@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Workflow, WorkflowNode } from "@/data/schema";
+import type { Workflow, WorkflowNode } from "@/data/workflowSchema";
 import { layoutSwimlane, routeSwimlaneEdge, SWIMLANE } from "./diagramLayout";
 import { WorkflowStepList } from "./WorkflowStepList";
 import { KIND_TAG, nodeLabel } from "./workflowSteps";

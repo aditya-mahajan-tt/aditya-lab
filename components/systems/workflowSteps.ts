@@ -1,4 +1,4 @@
-import type { Workflow, WorkflowNode } from "@/data/schema";
+import type { Workflow, WorkflowNode } from "@/data/workflowSchema";
 
 /** The tag printed above each node and in the list. Shape carries meaning; this names it. */
 export const KIND_TAG: Record<WorkflowNode["kind"], string> = {

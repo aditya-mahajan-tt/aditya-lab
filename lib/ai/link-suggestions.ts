@@ -1,4 +1,5 @@
-import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
+import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllWorkflows } from "@/data/workflowQueries";
 import { isPlaceholder } from "@/data/schema";
 import { retrievalWords } from "@/lib/ai/knowledge";
 

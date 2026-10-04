@@ -1,5 +1,5 @@
 import { Fill } from "@/components/ui/Placeholder";
-import type { Workflow } from "@/data/schema";
+import type { Workflow } from "@/data/workflowSchema";
 import { KIND_TAG, nodeLabel, phaseSteps, stepChips } from "./workflowSteps";
 
 const chip =
@@ -7,7 +7,7 @@ const chip =
 
 /**
  * The same workflow as plain text: the route to every node detail with
- * JavaScript off, and the whole diagram below `xl` (spec 6.4). Server-safe:
+ * JavaScript off, and the whole diagram below 1280px (spec 6.4). Server-safe:
  * no state, no ids (it is rendered twice on the page, see WorkflowDiagram).
  * Phase headings are h3 because the parent page supplies the h2.
  */
