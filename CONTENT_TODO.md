@@ -6,47 +6,4 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**0 missing, 40 unreviewed drafts.**
-
-## data/workflows.ts
-
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 37
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 39
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 44
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 48
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 52
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 56
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 60
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 64
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 68
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 73
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 74
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 75
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 76
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 77
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 78
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 79
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 80
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 81
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 82
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 83
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 84
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 85
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 89
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 90
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 91
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 92
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 93
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 94
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 95
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 96
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 97
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 101
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 102
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 103
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 104
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 117
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 119
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 121
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 123
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 292
+**No outstanding placeholders or unreviewed drafts. Content is complete.**

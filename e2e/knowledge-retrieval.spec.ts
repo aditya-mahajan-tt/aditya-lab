@@ -172,10 +172,9 @@ test("Turbotork stays the primary reference for AI agent work @retrieval", () =>
   expect(ranked[0]).toBe("project-turbotork");
 });
 
-// Correct only while ORBIT's narrative fields carry [AI_DRAFT_REVIEW]. Delete or
-// invert this once Aditya approves the copy (Checkpoint C).
-test("an unreviewed workflow's draft prose never reaches the corpus @retrieval", () => {
+test("ORBIT's approved prose reaches the corpus, without any draft marker @retrieval", () => {
   const text = getKnowledgeSections().find((s) => s.id === "workflow-orbit")?.text ?? "";
   expect(text).not.toContain("AI_DRAFT_REVIEW");
-  expect(text).not.toContain("Principle");
+  expect(text).toContain("Principle, One state file");
+  expect(text).toContain("Check, Three active projects");
 });

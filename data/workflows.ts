@@ -6,7 +6,7 @@ import { WorkflowSchema } from "./workflowSchema";
  *
  * Narrative fields below were drafted on 2026-10-04 from ORBIT's own rule
  * files and the Reels pipeline procedures (see the spec's appendix) and
- * carry the draft marker until Aditya approves them. Node labels and details
+ * were reviewed and approved by Aditya on 2026-10-04. Node labels and details
  * are structural descriptions of those same files and follow the precedent
  * in data/systems.ts.
  *
@@ -34,74 +34,74 @@ const raw = [
     ],
 
     summary:
-      "[AI_DRAFT_REVIEW] A personal operating system built on scheduled agent runs. It proposes one commitment a day, caps active projects at three, and turns saved Reels about AI tools into a verified, security-scanned shortlist, with a human approval gate before anything is installed.",
+      "A personal operating system built on scheduled agent runs. It proposes one commitment a day, caps active projects at three, and turns saved Reels about AI tools into a verified, security-scanned shortlist, with a human approval gate before anything is installed.",
 
-    why: "[AI_DRAFT_REVIEW] Two problems had the same shape. Too many projects were open at once, and every new tracker became one more thing to maintain. Separately, a growing list of saved Reels recommended AI tools with no way of telling which claims were real. ORBIT treats both as an operations problem: one state file, a small set of rules, and agents that do the reading and checking so that the only thing left for a person is the decision.",
+    why: "Two problems had the same shape. Too many projects were open at once, and every new tracker became one more thing to maintain. Separately, a growing list of saved Reels recommended AI tools with no way of telling which claims were real. ORBIT treats both as an operations problem: one state file, a small set of rules, and agents that do the reading and checking so that the only thing left for a person is the decision.",
 
     principles: [
       {
         title: "One state file",
-        body: "[AI_DRAFT_REVIEW] The system writes to exactly one file. The dashboard is a view of it and a queue of taps, never a second record to reconcile.",
+        body: "The system writes to exactly one file. The dashboard is a view of it and a queue of taps, never a second record to reconcile.",
       },
       {
         title: "Read sources where they live",
-        body: "[AI_DRAFT_REVIEW] Calendar, mail, git history and project files are read in place. Nothing is copied into a new tracker.",
+        body: "Calendar, mail, git history and project files are read in place. Nothing is copied into a new tracker.",
       },
       {
         title: "Friction, not control",
-        body: "[AI_DRAFT_REVIEW] The system can ask, flag and escalate. Only Aditya changes a project's state, and he can override any rule as long as the override is logged with a review date.",
+        body: "The system can ask, flag and escalate. Only Aditya changes a project's state, and he can override any rule as long as the override is logged with a review date.",
       },
       {
         title: "A claim is not a fact",
-        body: "[AI_DRAFT_REVIEW] A Reel naming a tool is treated as a claim. Nothing is recommended until an independent record confirms it exists and what it is.",
+        body: "A Reel naming a tool is treated as a claim. Nothing is recommended until an independent record confirms it exists and what it is.",
       },
       {
         title: "The finder never installs",
-        body: "[AI_DRAFT_REVIEW] The run that discovers a tool cannot install it, and the run that installs cannot choose what to install. A person sits between the two.",
+        body: "The run that discovers a tool cannot install it, and the run that installs cannot choose what to install. A person sits between the two.",
       },
       {
         title: "Hold and explain",
-        body: "[AI_DRAFT_REVIEW] A failed check stops the flow and says why in plain language. It is never a silent skip and never a silent pass.",
+        body: "A failed check stops the flow and says why in plain language. It is never a silent skip and never a silent pass.",
       },
       {
         title: "Evidence, not scores",
-        body: "[AI_DRAFT_REVIEW] Reviews count what happened and cite dated evidence. There are no ratings and no rankings.",
+        body: "Reviews count what happened and cite dated evidence. There are no ratings and no rankings.",
       },
     ],
 
     checks: [
-      { rule: "Chat wins over taps", prevents: "[AI_DRAFT_REVIEW] A stale tap on the dashboard overwriting something already agreed in conversation." },
-      { rule: "Deadlines outrank projects", prevents: "[AI_DRAFT_REVIEW] A project commitment being proposed on a day when a real deadline falls inside 48 hours." },
-      { rule: "Escalate by count", prevents: "[AI_DRAFT_REVIEW] A commitment being quietly rescheduled forever. The second slip is named; the third stops rescheduling until a decision is made." },
-      { rule: "Three active projects", prevents: "[AI_DRAFT_REVIEW] The active set growing silently. A fourth needs a trade or a logged override." },
-      { rule: "No reply, no invention", prevents: "[AI_DRAFT_REVIEW] A review filling in answers that were never given. It records what it observed and marks the rest as unanswered." },
-      { rule: "Read-only on project repos", prevents: "[AI_DRAFT_REVIEW] A scheduled run committing, staging or leaving a lock behind in a working repository." },
-      { rule: "Nothing new, nothing done", prevents: "[AI_DRAFT_REVIEW] Unchanged data being reprocessed for no reason." },
-      { rule: "Verify before recommending", prevents: "[AI_DRAFT_REVIEW] A tool being shortlisted on the strength of a caption alone." },
-      { rule: "Disambiguate by data", prevents: "[AI_DRAFT_REVIEW] The wrong project being picked when several share a name. A real trade-off goes to Aditya instead of being guessed." },
-      { rule: "Sweep never installs", prevents: "[AI_DRAFT_REVIEW] Discovery and installation happening in one unattended step." },
-      { rule: "Scan before copy", prevents: "[AI_DRAFT_REVIEW] Unreviewed code reaching the machine. A flagged candidate is held with an explanation." },
-      { rule: "Sandbox only", prevents: "[AI_DRAFT_REVIEW] A trial tool reaching global configuration. Only the skill folder is copied, its scripts are never run, and the source and commit are recorded." },
-      { rule: "Unreachable means stop", prevents: "[AI_DRAFT_REVIEW] A run guessing at data when the laptop or browser cannot be reached." },
+      { rule: "Chat wins over taps", prevents: "A stale tap on the dashboard overwriting something already agreed in conversation." },
+      { rule: "Deadlines outrank projects", prevents: "A project commitment being proposed on a day when a real deadline falls inside 48 hours." },
+      { rule: "Escalate by count", prevents: "A commitment being quietly rescheduled forever. The second slip is named; the third stops rescheduling until a decision is made." },
+      { rule: "Three active projects", prevents: "The active set growing silently. A fourth needs a trade or a logged override." },
+      { rule: "No reply, no invention", prevents: "A review filling in answers that were never given. It records what it observed and marks the rest as unanswered." },
+      { rule: "Read-only on project repos", prevents: "A scheduled run committing, staging or leaving a lock behind in a working repository." },
+      { rule: "Nothing new, nothing done", prevents: "Unchanged data being reprocessed for no reason." },
+      { rule: "Verify before recommending", prevents: "A tool being shortlisted on the strength of a caption alone." },
+      { rule: "Disambiguate by data", prevents: "The wrong project being picked when several share a name. A real trade-off goes to Aditya instead of being guessed." },
+      { rule: "Sweep never installs", prevents: "Discovery and installation happening in one unattended step." },
+      { rule: "Scan before copy", prevents: "Unreviewed code reaching the machine. A flagged candidate is held with an explanation." },
+      { rule: "Sandbox only", prevents: "A trial tool reaching global configuration. Only the skill folder is copied, its scripts are never run, and the source and commit are recorded." },
+      { rule: "Unreachable means stop", prevents: "A run guessing at data when the laptop or browser cannot be reached." },
     ],
 
     integrations: [
-      { name: "Claude scheduled tasks", access: "runs on", note: "[AI_DRAFT_REVIEW] Five scheduled agent runs: morning, evening, weekly, the sweep and the installer." },
-      { name: "Google Calendar", access: "reads", note: "[AI_DRAFT_REVIEW] Deadlines and sessions for the next 48 hours." },
-      { name: "Gmail", access: "reads", note: "[AI_DRAFT_REVIEW] Programme mail, for deadlines that never reach the calendar." },
-      { name: "GitHub", access: "reads", note: "[AI_DRAFT_REVIEW] The repository list, to detect new projects, and public repository records, to verify tools." },
-      { name: "Local git and project files", access: "reads", note: "[AI_DRAFT_REVIEW] What actually moved in each active project." },
-      { name: "Instagram saved collection", access: "reads", note: "[AI_DRAFT_REVIEW] The raw input for the Reels sweep, read through Aditya's own browser session." },
-      { name: "SQLite", access: "reads + writes", note: "[AI_DRAFT_REVIEW] The local database behind the Reels pipeline." },
-      { name: "Command Centre", access: "reads + writes", note: "[AI_DRAFT_REVIEW] One dashboard: a snapshot to read, and a queue of taps to act on." },
-      { name: "Sandbox folder", access: "writes", note: "[AI_DRAFT_REVIEW] Where approved tools are installed for trial, with their provenance." },
+      { name: "Claude scheduled tasks", access: "runs on", note: "Five scheduled agent runs: morning, evening, weekly, the sweep and the installer." },
+      { name: "Google Calendar", access: "reads", note: "Deadlines and sessions for the next 48 hours." },
+      { name: "Gmail", access: "reads", note: "Programme mail, for deadlines that never reach the calendar." },
+      { name: "GitHub", access: "reads", note: "The repository list, to detect new projects, and public repository records, to verify tools." },
+      { name: "Local git and project files", access: "reads", note: "What actually moved in each active project." },
+      { name: "Instagram saved collection", access: "reads", note: "The raw input for the Reels sweep, read through Aditya's own browser session." },
+      { name: "SQLite", access: "reads + writes", note: "The local database behind the Reels pipeline." },
+      { name: "Command Centre", access: "reads + writes", note: "One dashboard: a snapshot to read, and a queue of taps to act on." },
+      { name: "Sandbox folder", access: "writes", note: "Where approved tools are installed for trial, with their provenance." },
     ],
 
     limits: [
-      "[AI_DRAFT_REVIEW] It depends on one laptop being awake with the desktop app open. When the laptop is unreachable, scheduled runs pause.",
-      "[AI_DRAFT_REVIEW] It cannot see browser, phone or app time, by design. Anything about those comes only from what Aditya reports.",
-      "[AI_DRAFT_REVIEW] Reels are judged on their captions. There is no transcript of the video.",
-      "[AI_DRAFT_REVIEW] Automation stops at the sandbox. Moving a tool into everyday use is a manual step.",
+      "It depends on one laptop being awake with the desktop app open. When the laptop is unreachable, scheduled runs pause.",
+      "It cannot see browser, phone or app time, by design. Anything about those comes only from what Aditya reports.",
+      "Reels are judged on their captions. There is no transcript of the video.",
+      "Automation stops at the sandbox. Moving a tool into everyday use is a manual step.",
     ],
 
     lanes: [
@@ -114,13 +114,13 @@ const raw = [
 
     phases: [
       { id: "A", label: "DAILY CONTROL LOOP", lane: "orbit", row: 1,
-        summary: "[AI_DRAFT_REVIEW] Each scheduled run applies what was tapped on the dashboard, reads the real sources, and proposes one commitment for the day. The evening run checks it against evidence, and a slip escalates by count." },
+        summary: "Each scheduled run applies what was tapped on the dashboard, reads the real sources, and proposes one commitment for the day. The evening run checks it against evidence, and a slip escalates by count." },
       { id: "B", label: "PROJECT INTAKE", lane: "orbit", row: 10,
-        summary: "[AI_DRAFT_REVIEW] Nothing new becomes a project by default. A new repository or idea answers six questions, and with three projects already active it waits in the inbox unless something is traded out or an override is logged." },
+        summary: "Nothing new becomes a project by default. A new repository or idea answers six questions, and with three projects already active it waits in the inbox unless something is traded out or an override is logged." },
       { id: "C", label: "REELS SWEEP", lane: "reels", row: 1,
-        summary: "[AI_DRAFT_REVIEW] Every three days a run reads the saved collection, classifies what is new, and checks every named tool against independent records. It produces a shortlist and never installs anything." },
+        summary: "Every three days a run reads the saved collection, classifies what is new, and checks every named tool against independent records. It produces a shortlist and never installs anything." },
       { id: "D", label: "APPROVED INSTALL", lane: "reels", row: 10,
-        summary: "[AI_DRAFT_REVIEW] A separate hourly run turns approvals into installs. Each candidate is scanned first; a flagged one is held and explained, and anything installed goes into a sandbox with its provenance recorded." },
+        summary: "A separate hourly run turns approvals into installs. Each candidate is scanned first; a flagged one is held and explained, and anything installed goes into a sandbox with its provenance recorded." },
     ],
 
     nodes: [
@@ -289,4 +289,4 @@ export const workflows = z.array(WorkflowSchema).parse(raw);
  * reviews it with the rest.
  */
 export const workflowsIntro =
-  "[AI_DRAFT_REVIEW] The diagrams above show the shape work takes. This one is a system that runs: scheduled agents, real integrations, and the checks that decide what they are allowed to do.";
+  "The diagrams above show the shape work takes. This one is a system that runs: scheduled agents, real integrations, and the checks that decide what they are allowed to do.";
