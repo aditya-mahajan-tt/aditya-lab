@@ -1,8 +1,8 @@
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
-export type CommandGroup = "Navigate" | "Work" | "Experiments" | "AI";
+export type CommandGroup = "Navigate" | "Work" | "Experiments" | "Systems" | "AI";
 
 /** Sentinel href CommandPalette special-cases to open Ask the Lab instead of navigating. */
 export const ASK_THE_LAB_COMMAND_HREF = "#ask-the-lab";
@@ -51,7 +51,15 @@ function buildIndex(): CommandItem[] {
     href: `/experiments/${e.slug}`,
   }));
 
-  return [askTheLab, ...routes, ...projects, ...experiments];
+  const systems: CommandItem[] = getAllWorkflows().map((w) => ({
+    id: `workflow-${w.slug}`,
+    group: "Systems",
+    label: titleOf(w.title, `WORKFLOW_${w.id}`),
+    detail: w.subtitle,
+    href: `/systems/${w.slug}`,
+  }));
+
+  return [askTheLab, ...routes, ...projects, ...experiments, ...systems];
 }
 
 /** Built once per module load — the corpus is static build-time content. */
@@ -81,7 +89,7 @@ function fuzzyScore(query: string, text: string): number | null {
   return 2 + (lastMatch - firstMatch);
 }
 
-/** Fuzzy-searches routes, projects and experiments. Empty query returns the top of the index. */
+/** Fuzzy-searches routes, projects, experiments and workflows. Empty query returns the top of the index. */
 export function searchCommands(query: string, limit = 8): CommandItem[] {
   const trimmed = query.trim();
   if (!trimmed) return index.slice(0, limit);

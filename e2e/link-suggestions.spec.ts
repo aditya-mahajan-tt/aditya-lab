@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { suggestLink } from "@/lib/ai/link-suggestions";
+import { suggestLink, stripUnknownInternalPaths } from "@/lib/ai/link-suggestions";
 import { getHeroBodies } from "@/data/queries";
 import { systemDiagrams } from "@/data/systems";
 
@@ -107,4 +107,16 @@ test("system diagrams point at the Turbotork case study @links", () => {
   expect(agents).toBeDefined();
   expect(agents!.nodes.length).toBeGreaterThanOrEqual(4);
   expect(agents!.relatedProjectSlug).toBe("turbotork");
+});
+
+test("an answer that mentions ORBIT gets the /systems/orbit chip @links", () => {
+  const link = suggestLink(
+    "ORBIT is his personal operating system built on scheduled agents.",
+    "what personal automation has he built",
+  );
+  expect(link).toEqual({ label: "ORBIT workflow", href: "/systems/orbit" });
+});
+
+test("/systems/orbit survives stripUnknownInternalPaths @links", () => {
+  expect(stripUnknownInternalPaths("Read more at /systems/orbit for the flow.")).toContain("/systems/orbit");
 });

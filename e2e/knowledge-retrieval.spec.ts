@@ -160,3 +160,22 @@ test("a project's leadTopics reach the corpus as a PRIMARY REFERENCE line @retri
   expect(turbotork!.text).toContain("PRIMARY REFERENCE for questions about:");
   expect(turbotork!.text).toContain("fundraising");
 });
+
+test("ORBIT is its own retrievable section and answers a personal-automation question @retrieval", () => {
+  expect(getKnowledgeSections().map((s) => s.id)).toContain("workflow-orbit");
+  expect(selectSectionIds("What personal automation has he built?")).toContain("workflow-orbit");
+});
+
+test("Turbotork stays the primary reference for AI agent work @retrieval", () => {
+  const pinned = new Set(getKnowledgeSections().filter((s) => s.pinned).map((s) => s.id));
+  const ranked = selectSectionIds("Tell me about his AI agent work").filter((id) => !pinned.has(id));
+  expect(ranked[0]).toBe("project-turbotork");
+});
+
+// Correct only while ORBIT's narrative fields carry [AI_DRAFT_REVIEW]. Delete or
+// invert this once Aditya approves the copy (Checkpoint C).
+test("an unreviewed workflow's draft prose never reaches the corpus @retrieval", () => {
+  const text = getKnowledgeSections().find((s) => s.id === "workflow-orbit")?.text ?? "";
+  expect(text).not.toContain("AI_DRAFT_REVIEW");
+  expect(text).not.toContain("Principle");
+});

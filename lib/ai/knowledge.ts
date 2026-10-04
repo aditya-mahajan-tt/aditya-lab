@@ -4,7 +4,7 @@ import { skillGroups } from "@/data/skills";
 import { thinking } from "@/data/thinking";
 import { experience } from "@/data/experience";
 import { education } from "@/data/education";
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, getAllWorkflows } from "@/data/queries";
 import { isPlaceholder, isDraft } from "@/data/schema";
 
 /**
@@ -164,6 +164,44 @@ function buildExperimentSections(): KnowledgeSection[] {
     .filter((s): s is KnowledgeSection => s !== null);
 }
 
+/**
+ * One section per workflow (spec 7.3). The 49 node details are deliberately
+ * left out: they would spend the token budget. Draft and placeholder fields
+ * are skipped by field(), so this stays thin until Aditya approves the copy.
+ */
+function buildWorkflowSections(): KnowledgeSection[] {
+  return getAllWorkflows()
+    .map((w): KnowledgeSection | null => {
+      const title = field(w.title);
+      if (!title) return null;
+      const text = section(`Workflow: ${title}${w.subtitle ? ` — ${w.subtitle}` : ""}`, [
+        `Year: ${w.year}`,
+        `Status: ${w.status}`,
+        w.leadTopics.length > 0
+          ? `PRIMARY REFERENCE for questions about: ${w.leadTopics.join(", ")}.`
+          : null,
+        field(w.summary) && `Summary: ${field(w.summary)}`,
+        field(w.why) && `Why: ${field(w.why)}`,
+        ...w.principles.map((p) => field(p.body) && `Principle, ${p.title}: ${field(p.body)}`),
+        ...w.checks.map((c) => field(c.prevents) && `Check, ${c.rule}: prevents ${field(c.prevents)}`),
+        ...w.integrations.map(
+          (i) => field(i.note) && `Integration, ${i.name} (${i.access}): ${field(i.note)}`,
+        ),
+        ...w.limits.map((l) => field(l) && `Limit: ${field(l)}`),
+        ...w.phases.map((p) => field(p.summary) && `Phase ${p.id}, ${p.label}: ${field(p.summary)}`),
+        `Workflow page: /systems/${w.slug}`,
+      ]);
+      if (!text) return null;
+      return {
+        id: `workflow-${w.slug}`,
+        text,
+        topics: [title, ...w.leadTopics],
+        pinned: false,
+      };
+    })
+    .filter((s): s is KnowledgeSection => s !== null);
+}
+
 function buildExperienceSections(): KnowledgeSection[] {
   return [...experience]
     .map((e): KnowledgeSection | null => {
@@ -255,6 +293,7 @@ function buildKnowledgeSections(): KnowledgeSection[] {
     ...single("education", buildEducationSection(), ["education", "degree", "university"]),
     ...buildProjectSections(),
     ...buildExperimentSections(),
+    ...buildWorkflowSections(),
     ...single("thinking", buildThinkingSection(), ["thinking", "process", "framework"]),
     ...single("contact", buildContactSection(), ["contact", "email", "resume", "hire"], true),
   ];

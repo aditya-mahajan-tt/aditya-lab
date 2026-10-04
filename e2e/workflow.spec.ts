@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import sitemap from "@/app/sitemap";
+import { searchCommands } from "@/lib/search";
 import { workflows } from "@/data/workflows";
 import { getAllWorkflows, getWorkflow } from "@/data/queries";
 import { stepChips, phaseSteps, nodeLabel, KIND_TAG } from "@/components/systems/workflowSteps";
@@ -294,3 +296,16 @@ for (const size of [
     });
   });
 }
+
+test.describe("workflow wiring @workflow-wiring", () => {
+  test("sitemap lists /systems/orbit at priority 0.6", () => {
+    const entry = sitemap().find((e) => e.url.endsWith("/systems/orbit"));
+    expect(entry?.priority).toBe(0.6);
+  });
+
+  test("the command palette finds ORBIT under a Systems group", () => {
+    const hit = searchCommands("orbit").find((i) => i.href === "/systems/orbit");
+    expect(hit?.group).toBe("Systems");
+    expect(hit?.label).toBe("ORBIT");
+  });
+});
