@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { workflows } from "@/data/workflows";
 import { getAllWorkflows, getWorkflow } from "@/data/queries";
 import { stepChips, phaseSteps, nodeLabel, KIND_TAG } from "@/components/systems/workflowSteps";
@@ -161,3 +162,135 @@ test.describe("step list helpers @workflow-list", () => {
     expect(nodeLabel(orbit().nodes.find((n) => n.id === "a-propose")!)).toBe("PROPOSE ONE COMMITMENT");
   });
 });
+
+test.describe("/systems @workflow-ui", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "viewport-specific: desktop project only");
+  });
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test("sections are numbered 01-05 with Workflows third and neural-heading intact", async ({ page }) => {
+    await page.goto("/systems");
+    const labels = await page.locator("p.label").allTextContents();
+    for (const l of ["01 — SYSTEMS", "02 — AUTOMATION", "03 — WORKFLOWS", "04 — STRATEGY", "05 — CAPABILITY"]) {
+      expect(labels, `missing ${l}`).toContain(l);
+    }
+    await expect(page.locator("#neural-heading")).toHaveCount(1);
+  });
+
+  test("Agent Pipeline renders as an h3 under Automation, and ORBIT links to its write-up", async ({ page }) => {
+    await page.goto("/systems");
+    await expect(page.getByRole("heading", { level: 3, name: "Agent Pipeline" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "ORBIT" })).toBeVisible();
+    const link = page.getByRole("link", { name: /READ THE WRITE-UP: ORBIT/i });
+    await expect(link).toHaveAttribute("href", "/systems/orbit");
+  });
+});
+
+test.describe("/systems/orbit at 1280 @workflow-ui", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "viewport-specific: desktop project only");
+  });
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test("49 node buttons; focus shows detail; Escape clears; caption stays in view mid-figure", async ({ page }) => {
+    await page.goto("/systems/orbit");
+    const nodes = page.locator("figure svg [role='button']");
+    await expect(nodes).toHaveCount(49);
+
+    const caption = page.locator("figure figcaption");
+    await expect(caption).toContainText("Hover, tab or tap a step for detail.");
+
+    await nodes.first().focus();
+    await expect(caption).toContainText("Three scheduled agent runs");
+
+    await page.keyboard.press("Escape");
+    await expect(caption).toContainText("Hover, tab or tap a step for detail.");
+
+    // Mid-figure: the caption must still be on screen (sticky), not left behind below the fold.
+    await nodes.nth(24).scrollIntoViewIfNeeded();
+    await expect(caption).toBeInViewport();
+  });
+
+  test("Tab walks reading order, not the grid", async ({ page }) => {
+    await page.goto("/systems/orbit");
+    await page.locator("figure svg [role='button']").first().focus();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("figure figcaption")).toContainText("Every tap on the dashboard lands in a queue");
+  });
+
+  test("the skip link is first in the diagram and lands after it", async ({ page }) => {
+    await page.goto("/systems/orbit");
+    const skip = page.getByRole("link", { name: "Skip the diagram" });
+    await skip.focus();
+    await expect(skip).toBeVisible();
+    await skip.press("Enter");
+    await expect(page).toHaveURL(/#wf-after-orbit$/);
+  });
+
+  test("the list sits closed under the diagram and opens", async ({ page }) => {
+    await page.goto("/systems/orbit");
+    const details = page.locator("details", { hasText: "READ AS A LIST" });
+    await expect(details).not.toHaveAttribute("open", "");
+    await details.locator("summary").click();
+    await expect(details.getByRole("heading", { level: 3, name: /DAILY CONTROL LOOP/ })).toBeVisible();
+  });
+
+  for (const route of ["/systems", "/systems/orbit"]) {
+    test(`axe: no violations on ${route}`, async ({ page }) => {
+      await page.goto(route);
+      await page.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += 600) {
+          window.scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 30));
+        }
+        window.scrollTo(0, 0);
+      });
+      await page.waitForTimeout(800); // let GSAP reveals settle
+      const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+      expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    });
+  }
+});
+
+test.describe("/systems/orbit at 375 @workflow-ui", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "viewport-specific: desktop project only");
+  });
+  test.use({ viewport: { width: 375, height: 812 } });
+
+  test("no swimlane; four phase headings visible; no horizontal scroll", async ({ page }) => {
+    await page.goto("/systems/orbit");
+    await expect(page.locator("figure")).toBeHidden();
+    for (const label of ["DAILY CONTROL LOOP", "PROJECT INTAKE", "REELS SWEEP", "APPROVED INSTALL"]) {
+      await expect(page.getByRole("heading", { level: 3, name: new RegExp(label) })).toBeVisible();
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    expect(overflow).toBe(false);
+  });
+});
+
+for (const size of [
+  { width: 1280, height: 900 },
+  { width: 375, height: 812 },
+]) {
+  test.describe(`/systems/orbit JS disabled at ${size.width} @workflow-nojs`, () => {
+    test.beforeEach(({}, testInfo) => {
+      test.skip(testInfo.project.name !== "desktop", "viewport-specific: desktop project only");
+    });
+    test.use({ viewport: size, javaScriptEnabled: false });
+
+    test("a node detail from each phase is in the DOM", async ({ page }) => {
+      await page.goto("/systems/orbit");
+      const text = (await page.locator("body").textContent()) ?? "";
+      for (const detail of [
+        "Three scheduled agent runs", // A
+        "The cap is three active projects", // B
+        "Reads the saved collection through", // C
+        "A skill security scanner runs", // D
+      ]) {
+        expect(text, `missing: ${detail}`).toContain(detail);
+      }
+    });
+  });
+}
