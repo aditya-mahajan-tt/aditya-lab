@@ -29,10 +29,11 @@ const raw = [
     id: "BUILD",
     planes: ["product"],
     description:
-      "Shipping working products with a small team — a multi-product fleet-service platform and a D2C storefront, built rather than just specified.",
+      "Shipping working products: a multi-product fleet-service platform built with a small team, a D2C storefront, and a football simulator fitted to real match data. Built rather than just specified.",
     items: [
       { name: "Websites", depth: "comfortable" },
-      { name: "Apps", depth: "working knowledge" },
+      { name: "Apps", depth: "comfortable" },
+      { name: "Simulation modelling", depth: "working knowledge" },
       { name: "UI/UX", depth: "comfortable" },
       { name: "Product", depth: "comfortable" },
     ],

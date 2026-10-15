@@ -282,7 +282,7 @@ const raw = [
     category: ["Product", "Simulation"],
     year: "2026",
     status: "LIVE",
-    featured: false,
+    featured: true,
     order: 6,
 
     summary:
