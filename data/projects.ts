@@ -273,6 +273,45 @@ const raw = [
     ],
     links: [{ label: "Live App", url: "https://leadiq-tan.vercel.app" }],
   },
+  {
+    id: "006",
+    slug: "mezzala",
+    planes: ["product"],
+    title: "Mezzala",
+    subtitle: "Football Tactics Simulator",
+    category: ["Product", "Simulation"],
+    year: "2026",
+    status: "LIVE",
+    featured: false,
+    order: 6,
+
+    summary:
+      "A football tactics simulator: build a squad under a budget cap, set a tactical system, and test it in simulated matches against eight AI managers or another player, with an engine calibrated on real match data.",
+
+    context:
+      "Mezzala is for people who think about football the way Football Manager players do, with a system in their head (a 3-2-5, an inverted wing-back, a high press) and no quick way to find out whether it holds up.",
+    problem:
+      "Football Manager takes two seasons to tell you whether a 3-2-5 works. A tactics tool is only worth using if its scorelines mean something, so the simulation had to be believable before any interface could be worth building.",
+    role: "Solo builder, designed and built the product end to end: the simulation engine, the calibration pipeline, the web app and the live match runner.",
+    thinking:
+      "The engine is the product. It was built headless and fitted to real match data before any UI existed, because a polished tactics builder on top of a bad simulation produces meaningless results. The same rule runs through the interface: it never implies an effect the engine does not have.",
+    approach:
+      "The engine is pure TypeScript with no I/O, splits the pitch into a 30-zone grid, and is fitted to the public Wyscout dataset (1,941 matches, CC BY 4.0). Only the fitted coefficients ship, never the source data. The zone grid lives in one file read by both the Python pipeline and the engine, so calibration and simulation cannot drift apart. Matches are deterministic for a seed, and the engine version is pinned so old matches replay exactly as they were played.",
+    execution:
+      "The app covers a squad builder under a budget cap, a tactics board with a per-phase zone heatmap, instant simulation against eight AI managers, and live head-to-head matches with in-match changes, triggers, set pieces and opposition orders. A separate match-runner service ticks live matches, with signed match tokens between it and the web app. Players can replay any match, run a tactic hundreds of times in a Monte Carlo analysis, and climb a rated ladder.",
+    // outcome intentionally omitted: PRODUCT.md records no usage data, and none
+    // has been supplied.
+    learnings: [],
+
+    tools: ["Next.js", "TypeScript", "Postgres", "Drizzle", "Fastify", "Python"],
+    process: [
+      { label: "ENGINE", detail: "Build the simulation headless and fit it to real match data before any UI exists." },
+      { label: "TACTICS", detail: "Express a system through formation, roles, duties, directives, set pieces and opposition orders." },
+      { label: "SIMULATE", detail: "Test it against AI managers or another player, live or instantly." },
+      { label: "ANALYSE", detail: "Read the match output, replay it, and compare tactics over many runs." },
+    ],
+    links: [{ label: "Live App", url: "https://mezella.vercel.app" }],
+  },
 ];
 
 export const projects = z.array(ProjectSchema).parse(raw);
