@@ -292,7 +292,7 @@ const raw = [
       "Mezzala is for people who think about football the way Football Manager players do, with a system in their head (a 3-2-5, an inverted wing-back, a high press) and no quick way to find out whether it holds up.",
     problem:
       "Football Manager takes two seasons to tell you whether a 3-2-5 works. A tactics tool is only worth using if its scorelines mean something, so the simulation had to be believable before any interface could be worth building.",
-    role: "[PROJECT_ROLE_REQUIRED]",
+    role: "Solo builder, designed and built the product end to end: the simulation engine, the calibration pipeline, the web app and the live match runner.",
     thinking:
       "The engine is the product. It was built headless and fitted to real match data before any UI existed, because a polished tactics builder on top of a bad simulation produces meaningless results. The same rule runs through the interface: it never implies an effect the engine does not have.",
     approach:

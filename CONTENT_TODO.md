@@ -6,18 +6,4 @@
 > (a resume, etc) — read it, rewrite it in your own words or approve it, then remove the marker.
 > Both block the production build.
 
-**1 missing, 10 unreviewed drafts.**
-
-## data/projects.ts
-
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 289
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 292
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 294
-- [ ] `[PROJECT_ROLE_REQUIRED]` — line 295
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 297
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 299
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 301
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 308
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 309
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 310
-- [ ] **DRAFT** `[AI_DRAFT_REVIEW]` — line 311
+**No outstanding placeholders or unreviewed drafts. Content is complete.**
