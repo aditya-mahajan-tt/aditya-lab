@@ -64,6 +64,9 @@ const MODULE_RING_RADIUS = 1.9;
 
 const RING_SEGMENTS: Record<Exclude<QualityTier, "low">, number> = { high: 160, medium: 80 };
 
+/** How fast the idle rotation eases to a stop while a body is hovered. */
+const PAUSE_DAMPING = 12;
+
 /** How fast expansion settles. Frame-rate independent via MathUtils.damp. */
 const EXPANSION_DAMPING = 4.5;
 
@@ -168,6 +171,9 @@ export function Core({
   const expansion = useRef(0);
   const toggle = useCallback(() => setExpanded((value) => !value), []);
 
+  const idleSpeed = useRef(1);
+  const wobblePhase = useRef(0);
+
   const rotationRef = useRef<Group>(null);
   const ringScaleRef = useRef<Group>(null);
   const meridianRef = useRef<Group>(null);
@@ -181,6 +187,13 @@ export function Core({
 
     expansion.current = MathUtils.damp(expansion.current, expanded ? 1 : 0, EXPANSION_DAMPING, step);
     const e = expansion.current;
+
+    // A body under the pointer must hold still: the nodes ride the rotating
+    // group, so a moving hit target slides out from under the cursor and
+    // flickers hover on/off. Eased to a stop rather than cut, and the x wobble
+    // (also node-moving) freezes with it.
+    idleSpeed.current = MathUtils.damp(idleSpeed.current, activeBodyId ? 0 : 1, PAUSE_DAMPING, step);
+    wobblePhase.current += step * idleSpeed.current;
 
     if (rotationRef.current) {
       if (activePlane) {
@@ -197,9 +210,9 @@ export function Core({
         // Desktop: the existing idle rotation. Expanded, the machine spins up
         // slightly — the response to a click has to be legible in motion, not
         // only in position.
-        rotationRef.current.rotation.y += step * (0.14 + e * 0.16);
+        rotationRef.current.rotation.y += step * (0.14 + e * 0.16) * idleSpeed.current;
       }
-      rotationRef.current.rotation.x = Math.sin(t * 0.16) * 0.05;
+      rotationRef.current.rotation.x = Math.sin(wobblePhase.current * 0.16) * 0.05;
     }
 
     if (ringScaleRef.current) ringScaleRef.current.scale.setScalar(1 + e * 0.07);

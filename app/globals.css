@@ -271,6 +271,11 @@ html.custom-cursor-active * {
   animation: core-rotate 48s linear infinite;
   transform-origin: 200px 200px;
 }
+/* Hold still while a body is hovered or focused, so it can be read and clicked. */
+.core-rotate:hover,
+.core-rotate:focus-within {
+  animation-play-state: paused;
+}
 .core-pulse {
   animation: core-pulse 3.6s ease-in-out infinite;
   transform-origin: 200px 200px;

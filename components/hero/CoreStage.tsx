@@ -206,7 +206,7 @@ export function CoreStage() {
       <p className="label mt-4 min-h-[2.5em] text-center text-text-faint">
         {activeBody ? (
           <>
-            {activeBody.label} — <Fill value={activeBody.detail} />
+            <span className="text-accent">{activeBody.label}</span> — <span className="text-text"><Fill value={activeBody.detail} /></span>
           </>
         ) : (
           "Hover a body for detail — tap to open."
