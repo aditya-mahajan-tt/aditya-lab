@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { thinking } from "@/data/thinking";
-import { getAllProjects } from "@/data/queries";
+import { getAllProjects, projectHref } from "@/data/queries";
 import { buildBrainMesh } from "@/components/thinking/brainMesh";
 
 const STATIC_ROUTES = new Set(["/build"]);
@@ -14,10 +14,10 @@ test("every principle cites at least two pieces of real work @thinking", () => {
 });
 
 test("every evidence url points at a real route @thinking", () => {
-  const slugs = new Set(getAllProjects().map((p) => p.slug));
+  const projectUrls = new Set(getAllProjects().map(projectHref));
   for (const principle of thinking.principles) {
     for (const e of principle.evidence) {
-      const isProject = e.url.startsWith("/work/") && slugs.has(e.url.slice("/work/".length));
+      const isProject = projectUrls.has(e.url);
       expect(
         STATIC_ROUTES.has(e.url) || isProject,
         `evidence "${e.label}" links to unknown route ${e.url}`,
@@ -41,12 +41,12 @@ test("every framework step carries a real moment @thinking", () => {
 });
 
 test("every moment link points at a real project route @thinking", () => {
-  const slugs = new Set(getAllProjects().map((p) => p.slug));
+  const projectUrls = new Set(getAllProjects().map(projectHref));
   for (const step of thinking.steps) {
     const link = step.moment?.link;
     if (!link) continue;
     expect(
-      link.url.startsWith("/work/") && slugs.has(link.url.slice("/work/".length)),
+      projectUrls.has(link.url),
       `step ${step.label} moment links to unknown route ${link.url}`,
     ).toBe(true);
   }
@@ -73,7 +73,7 @@ test("the framework diagram is reachable on mobile @thinking", async ({ page }) 
   await expect(caption).toContainText(test_.body);
   await expect(caption.getByRole("link", { name: /Kensara AI/ })).toHaveAttribute(
     "href",
-    "/work/kensara-ai-gtm",
+    "/projects/kensara-ai-gtm",
   );
   // The caption link is a 44px tap target too.
   const linkBox = await caption.getByRole("link").boundingBox();
@@ -92,7 +92,7 @@ test("selecting a node updates the caption on desktop @thinking", async ({ page 
   await expect(caption).toContainText(test_.moment!.body);
   await expect(caption.getByRole("link", { name: /Kensara AI/ })).toHaveAttribute(
     "href",
-    "/work/kensara-ai-gtm",
+    "/projects/kensara-ai-gtm",
   );
 });
 

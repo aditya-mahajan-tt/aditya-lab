@@ -62,7 +62,7 @@ test("with WebGL unavailable the hero is complete and the DOM core renders", asy
 
   // The recruiter path, unchanged (CLAUDE.md §2).
   await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.getByRole("link", { name: /explore work/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /explore projects/i })).toBeVisible();
   await expect(page.locator(CORE)).toBeVisible();
   await expect(page.locator(CORE)).toHaveAttribute("data-suppressed", "false");
 
