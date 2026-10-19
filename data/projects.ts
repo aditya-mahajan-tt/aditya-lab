@@ -38,6 +38,7 @@ const raw = [
   {
     id: "005",
     slug: "turbotork",
+    kind: "work",
     planes: ["ai", "product", "business"],
     title: "Turbotork",
     subtitle: "Fleet-Service SaaS, 0→1",
@@ -112,6 +113,7 @@ const raw = [
   {
     id: "001",
     slug: "gostops-gtm",
+    kind: "case-study",
     planes: ["business"],
     title: "goSTOPS",
     subtitle: "GTM Strategy",
@@ -124,7 +126,10 @@ const raw = [
     // once goSTOPS is written.
     status: "IN PROGRESS",
     featured: true,
-    order: 4,
+    order: 8,
+    // Excluded from Ask the Lab grounding and transcription vocabulary only;
+    // the page itself stays public.
+    confidential: true,
 
     summary:
       "Primary market research and behavioural segmentation for goSTOPS' monsoon (JAS) offsite push — a 12-variable framework, a single-survey Google Form, and a 2×2 behavioural segmentation used to pick which companies to target and how to price the offer.",
@@ -158,6 +163,7 @@ const raw = [
   {
     id: "002",
     slug: "kensara-ai-gtm",
+    kind: "case-study",
     planes: ["business", "product"],
     title: "Kensara AI",
     subtitle: "GTM & Partnership Strategy",
@@ -168,7 +174,7 @@ const raw = [
     // enough to earn a featured slot yet — see data/experience.ts's sibling
     // reasoning. Still a full entry in the /work archive.
     featured: false,
-    order: 3,
+    order: 5,
 
     summary:
       "Leading GTM and partnership strategy for an AI startup — Team Audax won the IIT Guwahati case competition outright, finishing first out of 120 teams.",
@@ -195,6 +201,7 @@ const raw = [
   {
     id: "003",
     slug: "adda-d2c",
+    kind: "built",
     planes: ["product", "business"],
     title: "Adda",
     subtitle: "D2C E-commerce Venture",
@@ -205,7 +212,7 @@ const raw = [
     // reason for the promotion expired when a deeper narrative landed.
     status: "CASE STUDY",
     featured: true,
-    order: 2,
+    order: 4,
 
     summary:
       "Built a Shopify-based D2C e-commerce store end-to-end — product research, vendor sourcing and payment integration — as founder.",
@@ -238,6 +245,7 @@ const raw = [
   {
     id: "004",
     slug: "leadiq",
+    kind: "built",
     planes: ["product"],
     title: "LeadIQ",
     subtitle: "Lead Discovery & Prospecting Dashboard",
@@ -245,7 +253,7 @@ const raw = [
     year: "2026",
     status: "SHIPPED",
     featured: true,
-    order: 5,
+    order: 3,
 
     summary:
       "A personal, single-user lead-discovery dashboard — pulls real local businesses from OpenStreetMap, audits each one's live website against a set of checkable signals, and turns the gaps it finds into a score and a specific, evidence-backed outreach angle.",
@@ -276,6 +284,7 @@ const raw = [
   {
     id: "006",
     slug: "mezzala",
+    kind: "built",
     planes: ["product"],
     title: "Mezzala",
     subtitle: "Football Tactics Simulator",
@@ -283,7 +292,7 @@ const raw = [
     year: "2026",
     status: "LIVE",
     featured: true,
-    order: 6,
+    order: 2,
 
     summary:
       "A football tactics simulator: build a squad under a budget cap, set a tactical system, and test it in simulated matches against eight AI managers or another player, with an engine calibrated on real match data.",
@@ -311,6 +320,76 @@ const raw = [
       { label: "ANALYSE", detail: "Read the match output, replay it, and compare tactics over many runs." },
     ],
     links: [{ label: "Live App", url: "https://mezella.vercel.app" }],
+  },
+  {
+    id: "008",
+    slug: "touchd-gtm",
+    kind: "case-study",
+    planes: ["business"],
+    title: "Touch'd",
+    subtitle: "GTM Strategy",
+    category: ["Strategy", "GTM", "Consumer research"],
+    year: "2026",
+    status: "CASE STUDY",
+    featured: false,
+    order: 6,
+    leadTopics: ["go-to-market strategy", "consumer research", "positioning and pricing"],
+
+    // Drafted 2026-10-19 from Aditya's own deck (TOUCHD_final_dataviz). Every
+    // narrative field carries the inline marker until he approves it. role is
+    // his own statement and carries none.
+    summary:
+      "[AI_DRAFT_REVIEW] Go-to-market strategy for Touch'd, a care-first intimate-wellness brand for India: a survey of 150 women, a six-brand competitor scan, behavioural segmentation, a market-size estimate, pricing and 7Ps, and a launch plan with spend gates.",
+    context:
+      "[AI_DRAFT_REVIEW] Touch'd is a proposed brand for the moment around sex that nobody names: pH-matched care for before and after, launching with a Care range and a gated 18+ Play range from month 12. A coursework go-to-market project covering need-gap analysis, market scanning, segmentation, targeting and positioning, and the 7Ps.",
+    problem:
+      "[AI_DRAFT_REVIEW] Everyone sells a wipe and nobody owns the moment. Bar soap sits at pH 8 to 10 while healthy vaginal pH is 3.5 to 4.5, and in a survey of 150 women aged 21 to 32, 77% relied on tissue, water or water with a towel. The brand promises comfort and pH-matched care, never that it prevents UTIs, because that has not been clinically proven.",
+    role: "Group project. Everyone worked across every part, from the survey to the launch plan.",
+    thinking:
+      "[AI_DRAFT_REVIEW] Cluster customers on behaviour (trigger, price sensitivity, channel and motive) and only then profile them on demographics, and keep every claim inside what is proven: clinic and community samples show burden, not national prevalence.",
+    approach:
+      "[AI_DRAFT_REVIEW] A primary survey of 150 women, a scan of six players (VWash, Sirona, Pee Safe, Bold Care, MyMuse and Durex) on price, profitability and how easily each could copy the idea, a SWOT, and five segments scored on sales, profit and unique need. Newly married women became the beachhead, doctor-referred buyers the credibility segment and quick-commerce natives the group from month six. Positioned as the only intimate-care brand made for the before-and-after moment, with its clinical specs printed on the pack.",
+    execution:
+      "[AI_DRAFT_REVIEW] Sized the market at ₹882 cr addressable, ₹265 cr serviceable and ₹4.0 cr obtainable by year three, with a top-down check within 0.4%. Priced inside the survey's willingness to pay (mist ₹349, glide ₹399, post-wax gel ₹299, plus a ₹49 trial sachet), set year-one channels at 50% quick commerce, 35% own website, 10% salons and 5% marketplace, and planned a six-month launch with ₹36 L of spend released only at gates. The plan needs ₹1.05 cr over two years and reaches EBITDA-positive in year three, with an LTV/CAC of 0.8x to 1.5x shown rather than hidden.",
+    learnings: [],
+
+    tools: [],
+    links: [],
+  },
+  {
+    id: "007",
+    slug: "pepperfry-experience-index",
+    kind: "case-study",
+    planes: ["business"],
+    title: "Pepperfry",
+    subtitle: "Furniture Experience Index, Delhi NCR",
+    category: ["Strategy", "Consulting", "Research"],
+    year: "2026",
+    status: "CASE STUDY",
+    featured: false,
+    order: 7,
+    // Excluded from Ask the Lab grounding and transcription vocabulary only;
+    // the page itself stays public.
+    confidential: true,
+
+    // Drafted 2026-10-19 from Aditya's own deck. Same marker rule as Touch'd.
+    summary:
+      "[AI_DRAFT_REVIEW] Live consulting challenge with Pepperfry: a team of five scored three Gurugram furniture stores on store feel and sales advice, found Pepperfry ahead on feel and behind WoodenStreet on sales interaction, and proposed ten moves to help it win the sale. Provisional: one visit per brand, no customer interviews yet.",
+    context:
+      "[AI_DRAFT_REVIEW] A Masters' Union x Pepperfry live consulting challenge built around a Furniture Experience Index for Delhi NCR: seven weighted dimensions (store, sales, product, delivery, website, digital and service) used to compare Pepperfry with WoodenStreet and Urban Ladder.",
+    problem:
+      "[AI_DRAFT_REVIEW] Where does Pepperfry's store experience lose the sale? Only store and sales, 35% of the index, had been observed, so the work kept what was seen in a store apart from what was hypothesis, or only indicative from public ratings and reviews.",
+    role: "Group project, a team of five. Everyone worked across every part, from the store visits to the recommendations.",
+    thinking:
+      "[AI_DRAFT_REVIEW] Every claim carries an evidence label (observed, indicative, benchmark, hypothesis or proposal), and the buying drivers are ordered by strength of evidence, with advice at the point of sale rated weakest and tested first. The ranking is explicitly provisional: one visit per brand, the team's own ratings, and no customer interviews yet.",
+    approach:
+      "[AI_DRAFT_REVIEW] Three store visits in Gurugram on 22 and 26 September 2026, rated on store layout, premium feel, sales interaction and follow-up, then converted into a weighted score on the 35% observed (Pepperfry 3.88 of 5, WoodenStreet 2.46, Urban Ladder 2.09, provisional). That was set against Google ratings, public reviews and what rivals advertise, such as an in-store scanner, 3D interior design and compact city stores, to map the customer journey and a SWOT.",
+    execution:
+      "[AI_DRAFT_REVIEW] Pepperfry led on premium feel (9/10 against 5/10) and called back after a visit where nothing was bought, but trailed WoodenStreet on sales interaction (4/10 against 9/10), its scanner showed price only, and installation was charged to the customer. The team proposed ten moves in five steps, ranked by impact, ease and investment, starting with a need-based sales playbook, a smart QR tag and a follow-up-to-referral loop. A 180-day roadmap with two gates and a pilot in three studios against two controls follows, with no targets set until a four-week baseline is recorded. All ten moves are proposals; none is tested.",
+    learnings: [],
+
+    tools: [],
+    links: [],
   },
 ];
 

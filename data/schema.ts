@@ -89,9 +89,18 @@ export const LeadTopics = z.array(z.string()).default([]);
  * image exists to justify it -- the asset first, then the surface
  * (CLAUDE.md section 3.1).
  */
+/**
+ * Where a project lives. "work" is a role (detail at /work/[slug]); "built"
+ * and "case-study" are the two groups on /projects (detail at
+ * /projects/[slug]). Use projectHref() in data/queries.ts, never build the
+ * URL by hand.
+ */
+export const ProjectKind = z.enum(["work", "built", "case-study"]);
+
 export const ProjectSchema = z.object({
   id: z.string(),
   slug: z.string().regex(/^[a-z0-9-]+$/, "Slug must be lowercase-kebab-case"),
+  kind: ProjectKind,
   title: Fillable,
   subtitle: z.string().optional(),
   category: z.array(z.string()).min(1),
@@ -258,6 +267,8 @@ export const ExperienceEntrySchema = z.object({
   /** Only set on entries the orbital hero's outer ring reads (spec §3.2/§6). */
   planes: z.array(Plane).min(1).optional(),
   leadTopics: LeadTopics,
+  /** False keeps an entry on the About timeline only, off the /work list. */
+  onWork: z.boolean().default(true),
 });
 
 /* ------------------------------------------------------------ education */

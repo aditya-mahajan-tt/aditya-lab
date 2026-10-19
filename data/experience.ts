@@ -2,7 +2,8 @@ import { z } from "zod";
 import { ExperienceEntrySchema } from "./schema";
 
 /**
- * Work experience — distinct from /work, which is case studies. Drafted
+ * Work experience, listed on /work (onWork: false keeps an entry on the
+ * About timeline only). Drafted
  * from Aditya_Mahajan_OnePager.pdf (supplied 2026-09-05) and reviewed and
  * approved by Aditya on 2026-09-07 (draft-review marker removed; see
  * data/schema.ts's DRAFT_PATTERN comment).
@@ -60,6 +61,7 @@ const raw = [
       "Analyzed manufacturing energy consumption data, identifying efficiency gaps through industry benchmarking.",
     ],
     tools: [],
+    onWork: false,
   },
 ];
 
