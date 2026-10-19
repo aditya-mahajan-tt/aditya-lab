@@ -29,7 +29,7 @@ test("without a topic match, the earliest mention wins @links", () => {
   const link = suggestLink(answer, "what did he do in 2026");
 
   expect(link).not.toBeNull();
-  expect(link!.href).toBe("/work/kensara-ai-gtm");
+  expect(link!.href).toBe("/projects/kensara-ai-gtm");
 });
 
 test("an answer naming nothing returns no chip @links", () => {
@@ -39,7 +39,7 @@ test("an answer naming nothing returns no chip @links", () => {
 test("a project named in the answer still links when the question is vague @links", () => {
   const link = suggestLink("Adda is a D2C wellness brand he founded.", "tell me more");
   expect(link).not.toBeNull();
-  expect(link!.href).toBe("/work/adda-d2c");
+  expect(link!.href).toBe("/projects/adda-d2c");
 });
 
 test("the topic word 'AI' pulls the link to Turbotork over an earlier mention @links", () => {
@@ -59,7 +59,7 @@ test("'ai' inside 'explain' or 'detail' is not a topic match @links", () => {
   const link = suggestLink(answer, "Can you explain his process in detail?");
 
   expect(link).not.toBeNull();
-  expect(link!.href).toBe("/work/kensara-ai-gtm");
+  expect(link!.href).toBe("/projects/kensara-ai-gtm");
 });
 
 test("a question naming a project outranks the leadTopics word 'AI' @links", () => {
@@ -68,7 +68,7 @@ test("a question naming a project outranks the leadTopics word 'AI' @links", () 
   const link = suggestLink(answer, "Tell me about Kensara AI");
 
   expect(link).not.toBeNull();
-  expect(link!.href).toBe("/work/kensara-ai-gtm");
+  expect(link!.href).toBe("/projects/kensara-ai-gtm");
 });
 
 test("earliest mention in the answer beats declaration order @links", () => {

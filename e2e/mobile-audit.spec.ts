@@ -33,7 +33,7 @@ test("check:placeholders --strict exits non-zero when data has an outstanding to
 });
 
 test("no interactive element renders under 44px in either dimension at 375px", async ({ page }) => {
-  const routes = ["/", "/work/gostops-gtm", "/resume", "/contact"];
+  const routes = ["/", "/projects/gostops-gtm", "/resume", "/contact"];
   const offenders: string[] = [];
 
   for (const route of routes) {
@@ -152,7 +152,7 @@ test("the Strategy Wall diagram renders as a real SVG (not a text list) at 375px
 });
 
 test("the goSTOPS process diagram renders on the project detail page at 375px", async ({ page }) => {
-  await page.goto("/work/gostops-gtm", { waitUntil: "networkidle" });
+  await page.goto("/projects/gostops-gtm", { waitUntil: "networkidle" });
 
   const figures = page.locator("figure");
   const mobileFigure = figures.last();
@@ -167,7 +167,8 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   const page = await context.newPage();
   await page.goto("/");
 
-  // 5 skill groups + 5 projects (Turbotork included) + 1 experiment.
+  // 5 skill groups + 8 projects (Turbotork included) + 1 experiment = 14.
+  // This asserted 11 while main already had 6 projects (real count 12), so it was stale before the projects restructure.
   const links = page.locator("h2:has-text('What Aditya works on, by discipline') ~ * a, h2:has-text('What Aditya works on, by discipline') + * a");
   const hrefs = await page.evaluate(() => {
     const heading = [...document.querySelectorAll("h2")].find((h) => h.textContent === "What Aditya works on, by discipline");
@@ -175,7 +176,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
     return container ? [...container.querySelectorAll("a")].map((a) => a.getAttribute("href")) : [];
   });
 
-  expect(hrefs.length).toBe(11);
+  expect(hrefs.length).toBe(14);
   // Each of the 5 capability nodes routes to its own pre-selected group
   // (data/queries.ts's getHeroBodies) rather than all 5 sharing one anchor.
   expect(hrefs).toContain("/systems?capability=THINK#neural-heading");
@@ -183,17 +184,20 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   expect(hrefs).toContain("/systems?capability=AUTOMATE#neural-heading");
   expect(hrefs).toContain("/systems?capability=INTELLIGENCE#neural-heading");
   expect(hrefs).toContain("/systems?capability=GROW#neural-heading");
-  expect(hrefs).toContain("/work/gostops-gtm");
-  expect(hrefs).toContain("/work/kensara-ai-gtm");
-  expect(hrefs).toContain("/work/adda-d2c");
-  expect(hrefs).toContain("/work/leadiq");
+  expect(hrefs).toContain("/projects/gostops-gtm");
+  expect(hrefs).toContain("/projects/kensara-ai-gtm");
+  expect(hrefs).toContain("/projects/adda-d2c");
+  expect(hrefs).toContain("/projects/leadiq");
   expect(hrefs).toContain("/experiments/ai-lead-generation-engine");
   expect(hrefs).toContain("/work/turbotork");
+  expect(hrefs).toContain("/projects/mezzala");
+  expect(hrefs).toContain("/projects/touchd-gtm");
+  expect(hrefs).toContain("/projects/pepperfry-experience-index");
 
   await context.close();
 });
 
-test("the SVG orbital hero renders 11 real, focusable, distinctly-positioned bodies", async ({ page }) => {
+test("the SVG orbital hero renders 14 real, focusable, distinctly-positioned bodies", async ({ page }) => {
   // The stage's idle `core-rotate` animation (48s/rotation, globals.css)
   // never stops moving, which makes Playwright's hover-stability check
   // spin forever waiting for the target to settle. Freezing motion here
@@ -205,7 +209,7 @@ test("the SVG orbital hero renders 11 real, focusable, distinctly-positioned bod
   await page.goto("/", { waitUntil: "networkidle" });
 
   const stageLinks = page.locator(".core-dom a");
-  await expect(stageLinks).toHaveCount(11);
+  await expect(stageLinks).toHaveCount(14);
 
   // Turbotork spans all three planes — layoutBodyAngles lands it at 0°,
   // the point equidistant from AI (-90°), PRODUCT (30°) and BUSINESS
@@ -221,7 +225,7 @@ test("the SVG orbital hero renders 11 real, focusable, distinctly-positioned bod
   // would make Playwright report the ancestor <svg> as intercepting.
   // .last() picks the small visible marker rect, not the invisible,
   // larger 44px-minimum hit-target rect that precedes it in the DOM.
-  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  const kensaraLink = page.locator('.core-dom a[href="/projects/kensara-ai-gtm"]');
   await kensaraLink.locator("rect").last().hover();
   // The sr-only accessible link list (Task 4) also contains "Kensara AI"
   // text, so match on the em-dash the caption row alone renders, not a
@@ -264,7 +268,7 @@ test("the mobile plane tabs are 44px, filter dimmed bodies, and keep spanning bo
 
   // AUTOMATE (product-only) should be tabbable; INTELLIGENCE (ai-only) should not.
   const automateLink = page.locator('.core-dom a[href="/systems?capability=AUTOMATE#neural-heading"]');
-  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  const kensaraLink = page.locator('.core-dom a[href="/projects/kensara-ai-gtm"]');
   await expect(kensaraLink).toHaveAttribute("tabindex", "0"); // spans product+business — stays visible/tabbable
 });
 
@@ -284,8 +288,8 @@ test("every multi-plane body stays undimmed and tabbable on all three mobile tab
 
   const spanningHrefs = [
     "/work/turbotork", // ai + product + business
-    "/work/kensara-ai-gtm", // business + product
-    "/work/adda-d2c", // product + business
+    "/projects/kensara-ai-gtm", // business + product
+    "/projects/adda-d2c", // product + business
     "/experiments/ai-lead-generation-engine", // ai + product
   ];
 
@@ -318,7 +322,7 @@ test("the SVG layer's hero body links stay reachable and navigable after the 3D 
   await page.goto("/", { waitUntil: "networkidle" });
   await page.waitForTimeout(1000);
 
-  const kensaraLink = page.locator('.core-dom a[href="/work/kensara-ai-gtm"]');
+  const kensaraLink = page.locator('.core-dom a[href="/projects/kensara-ai-gtm"]');
   await expect(kensaraLink).toHaveCount(1);
   // Activated by keyboard, not by a pointer: the bodies ride `.core-rotate`,
   // a continuous CSS rotation, so Playwright's pointer actionability check
@@ -327,5 +331,5 @@ test("the SVG layer's hero body links stay reachable and navigable after the 3D 
   // covers the keyboard route CLAUDE.md §4 requires.
   await kensaraLink.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/work\/kensara-ai-gtm/);
+  await expect(page).toHaveURL(/\/projects\/kensara-ai-gtm/);
 });

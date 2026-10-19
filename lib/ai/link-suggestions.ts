@@ -1,4 +1,4 @@
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
 import { getAllWorkflows } from "@/data/workflowQueries";
 import { isPlaceholder } from "@/data/schema";
 import { retrievalWords } from "@/lib/ai/knowledge";
@@ -11,6 +11,7 @@ const STATIC_ROUTES = [
   "/contact",
   "/experiments",
   "/log",
+  "/projects",
   "/resume",
   "/systems",
   "/thinking",
@@ -23,7 +24,7 @@ function knownRoutes(): Set<string> {
   if (routeCache) return routeCache;
   routeCache = new Set([
     ...STATIC_ROUTES,
-    ...getAllProjects().map((p) => `/work/${p.slug}`),
+    ...getAllProjects().map(projectHref),
     ...getAllExperiments().map((e) => `/experiments/${e.slug}`),
     ...getAllWorkflows().map((w) => `/systems/${w.slug}`),
   ]);
@@ -69,7 +70,7 @@ function linkCandidates(): Candidate[] {
         title: p.title,
         leadTopics: p.leadTopics,
         label: `${p.title} case study`,
-        href: `/work/${p.slug}`,
+        href: projectHref(p),
       })),
     ...getAllExperiments()
       .filter((e) => !isPlaceholder(e.title))

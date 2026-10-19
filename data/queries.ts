@@ -27,6 +27,10 @@ export const getAllProjects = (): Project[] =>
 export const getFeaturedProjects = (): Project[] =>
   getAllProjects().filter((p) => p.featured);
 
+/** The one place a project URL is built: roles live under /work, everything else under /projects. */
+export const projectHref = (p: Pick<Project, "kind" | "slug">): string =>
+  p.kind === "work" ? `/work/${p.slug}` : `/projects/${p.slug}`;
+
 export const getProject = (slug: string): Project | undefined =>
   projects.find((p) => p.slug === slug);
 
@@ -36,11 +40,12 @@ export const getProjectCategories = (): string[] =>
 export const getProjectsByCategory = (category: string): Project[] =>
   getAllProjects().filter((p) => p.category.includes(category));
 
-/** Previous/next for case-study navigation. Wraps around. */
+/** Previous/next for case-study navigation. Wraps within the same section (work vs projects). */
 export const getProjectNeighbours = (slug: string) => {
-  const all = getAllProjects();
+  const current = getProject(slug);
+  if (!current) return { previous: undefined, next: undefined };
+  const all = getAllProjects().filter((p) => (p.kind === "work") === (current.kind === "work"));
   const i = all.findIndex((p) => p.slug === slug);
-  if (i === -1) return { previous: undefined, next: undefined };
   return {
     previous: all[(i - 1 + all.length) % all.length],
     next: all[(i + 1) % all.length],
@@ -88,7 +93,7 @@ export const getHeroBodies = (): HeroBody[] => {
     detail: project.summary,
     ring: "outer",
     planes: project.planes,
-    href: `/work/${project.slug}`,
+    href: projectHref(project),
   }));
 
   const outerExperiments: HeroBody[] = experiments.map((experiment) => ({

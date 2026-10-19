@@ -9,11 +9,15 @@ import AxeBuilder from "@axe-core/playwright";
 const ROUTES = [
   "/",
   "/work",
-  "/work/gostops-gtm",
-  "/work/kensara-ai-gtm",
-  "/work/adda-d2c",
-  "/work/leadiq",
   "/work/turbotork",
+  "/projects",
+  "/projects/mezzala",
+  "/projects/leadiq",
+  "/projects/adda-d2c",
+  "/projects/kensara-ai-gtm",
+  "/projects/touchd-gtm",
+  "/projects/pepperfry-experience-index",
+  "/projects/gostops-gtm",
   "/systems",
   "/systems/orbit",
   "/experiments",
@@ -197,9 +201,9 @@ test("command palette closes on Escape and returns focus to its trigger", async 
   await expect(trigger).toBeFocused();
 });
 
-test("the work archive filters by category and the full list works with JavaScript disabled", async ({ page }) => {
-  await page.goto("/work");
-  const items = page.locator('ul li a[href^="/work/"]');
+test("the project archive filters by category across both groups", async ({ page }) => {
+  await page.goto("/projects");
+  const items = page.locator('ul li a[href^="/projects/"], ul li a[href^="/systems/"]');
   const totalCount = await items.count();
   expect(totalCount).toBeGreaterThan(0);
 
@@ -210,6 +214,35 @@ test("the work archive filters by category and the full list works with JavaScri
 
   await page.getByRole("button", { name: "All" }).click();
   await expect(items).toHaveCount(totalCount);
+});
+
+test("/work lists Turbotork and Accordion but not UltraTech", async ({ page }) => {
+  await page.goto("/work");
+  await expect(page.getByRole("heading", { level: 2, name: /Turbotork/ })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: /Accordion/ })).toBeVisible();
+  await expect(page.getByText("UltraTech")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /Read the case study/ })).toHaveAttribute("href", "/work/turbotork");
+  await expect(page.getByRole("main").getByRole("link", { name: "Projects" })).toHaveAttribute("href", "/projects");
+});
+
+test("/projects has both section headings, ORBIT links to /systems/orbit and sorts after Mezzala", async ({ page }) => {
+  await page.goto("/projects");
+  await expect(page.getByRole("heading", { level: 2, name: "BUILT & SHIPPED" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "CASE STUDIES" })).toBeVisible();
+
+  const hrefs = await page.locator("ul li a").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+  const built = hrefs.filter((h) => h === "/projects/mezzala" || h === "/systems/orbit");
+  expect(built).toEqual(["/projects/mezzala", "/systems/orbit"]);
+  await expect(page.locator('a[href="/systems/orbit"]')).toContainText("WORKFLOW_001");
+});
+
+test("old /work/<slug> project URLs permanently redirect to /projects/<slug>", async ({ request }) => {
+  const res = await request.get("/work/kensara-ai-gtm", { maxRedirects: 0 });
+  expect(res.status()).toBe(308);
+  expect(res.headers()["location"]).toBe("/projects/kensara-ai-gtm");
+
+  const turbotork = await request.get("/work/turbotork", { maxRedirects: 0 });
+  expect(turbotork.status()).toBe(200);
 });
 
 test("content and navigation still render with JavaScript disabled", async ({ browser }) => {
@@ -229,9 +262,10 @@ test("content and navigation still render with JavaScript disabled", async ({ br
   await workLink.click();
   await expect(page).toHaveURL(/\/work$/);
 
-  // The archive's default (unfiltered) state is server-rendered — the full
-  // list of projects is there and reachable with no JS to run the filter.
-  await expect(page.locator('ul li a[href^="/work/"]').first()).toBeVisible();
+  // The projects archive's default (unfiltered) state is server-rendered — the
+  // full list is there and reachable with no JS to run the filter.
+  await page.goto("/projects");
+  await expect(page.locator('ul li a[href^="/projects/"]').first()).toBeVisible();
 
   await context.close();
 });
@@ -292,7 +326,7 @@ test("content still loads and is usable on a throttled slow connection", async (
   const response = await page.goto("/");
   expect(response?.status()).toBe(200);
   await expect(page.locator("h1")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Explore Work" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Explore Projects" })).toBeVisible();
 });
 
 test("page remains usable at 200% browser zoom", async ({ page }) => {

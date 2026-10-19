@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Project } from "@/data/schema";
+import { projectHref } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { useMagnetic } from "@/lib/utils/useMagnetic";
 import { analytics } from "@/lib/analytics/events";
@@ -18,7 +19,7 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       ref={triggerRef}
-      href={`/work/${project.slug}`}
+      href={projectHref(project)}
       data-cursor="view"
       onClick={() => analytics.projectOpen(project.slug)}
       className="group flex h-full flex-col justify-between gap-8 p-6 transition-colors hover:bg-surface-raised"

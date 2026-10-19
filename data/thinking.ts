@@ -27,7 +27,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Dig into the data and the edge cases until the problem is concrete enough to state in one sentence.",
       moment: {
         body: "Defined twelve behavioural variables, each tied to a hypothesis about what drives an offsite booking, before writing a single survey question.",
-        link: { label: "goSTOPS", url: "/work/gostops-gtm" },
+        link: { label: "goSTOPS", url: "/projects/gostops-gtm" },
       },
     },
     {
@@ -35,7 +35,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Turn the problem into a testable bet — what would prove this right or wrong, and how cheaply can I find out.",
       moment: {
         body: "Reframed a compliance product's go-to-market as a bet on a regulatory deadline rather than a software category — a claim that could be tested against real practitioners inside a month.",
-        link: { label: "Kensara AI", url: "/work/kensara-ai-gtm" },
+        link: { label: "Kensara AI", url: "/projects/kensara-ai-gtm" },
       },
     },
     {
@@ -51,7 +51,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Put it in front of real usage or real data before trusting my own read of whether it works.",
       moment: {
         body: "Put the GTM strategy in front of practitioner communities as a live voice-of-customer channel, rather than trusting the deck's own logic about what buyers cared about.",
-        link: { label: "Kensara AI", url: "/work/kensara-ai-gtm" },
+        link: { label: "Kensara AI", url: "/projects/kensara-ai-gtm" },
       },
     },
     {
@@ -59,7 +59,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Separate what the result says about the idea from what it says about the execution — they're not the same failure.",
       moment: {
         body: "The lead scorer worked; the plumbing didn't. An open redirect and an SSRF hole said nothing about the scoring idea and everything about where I hadn't looked.",
-        link: { label: "LeadIQ", url: "/work/leadiq" },
+        link: { label: "LeadIQ", url: "/projects/leadiq" },
       },
     },
     {
@@ -67,7 +67,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Fix one variable at a time and re-test, rather than rebuilding from scratch.",
       moment: {
         body: "Chose a payment gateway on cash-on-delivery reconciliation rather than checkout speed, after the unit-economics model showed a 10% return-to-origin rate was the variable that actually moved.",
-        link: { label: "Adda", url: "/work/adda-d2c" },
+        link: { label: "Adda", url: "/projects/adda-d2c" },
       },
     },
   ],
@@ -78,9 +78,9 @@ export const thinking = ThinkingSchema.parse({
       title: "Measure the thing that decides, not the thing that's easy to measure",
       body: "Demographics are easy to collect and don't predict who books an offsite; site polish is easy to score and doesn't predict who'll buy. The variable worth measuring is usually the one that takes work to define, which is why I define it before collecting anything.",
       evidence: [
-        { label: "goSTOPS — 12 behavioural variables, defined first", url: "/work/gostops-gtm" },
-        { label: "LeadIQ — scoring opportunity, not polish", url: "/work/leadiq" },
-        { label: "Kensara AI — selling the trigger, not the category", url: "/work/kensara-ai-gtm" },
+        { label: "goSTOPS — 12 behavioural variables, defined first", url: "/projects/gostops-gtm" },
+        { label: "LeadIQ — scoring opportunity, not polish", url: "/projects/leadiq" },
+        { label: "Kensara AI — selling the trigger, not the category", url: "/projects/kensara-ai-gtm" },
       ],
     },
     {
@@ -88,7 +88,7 @@ export const thinking = ThinkingSchema.parse({
       body: "AI, automation and analytics are all multipliers, and a multiplier applied to an unstructured process returns the process. So the system of record comes first, every time, even when it's the least interesting part of the work.",
       evidence: [
         { label: "Turbotork — digitise the record, then run AI on it", url: "/work/turbotork" },
-        { label: "Adda — store, payments and brand before selling", url: "/work/adda-d2c" },
+        { label: "Adda — store, payments and brand before selling", url: "/projects/adda-d2c" },
         { label: "This site — a parsed data layer before the 3D layer", url: "/build" },
       ],
     },
@@ -104,7 +104,7 @@ export const thinking = ThinkingSchema.parse({
       title: "The risk is rarely where the interesting work is",
       body: "The scoring engine is the fun part; the plumbing is what breaks. I've learned to go looking for the boring failure specifically, because nothing about it announces itself — and the one time I didn't, it cost me.",
       evidence: [
-        { label: "LeadIQ — the risk was SSRF and open redirect, not the logic", url: "/work/leadiq" },
+        { label: "LeadIQ — the risk was SSRF and open redirect, not the logic", url: "/projects/leadiq" },
         { label: "Turbotork — rules governed architecture, nothing governed correctness", url: "/work/turbotork" },
       ],
     },
@@ -113,7 +113,7 @@ export const thinking = ThinkingSchema.parse({
       body: "Analysis looks forward into facts; anxiety loops backward into regret or forward into imagined failure. Decisions clear up the moment you separate them and focus only on the present, controllable constraint.",
       evidence: [
         { label: "Turbotork — attacking the coordination constraint, not the fear of output", url: "/work/turbotork" },
-        { label: "LeadIQ — isolating security vulnerabilities from core scoring logic", url: "/work/leadiq" },
+        { label: "LeadIQ — isolating security vulnerabilities from core scoring logic", url: "/projects/leadiq" },
       ],
     },
     {
@@ -121,14 +121,14 @@ export const thinking = ThinkingSchema.parse({
       body: "High-performing teams aren't built on individual heroics, but on Adlerian division of labor: clear roles aligned to distinct strengths, collective ownership, and continuous marginal improvement.",
       evidence: [
         { label: "Turbotork — multi-agent role separation and handoffs", url: "/work/turbotork" },
-        { label: "Adda — decoupling payments, storefront and logistics handoffs", url: "/work/adda-d2c" },
+        { label: "Adda — decoupling payments, storefront and logistics handoffs", url: "/projects/adda-d2c" },
       ],
     },
     {
       title: "Technical solutions are binary; market adoption is behavioral",
       body: "You can engineer a flawless system and still fail if you ignore the ecosystem around it. Software solves technical constraints, but market intelligence and distribution decide whether anyone cares.",
       evidence: [
-        { label: "goSTOPS — demand hypotheses defined before writing software", url: "/work/gostops-gtm" },
+        { label: "goSTOPS — demand hypotheses defined before writing software", url: "/projects/gostops-gtm" },
         { label: "Turbotork — building for garage reality, not just clean architecture", url: "/work/turbotork" },
       ],
     },
@@ -136,7 +136,7 @@ export const thinking = ThinkingSchema.parse({
       title: "Lead by conviction over consensus when navigating ambiguity",
       body: "Consensus averages out variance to find comfort; conviction forms an explicit, falsifiable bet from first principles. In zero-to-one problem spaces with incomplete data, the job is to form an explicit point of view and expose it to reality as cheaply as possible.",
       evidence: [
-        { label: "Kensara AI — testing a regulatory trigger directly with practitioners", url: "/work/kensara-ai-gtm" },
+        { label: "Kensara AI — testing a regulatory trigger directly with practitioners", url: "/projects/kensara-ai-gtm" },
         { label: "Turbotork — system of record first before AI features", url: "/work/turbotork" },
       ],
     },

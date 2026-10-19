@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/data/site";
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
 import { getAllWorkflows } from "@/data/workflowQueries";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: item.href === "/" ? 1 : 0.8,
     })),
     ...getAllProjects().map((p) => ({
-      url: `${site.url}/work/${p.slug}`,
+      url: `${site.url}${projectHref(p)}`,
       lastModified: now,
       priority: 0.7,
     })),

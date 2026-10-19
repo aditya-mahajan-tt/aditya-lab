@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  // Projects moved from /work/<slug> to /projects/<slug>; Turbotork is a role and stays.
+  async redirects() {
+    return [
+      { source: "/work/:slug((?!turbotork$).+)", destination: "/projects/:slug", permanent: true },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

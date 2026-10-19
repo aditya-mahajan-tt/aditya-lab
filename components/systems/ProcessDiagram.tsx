@@ -14,7 +14,7 @@ type Step = { label: string; detail?: string };
  * Shared per-project process flow (ARCHITECTURE.md components/systems,
  * PLAN.md Phase 11). Reads `project.process` — schema-optional, so this
  * renders nothing for projects that don't have one. The ordered list
- * rendered alongside it (app/work/[slug]/page.tsx) is a plain-text fallback
+ * rendered alongside it (components/projects/ProjectDetail.tsx) is a plain-text fallback
  * for JS-off/screen-reader visitors, but it only carries each step's label,
  * not its `detail` — so the SVG itself has to be genuinely keyboard-operable
  * (each node is a real, focusable, labeled control, not a hover-only `<g>`)

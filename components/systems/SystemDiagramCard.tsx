@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { layoutSerpentine, layoutVertical, edgePoints, boundingViewBox } from "./diagramLayout";
 import { Fill } from "@/components/ui/Placeholder";
-import { getProject } from "@/data/queries";
+import { getProject, projectHref } from "@/data/queries";
 import { prefersReducedMotion } from "@/animations/tokens";
 import type { SystemDiagram } from "@/data/schema";
 
@@ -45,7 +45,7 @@ export function SystemDiagramCard({
   const mobileBox = boundingViewBox(mobilePositions, NODE_W, NODE_H);
   const activeNode = active !== null ? diagram.nodes[active] : undefined;
   const relatedProject = diagram.relatedProjectSlug ? getProject(diagram.relatedProjectSlug) : undefined;
-  const related = diagram.relatedLink ?? (relatedProject ? { label: relatedProject.title, url: `/work/${relatedProject.slug}` } : undefined);
+  const related = diagram.relatedLink ?? (relatedProject ? { label: relatedProject.title, url: projectHref(relatedProject) } : undefined);
 
   return (
     <div>
