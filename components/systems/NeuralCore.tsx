@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { skillGroups } from "@/data/skills";
-import { getAllProjects } from "@/data/queries";
+import { getAllProjects, projectHref } from "@/data/queries";
 import { Fill } from "@/components/ui/Placeholder";
 import { cn } from "@/lib/utils/cn";
 
@@ -142,7 +142,7 @@ export function NeuralCore() {
               {relatedProjects.map((p) => (
                 <li key={p.slug}>
                   <Link
-                    href={`/work/${p.slug}`}
+                    href={projectHref(p)}
                     className="label inline-flex min-h-11 items-center text-accent transition-colors duration-[var(--duration-fast)] hover:text-accent-dim"
                   >
                     <Fill value={p.title} /> →

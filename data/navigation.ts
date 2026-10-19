@@ -7,7 +7,8 @@ export type NavItem = {
 /** Single source for the header, mobile menu, command palette and sitemap. */
 export const navigation: NavItem[] = [
   { label: "LAB", href: "/", description: "The homepage experience" },
-  { label: "WORK", href: "/work", description: "Case studies and projects" },
+  { label: "WORK", href: "/work", description: "Where I have worked and what I owned there" },
+  { label: "PROJECTS", href: "/projects", description: "Things I built and shipped, and case studies" },
   { label: "SYSTEMS", href: "/systems", description: "Interactive diagrams of how the work actually runs" },
   { label: "EXPERIMENTS", href: "/experiments", description: "Things being built and broken" },
   { label: "THINKING", href: "/thinking", description: "How Aditya approaches problems" },

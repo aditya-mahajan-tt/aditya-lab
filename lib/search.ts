@@ -1,8 +1,8 @@
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
-export type CommandGroup = "Navigate" | "Work" | "Experiments" | "Systems" | "AI";
+export type CommandGroup = "Navigate" | "Work" | "Projects" | "Experiments" | "Systems" | "AI";
 
 /** Sentinel href CommandPalette special-cases to open Ask the Lab instead of navigating. */
 export const ASK_THE_LAB_COMMAND_HREF = "#ask-the-lab";
@@ -37,10 +37,10 @@ function buildIndex(): CommandItem[] {
 
   const projects: CommandItem[] = getAllProjects().map((p) => ({
     id: `project-${p.slug}`,
-    group: "Work",
+    group: p.kind === "work" ? "Work" : "Projects",
     label: titleOf(p.title, `PROJECT_${p.id}`),
     detail: p.category.join(" / "),
-    href: `/work/${p.slug}`,
+    href: projectHref(p),
   }));
 
   const experiments: CommandItem[] = getAllExperiments().map((e) => ({

@@ -20,6 +20,7 @@ type AskApiResponse =
 
 const MANUAL_LINKS = [
   { label: "Work", href: "/work" },
+  { label: "Projects", href: "/projects" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

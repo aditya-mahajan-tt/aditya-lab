@@ -50,12 +50,12 @@ export function Hero() {
               Enter the Lab
             </MagneticLink>
             <Link
-              href="/work"
+              href="/projects"
               data-cursor="interact"
               onClick={() => analytics.heroCtaClick("explore_work")}
               className="inline-flex min-h-11 items-center rounded-sm border border-border px-6 py-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
             >
-              Explore Work
+              Explore Projects
             </Link>
           </div>
         </div>

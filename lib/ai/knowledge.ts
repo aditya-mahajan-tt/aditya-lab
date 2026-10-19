@@ -4,7 +4,7 @@ import { skillGroups } from "@/data/skills";
 import { thinking } from "@/data/thinking";
 import { experience } from "@/data/experience";
 import { education } from "@/data/education";
-import { getAllProjects, getAllExperiments } from "@/data/queries";
+import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
 import { getAllWorkflows } from "@/data/workflowQueries";
 import { isPlaceholder, isDraft } from "@/data/schema";
 
@@ -122,7 +122,7 @@ function buildProjectSections(): KnowledgeSection[] {
         field(p.execution) && `Execution: ${field(p.execution)}`,
         field(p.outcome) && `Outcome: ${field(p.outcome)}`,
         p.tools.length > 0 ? `Tools: ${p.tools.join(", ")}` : null,
-        `Case study page: /work/${p.slug}`,
+        `Case study page: ${projectHref(p)}`,
       ]);
       if (!text) return null;
       return {
