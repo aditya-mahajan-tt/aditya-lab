@@ -6,24 +6,12 @@ import { experience } from "@/data/experience";
 import { timelineIcons } from "@/components/icons/TimelineIcons";
 import { Fill } from "@/components/ui/Placeholder";
 import { cn } from "@/lib/utils/cn";
+import { formatRange } from "@/lib/utils/formatDate";
 import type { Highlight } from "@/data/schema";
 
 /** "2018" -> "2018-01"; "2025-07" is untouched — a comparable sort key regardless of precision. */
 function sortKey(date: string): string {
   return /^\d{4}$/.test(date) ? `${date}-01` : date;
-}
-
-/** "2025-07" -> "JUL 2025"; "2018" -> "2018" (year-only stays year-only). */
-function formatDate(value: string): string {
-  if (/^\d{4}$/.test(value)) return value;
-  const [y, m] = value.split("-");
-  const month = new Date(Number(y), Number(m) - 1).toLocaleString("en-US", { month: "short" });
-  return `${month.toUpperCase()} ${y}`;
-}
-
-/** No end date reads as "PRESENT". */
-function formatRange(start: string, end?: string): string {
-  return `${formatDate(start)} — ${end ? formatDate(end) : "PRESENT"}`;
 }
 
 type Entry = {
