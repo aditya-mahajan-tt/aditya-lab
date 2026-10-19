@@ -12,6 +12,8 @@ export const HERO_PLANE_CENTER_DEG: Record<PlaneValue, number> = {
   business: 150,
 };
 
+const MIN_NEIGHBOUR_DEG = 18;
+
 export type LayoutInput = { id: string; planes: PlaneValue[] };
 export type BodyAngle = { id: string; deg: number; spanning: boolean };
 
@@ -56,9 +58,11 @@ export function layoutBodyAngles(bodies: LayoutInput[], spreadDeg = 26): BodyAng
   const result: BodyAngle[] = [];
   for (const group of groups.values()) {
     const n = group.length;
+    // Neighbours must sit at least 18° apart or their 44px hit targets overlap.
+    const spread = Math.max(spreadDeg, (n - 1) * MIN_NEIGHBOUR_DEG);
     group.forEach((body, i) => {
       const center = baseDeg.get(body.id)!;
-      const offset = n === 1 ? 0 : (i - (n - 1) / 2) * (spreadDeg / Math.max(1, n - 1));
+      const offset = n === 1 ? 0 : (i - (n - 1) / 2) * (spread / Math.max(1, n - 1));
       result.push({ id: body.id, deg: center + offset, spanning: body.planes.length > 1 });
     });
   }
