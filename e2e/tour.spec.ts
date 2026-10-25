@@ -36,4 +36,16 @@ test.describe("homepage tour", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toBeHidden();
   });
+
+  test("the native pointer stays visible over the tour panel", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.move(300, 300);
+    await page.getByRole("button", { name: /take a short tour/i }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await page.mouse.move(400, 400);
+    await expect(page.locator("html")).not.toHaveClass(/custom-cursor-active/);
+    await dialog.getByRole("button", { name: "Next" }).click();
+    await expect(dialog).toContainText("STEP 2 /");
+  });
 });
