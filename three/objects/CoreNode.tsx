@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Color, Group, MathUtils, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from "three";
+import { Color, DoubleSide, Group, MathUtils, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from "three";
 import { createMetalMaterial } from "@/three/materials/MetalMaterial";
 import type { LabTokens } from "@/three/materials/tokens";
 
@@ -44,6 +44,14 @@ const HIT_TARGET_SIZE = 0.34;
 
 const HOVER_EMISSIVE = 2.4;
 const EXPANDED_EMISSIVE = 1.3;
+/**
+ * Resting glow. Nodes are the only linked parts of the machine; the ring
+ * modules are decoration (three/objects/Core dims them). A lit node plus the
+ * halo below is what lets a visitor tell "clickable" from "structure" in a
+ * still frame, without hovering.
+ */
+const REST_EMISSIVE = 1.1;
+const NODE_SIZE = 0.11;
 
 type Props = {
   /** Unit direction from the core. */
@@ -75,6 +83,18 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
   // near-invisible borderStrong) and lerps to full-brightness accent on
   // hover/active in useFrame below — the same rest→hot progression the
   // node's own emissive material already uses.
+  const haloMaterial = useMemo(
+    () =>
+      new MeshBasicMaterial({
+        color: new Color(tokens.accent),
+        transparent: true,
+        opacity: 0.8,
+        side: DoubleSide,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    [tokens],
+  );
   const connectorMaterial = useMemo(
     () => new MeshBasicMaterial({ color: new Color(tokens.accentDim), transparent: true, opacity: 0.85, toneMapped: false }),
     [tokens],
@@ -96,18 +116,20 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
     return () => {
       material.dispose();
       connectorMaterial.dispose();
+      haloMaterial.dispose();
     };
-  }, [material, connectorMaterial, tokens]);
+  }, [material, connectorMaterial, haloMaterial, tokens]);
 
   const meshRef = useRef<Mesh>(null);
   const hitRef = useRef<Mesh>(null);
+  const haloRef = useRef<Mesh>(null);
   const connectorGroupRef = useRef<Group>(null);
   const connectorRef = useRef<Mesh>(null);
 
   const restColor = useMemo(() => new Color(tokens.accentDim), [tokens]);
   const activeColor = useMemo(() => new Color(tokens.accent), [tokens]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const step = Math.min(delta, 1 / 30);
     const dist = radius + expansion.current * EXPANDED_EXTRA;
 
@@ -117,6 +139,16 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
       const targetScale = hovered ? 1.35 : 1;
       const scale = MathUtils.damp(meshRef.current.scale.x, targetScale, DAMPING, step);
       meshRef.current.scale.setScalar(scale);
+    }
+
+    // The halo is a flat ring turned to face the camera (lookAt resolves the
+    // rotating parent for us) and breathes slowly, so a node reads as "live"
+    // even while the assembly is still.
+    if (haloRef.current) {
+      haloRef.current.position.set(direction[0] * dist, direction[1] * dist, direction[2] * dist);
+      haloRef.current.lookAt(state.camera.position);
+      const target = hovered || active ? 1.5 : 1 + Math.sin(state.clock.elapsedTime * 2) * 0.08;
+      haloRef.current.scale.setScalar(MathUtils.damp(haloRef.current.scale.x, target, DAMPING, step));
     }
 
     // The hit target tracks the visible node's position but never its hover
@@ -138,7 +170,7 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
     // only moves things a few percent, which is not a legible response —
     // "the machine is energised" has to be readable in a still frame, not
     // only in motion.
-    const target = (hovered || active ? HOVER_EMISSIVE : 0) + expansion.current * EXPANDED_EMISSIVE;
+    const target = (hovered || active ? HOVER_EMISSIVE : REST_EMISSIVE) + expansion.current * EXPANDED_EMISSIVE;
     material.emissiveIntensity = MathUtils.damp(material.emissiveIntensity, target, DAMPING, step);
 
     const lit = Math.min(material.emissiveIntensity / HOVER_EMISSIVE, 1);
@@ -160,7 +192,11 @@ export function CoreNode({ direction, radius, tokens, expansion, active, onHover
       </group>
 
       <mesh ref={meshRef} material={material}>
-        <boxGeometry args={[0.085, 0.085, 0.085]} />
+        <boxGeometry args={[NODE_SIZE, NODE_SIZE, NODE_SIZE]} />
+      </mesh>
+
+      <mesh ref={haloRef} material={haloMaterial}>
+        <ringGeometry args={[0.105, 0.12, 32]} />
       </mesh>
 
       {/* Invisible, larger hit target — the actual raycast surface. Kept as

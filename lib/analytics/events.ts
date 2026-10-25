@@ -19,5 +19,7 @@ export const analytics = {
   contactClick: (channel: "email" | "linkedin" | "github") => track("contact_click", { channel }),
   webglFallback: (reason: string) => track("webgl_fallback", { reason }),
   qualityTier: (tier: string) => track("quality_tier", { tier }),
+  tourStart: (source: "chip" | "hero") => track("tour_start", { source }),
+  tourEnd: (outcome: "completed" | "skipped", step: number) => track("tour_end", { outcome, step }),
   easterEggFound: (kind: "konami" | "sudo") => track("easter_egg_found", { kind }),
 };

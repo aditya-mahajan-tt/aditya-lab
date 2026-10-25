@@ -142,6 +142,7 @@ export function CommandPalette({ extraItems = [] }: { extraItems?: CommandItem[]
           analytics.commandPaletteOpen("click");
         }}
         aria-label="Open command palette"
+        data-tour="palette"
         data-cursor="interact"
         className="hidden h-11 items-center gap-1.5 rounded-sm border border-border px-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text md:flex"
       >

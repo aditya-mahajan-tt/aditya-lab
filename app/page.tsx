@@ -24,11 +24,11 @@ export default function HomePage() {
       <Hero />
 
       <div id="lab">
-        <section className="section border-t border-border" aria-labelledby="lab-env-heading">
+        <section className="section border-t border-border" aria-labelledby="lab-env-heading" data-tour="lab">
           <LabEnvironmentStage />
         </section>
 
-        <section className="section border-t border-border" aria-labelledby="work-heading">
+        <section className="section border-t border-border" aria-labelledby="work-heading" data-tour="work">
           <div className="container-lab">
             <RevealText>
               <p className="label mb-4">01 — WORK</p>
@@ -89,7 +89,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section border-t border-border" aria-labelledby="contact-heading">
+        <section className="section border-t border-border" aria-labelledby="contact-heading" data-tour="contact">
           <div className="container-lab">
             <RevealText>
               <h2 id="contact-heading" className="text-[length:var(--text-3xl)]">

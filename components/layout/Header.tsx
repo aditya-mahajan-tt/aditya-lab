@@ -24,7 +24,9 @@ import type { CommandItem } from "@/lib/search";
 export function Header({ commandItems = [] }: { commandItems?: CommandItem[] }) {
   const menuOpen = useLabStore((s) => s.menuOpen);
   const commandPaletteOpen = useLabStore((s) => s.commandPaletteOpen);
-  const hidden = useHideOnScroll(menuOpen || commandPaletteOpen);
+  const tourOpen = useLabStore((s) => s.tourOpen);
+  // The tour points at header buttons, so the header must not slide away mid-tour.
+  const hidden = useHideOnScroll(menuOpen || commandPaletteOpen || tourOpen);
 
   const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);

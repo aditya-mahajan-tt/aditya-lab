@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CustomCursor } from "@/components/effects/CustomCursor";
 import { PageTransition } from "@/components/effects/PageTransition";
 import { PersonJsonLd } from "@/components/seo/PersonJsonLd";
+import { SiteTour } from "@/components/tour/SiteTour";
 import { KonamiListener } from "@/components/easter-eggs/KonamiListener";
 
 /**
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        <SiteTour />
         <KonamiListener />
         {/* The tracking script only actually exists once deployed on Vercel — anywhere
             else (local `next start`, CI, this repo's own e2e/verify) "auto" mode still
