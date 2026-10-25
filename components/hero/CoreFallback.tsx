@@ -140,13 +140,22 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                   height={HIT_TARGET_SIZE}
                   fill="transparent"
                 />
+                <circle
+                  cx={200 + x}
+                  cy={200 + y}
+                  r={active ? size * 1.5 : size * 1.1}
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  strokeWidth="1.2"
+                  opacity={active ? 1 : 0.7}
+                />
                 <rect
                   x={200 + x - size / 2}
                   y={200 + y - size / 2}
                   width={size}
                   height={size}
-                  fill={active ? "var(--color-accent)" : "var(--color-surface)"}
-                  stroke={active ? "var(--color-accent)" : "var(--color-accent-dim)"}
+                  fill={active ? "var(--color-accent)" : "var(--color-accent-dim)"}
+                  stroke="var(--color-accent)"
                   strokeWidth="1.5"
                 />
               </g>

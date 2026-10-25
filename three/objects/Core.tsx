@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { MathUtils, type Group, type Mesh, type MeshStandardMaterial } from "three";
+import { Color, MathUtils, type Group, type Mesh, type MeshStandardMaterial } from "three";
 import type { PlaneValue } from "@/data/schema";
 import type { HeroBody } from "@/data/queries";
 import { degToXY, HERO_PLANE_CENTER_DEG, layoutBodyAngles } from "@/lib/heroOrbitalLayout";
@@ -97,6 +97,10 @@ export function Core({
       // metalness:1(ish) that neutral tint was reading as near-invisible
       // against the near-black background outside a passing highlight.
       metal: createMetalMaterial(tokens, tokens.accentDim),
+      // The 12 ring blocks are structure, not links. Darker than the rings so
+      // the lit, haloed nodes (CoreNode) are the only parts that read as
+      // clickable.
+      module: createMetalMaterial(tokens, new Color(tokens.accentDim).multiplyScalar(0.35).getStyle()),
     }),
     [tokens, tier],
   );
@@ -106,6 +110,7 @@ export function Core({
       materials.core.dispose();
       materials.glass.dispose();
       materials.metal.dispose();
+      materials.module.dispose();
     };
   }, [materials]);
 
@@ -274,7 +279,7 @@ export function Core({
           </mesh>
 
           {modules.map((module, i) => (
-            <mesh key={i} position={module.position} rotation={module.rotation} material={materials.metal}>
+            <mesh key={i} position={module.position} rotation={module.rotation} material={materials.module}>
               <boxGeometry args={[0.05, 0.085, 0.13]} />
             </mesh>
           ))}

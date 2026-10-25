@@ -61,6 +61,7 @@ export function NavOverlay() {
     <details ref={detailsRef} className="group relative">
       <summary
         aria-controls={panelId}
+        data-tour="menu"
         className="relative z-[var(--z-palette)] flex min-h-11 cursor-pointer list-none items-center rounded-sm border border-border px-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] marker:hidden hover:border-border-strong hover:text-text [&::-webkit-details-marker]:hidden"
       >
         <span className="group-open:hidden">Menu</span>

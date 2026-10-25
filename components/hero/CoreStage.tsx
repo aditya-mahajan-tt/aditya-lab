@@ -149,7 +149,7 @@ export function CoreStage() {
   const live = phase === "live";
 
   return (
-    <div ref={stageRef} className="mx-auto w-full max-w-[420px]">
+    <div ref={stageRef} data-tour="core" className="mx-auto w-full max-w-[420px]">
       {/* Lifted above the 3D layer explicitly: the canvas overlay takes
           pointer events, so any stacking accident that put it over the tabs
           would swallow every tap meant for them — which is exactly when the

@@ -8,6 +8,7 @@ import { ScrambleText } from "@/components/effects/ScrambleText";
 import { MagneticLink } from "@/components/effects/MagneticButton";
 import { analytics } from "@/lib/analytics/events";
 import { getHeroBodies } from "@/data/queries";
+import { TourTrigger } from "@/components/tour/TourTrigger";
 
 /**
  * PLAN.md Phase 5/6. The headline is immediately visible (it's the LCP
@@ -57,6 +58,7 @@ export function Hero() {
             >
               Explore Projects
             </Link>
+            <TourTrigger />
           </div>
         </div>
 

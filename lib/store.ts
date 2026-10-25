@@ -14,6 +14,7 @@ type LabState = {
   commandPaletteOpen: boolean;
   menuOpen: boolean;
   aiOpen: boolean;
+  tourOpen: boolean;
   buildMode: boolean;
   soundEnabled: boolean;
   quality: Quality;
@@ -25,6 +26,7 @@ type LabState = {
   setCommandPaletteOpen: (open: boolean) => void;
   setMenuOpen: (open: boolean) => void;
   setAiOpen: (open: boolean) => void;
+  setTourOpen: (open: boolean) => void;
   toggleBuildMode: () => void;
   setSoundEnabled: (on: boolean) => void;
   setQuality: (q: Quality) => void;
@@ -40,6 +42,7 @@ export const useLabStore = create<LabState>()(
       commandPaletteOpen: false,
       menuOpen: false,
       aiOpen: false,
+      tourOpen: false,
       buildMode: false,
       soundEnabled: false,
       quality: "auto",
@@ -56,18 +59,28 @@ export const useLabStore = create<LabState>()(
           commandPaletteOpen: open,
           menuOpen: open ? false : s.menuOpen,
           aiOpen: open ? false : s.aiOpen,
+          tourOpen: open ? false : s.tourOpen,
         })),
       setMenuOpen: (open) =>
         set((s) => ({
           menuOpen: open,
           commandPaletteOpen: open ? false : s.commandPaletteOpen,
           aiOpen: open ? false : s.aiOpen,
+          tourOpen: open ? false : s.tourOpen,
         })),
       setAiOpen: (open) =>
         set((s) => ({
           aiOpen: open,
           menuOpen: open ? false : s.menuOpen,
           commandPaletteOpen: open ? false : s.commandPaletteOpen,
+          tourOpen: open ? false : s.tourOpen,
+        })),
+      setTourOpen: (open) =>
+        set((s) => ({
+          tourOpen: open,
+          menuOpen: open ? false : s.menuOpen,
+          commandPaletteOpen: open ? false : s.commandPaletteOpen,
+          aiOpen: open ? false : s.aiOpen,
         })),
       toggleBuildMode: () => set((s) => ({ buildMode: !s.buildMode })),
       setSoundEnabled: (on) => set({ soundEnabled: on }),
