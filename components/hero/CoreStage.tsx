@@ -203,17 +203,19 @@ export function CoreStage() {
         </p>
       )}
 
-      <p className="label mt-4 min-h-[2.5em] text-center text-text-faint">
-        {activeBody ? (
-          <>
-            <span className="text-accent">{activeBody.label}</span> — <span className="text-text"><Fill value={activeBody.detail} /></span>
-          </>
-        ) : (
-          <>
-            <span className="hidden pointer-fine:inline">Hover a node for detail — click to open.</span>
-            <span className="pointer-fine:hidden">Tap a node to open it.</span>
-          </>
-        )}
+      <p className="label mt-4 h-[4lh] overflow-hidden text-center text-text-faint">
+        <span className="line-clamp-4">
+          {activeBody ? (
+            <>
+              <span className="text-accent">{activeBody.label}</span> — <span className="text-text"><Fill value={activeBody.detail} /></span>
+            </>
+          ) : (
+            <>
+              <span className="hidden pointer-fine:inline">Hover a node for detail — click to open.</span>
+              <span className="pointer-fine:hidden">Tap a node to open it.</span>
+            </>
+          )}
+        </span>
       </p>
     </div>
   );

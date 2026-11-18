@@ -234,6 +234,33 @@ test("the SVG orbital hero renders 15 real, focusable, distinctly-positioned bod
   await expect(page.getByText("Kensara AI —", { exact: false })).toBeVisible();
 });
 
+test("hovering a hero body never moves the diagram (caption is fixed-height)", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    sessionStorage.setItem("aditya-lab:booted", "1");
+    localStorage.setItem("aditya-lab:tour-seen", "1");
+  });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const core = page.locator('[data-tour="core"]');
+  const before = await core.boundingBox();
+  expect(before).not.toBeNull();
+
+  const links = page.locator("svg.core-dom a");
+  const n = await links.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const box = await links.nth(i).locator("rect").last().boundingBox();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.waitForTimeout(200);
+    const after = await core.boundingBox();
+    expect(Math.abs(after!.y - before!.y), `body ${i} y`).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(after!.height - before!.height), `body ${i} height`).toBeLessThanOrEqual(0.5);
+    await page.mouse.move(2, 2);
+  }
+});
+
 test("every SVG orbital body remains keyboard-reachable and shows a visible focus state", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
   const firstBody = page.locator(".core-dom a").first();
