@@ -169,9 +169,9 @@ test("every orbital hero body is a real, working link even with JavaScript disab
 
   // 5 skill groups + 8 projects (Turbotork included) + 1 work entry (Accordion) + 1 experiment = 15.
   // This asserted 11 while main already had 6 projects (real count 12), so it was stale before the projects restructure.
-  const links = page.locator("h2:has-text('What Aditya works on, by discipline') ~ * a, h2:has-text('What Aditya works on, by discipline') + * a");
+  const links = page.locator("h2:has-text('What I work on, by discipline') ~ * a, h2:has-text('What I work on, by discipline') + * a");
   const hrefs = await page.evaluate(() => {
-    const heading = [...document.querySelectorAll("h2")].find((h) => h.textContent === "What Aditya works on, by discipline");
+    const heading = [...document.querySelectorAll("h2")].find((h) => h.textContent === "What I work on, by discipline");
     const container = heading?.parentElement;
     return container ? [...container.querySelectorAll("a")].map((a) => a.getAttribute("href")) : [];
   });

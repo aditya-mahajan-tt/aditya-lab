@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { site } from "@/data/site";
 import { filled } from "@/components/ui/Placeholder";
 import { QualityControl } from "@/components/ui/QualityControl";
@@ -17,12 +18,14 @@ export function Footer() {
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
           {site.social.filter((s) => filled(s.url)).map((s) => (
             <li key={s.label}>
-              <Link
+              <TrackedLink
                 href={s.url}
+                event="contact_click"
+                eventProps={{ channel: s.label.toLowerCase() }}
                 className="flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-accent"
               >
                 {s.label}
-              </Link>
+              </TrackedLink>
             </li>
           ))}
           <li>

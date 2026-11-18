@@ -16,7 +16,7 @@ export default function LogPage() {
           <p className="label mb-4">LAB LOG</p>
           <h1 className="text-[length:var(--text-3xl)]">What&rsquo;s happening, as it happens.</h1>
           <p className="prose-lab mt-6 max-w-[68ch] text-[length:var(--text-lg)] text-text-muted">
-            Every entry below is written by Aditya, not generated — a running record of builds,
+            Every entry below is written by me, not generated — a running record of builds,
             experiments, strategy work and what got learned along the way.
           </p>
         </RevealText>

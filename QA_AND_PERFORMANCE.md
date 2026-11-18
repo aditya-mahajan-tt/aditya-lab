@@ -162,9 +162,14 @@ ask_lab_question          { refused: boolean }      // question text logged sepa
 build_mode_toggle
 resume_click
 contact_click             { channel: "email" | "linkedin" | "github" }
+tour_start                { source: "chip" | "hero" }
+tour_end                  { outcome: "completed" | "skipped", step }
+easter_egg_found          { kind: "konami" | "sudo" }
 webgl_fallback            { reason }
 quality_tier              { tier }
 ```
+
+**Primary success metric:** share of visits that fire `resume_click` or `contact_click` (any channel). Review monthly in Vercel Analytics; the hero, Work and project changes are judged against it.
 
 **Funnel to watch:** `page_view` → `project_open` → `project_scroll_complete` → `contact_click`. If people open projects but never finish them, the case studies are too long or too dense — that is a content fix, not a design fix.
 

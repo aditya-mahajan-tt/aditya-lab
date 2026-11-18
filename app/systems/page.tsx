@@ -14,7 +14,7 @@ import { workflowsIntro } from "@/data/workflows";
 
 export const metadata: Metadata = {
   title: "Systems",
-  description: "Interactive diagrams of how Aditya actually works — automation, strategy and capability, grounded in real projects.",
+  description: "Interactive diagrams of how I actually work — automation, strategy and capability, grounded in real projects.",
   alternates: { canonical: "/systems" },
 };
 

@@ -7,7 +7,7 @@ import { AskTheLabStatic } from "@/components/ai/AskTheLabStatic";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Start a conversation with Aditya.",
+  description: "Start a conversation with me.",
   alternates: { canonical: "/contact" },
 };
 
