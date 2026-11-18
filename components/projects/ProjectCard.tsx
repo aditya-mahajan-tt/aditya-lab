@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Project } from "@/data/schema";
 import { projectHref } from "@/data/queries";
+import { isPlaceholder } from "@/data/schema";
 import { Fill } from "@/components/ui/Placeholder";
 import { useMagnetic } from "@/lib/utils/useMagnetic";
 import { analytics } from "@/lib/analytics/events";
@@ -33,6 +34,12 @@ export function ProjectCard({ project }: { project: Project }) {
         <p className="mt-4 text-sm text-text-muted">
           <Fill value={project.summary} />
         </p>
+        {project.outcome && !isPlaceholder(project.outcome) && (
+          <p className="mt-4 line-clamp-3 text-sm text-text">
+            <span className="label mr-2">OUTCOME</span>
+            <Fill value={project.outcome} />
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-between">

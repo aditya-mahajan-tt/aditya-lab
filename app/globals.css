@@ -276,6 +276,14 @@ html.custom-cursor-active * {
 .core-rotate:focus-within {
   animation-play-state: paused;
 }
+/* Keeps capability labels upright inside .core-rotate; mirrors its pause states. */
+.core-counter {
+  animation: core-rotate 48s linear infinite reverse;
+}
+.core-rotate:hover .core-counter,
+.core-rotate:focus-within .core-counter {
+  animation-play-state: paused;
+}
 .core-pulse {
   animation: core-pulse 3.6s ease-in-out infinite;
   transform-origin: 200px 200px;
@@ -325,6 +333,7 @@ html.custom-cursor-active * {
   opacity: 0;
 }
 .core-dom[data-suppressed="true"] .core-rotate,
+.core-dom[data-suppressed="true"] .core-counter,
 .core-dom[data-suppressed="true"] .core-pulse {
   animation-play-state: paused;
 }

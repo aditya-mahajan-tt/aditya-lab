@@ -31,7 +31,7 @@ export const site = SiteSchema.parse({
   name: "ADITYA LAB",
   title: "Aditya Mahajan — AI × Product × Business",
   description:
-    "An interactive digital laboratory exploring AI, automation, product, strategy and technology.",
+    "Aditya Mahajan, product manager and former founding AI PM at Turbotork (0→40+ clients in five months). Work, case studies and experiments.",
   url: resolveSiteUrl(),
   author: "Aditya Mahajan",
   // Inferred from resume (current program + most recent role, both Gurugram) — confirm or replace.
