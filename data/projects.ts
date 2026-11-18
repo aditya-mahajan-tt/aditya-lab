@@ -125,7 +125,7 @@ const raw = [
     // to Adda (order 3 below) until real content lands here. Revert both
     // once goSTOPS is written.
     status: "IN PROGRESS",
-    featured: true,
+    featured: false,
     order: 8,
     // Excluded from Ask the Lab grounding and transcription vocabulary only;
     // the page itself stays public.
@@ -170,10 +170,8 @@ const raw = [
     category: ["Strategy", "GTM"],
     year: "2026",
     status: "CASE STUDY",
-    // Not on the homepage: the resume gives one bullet for this one, not
-    // enough to earn a featured slot yet — see data/experience.ts's sibling
-    // reasoning. Still a full entry in the /work archive.
-    featured: false,
+    // Featured: a won national case competition is proof the homepage can lead with.
+    featured: true,
     order: 5,
 
     summary:
@@ -229,7 +227,7 @@ const raw = [
     execution:
       "Built a Shopify-based D2C storefront end-to-end, covering product research, vendor sourcing, and payment integration.",
     outcome:
-      "Generated over ₹1L+ in revenue within the first 2 months, across the Shopify store and offline sales. (As stated on Aditya's resume — self-reported.)",
+      "Generated over ₹1L+ in revenue within the first 2 months, across the Shopify store and offline sales. (Self-reported, from my resume.)",
     learnings: [
       "Cash-on-delivery, not card or UPI alone, drives this category's buying behaviour in Tier-1/Tier-2 India — so the payment gateway decision had to be judged on COD reconciliation tooling as much as on checkout speed, not treated as a generic \"pick the cheapest processor\" call.",
     ],

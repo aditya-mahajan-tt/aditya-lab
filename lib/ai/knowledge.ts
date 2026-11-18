@@ -60,12 +60,13 @@ function formatDate(value: string): string {
 }
 
 function buildAboutSection(): string | null {
-  return section("About", [
+  return section("About (in Aditya's own words)", [
+    field(about.heroRole),
     field(about.heroHeadline),
     field(about.heroSubline),
     field(about.shortBio),
     field(about.longBio),
-    field(about.problemsIEnjoy) && `Problems he enjoys: ${field(about.problemsIEnjoy)}`,
+    field(about.problemsIEnjoy) && `Problems I enjoy: ${field(about.problemsIEnjoy)}`,
     ...about.progression
       .map((p) => field(p.body) && `${p.label}: ${field(p.body)}`)
       .filter((l): l is string => !!l),

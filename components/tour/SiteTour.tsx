@@ -43,17 +43,22 @@ export function SiteTour() {
 
   const onHome = pathname === "/";
 
-  // One-time chip. Marked seen as soon as it is shown, so a visitor who
-  // ignores it is not nagged on the next page view.
+  // One-time chip, held back until the first scroll so it never covers the
+  // hero (name, tagline, CTAs) on first paint. Marked seen as soon as it is
+  // shown, so a visitor who ignores it is not nagged on the next page view.
   useEffect(() => {
     if (!onHome || !bootComplete) return;
-    try {
-      if (localStorage.getItem(SEEN_KEY)) return;
-      localStorage.setItem(SEEN_KEY, "1");
-      setChip(true);
-    } catch {
-      // Storage blocked: skip the chip; the hero button still works.
-    }
+    const show = () => {
+      try {
+        if (localStorage.getItem(SEEN_KEY)) return;
+        localStorage.setItem(SEEN_KEY, "1");
+        setChip(true);
+      } catch {
+        // Storage blocked: skip the chip; the hero button still works.
+      }
+    };
+    window.addEventListener("scroll", show, { once: true, passive: true });
+    return () => window.removeEventListener("scroll", show);
   }, [onHome, bootComplete]);
 
   useEffect(() => {

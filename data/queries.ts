@@ -1,4 +1,5 @@
 import { projects } from "./projects";
+import { experience } from "./experience";
 import { experiments } from "./experiments";
 import { skillGroups } from "./skills";
 import { stripDraftMarker, type Experiment, type PlaneValue, type Project } from "./schema";
@@ -52,6 +53,16 @@ export const getProjectNeighbours = (slug: string) => {
   };
 };
 
+/** Experience entries shown on /work, newest first. */
+export const getWorkEntries = () =>
+  experience.filter((job) => job.onWork).sort((a, b) => b.start.localeCompare(a.start));
+
+/** A job's case study when one exists, else its anchor on /work. */
+export const workHref = (job: { id: string }): string => {
+  const p = getProject(job.id);
+  return p?.kind === "work" ? projectHref(p) : `/work#job-${job.id}`;
+};
+
 /* ---------------------------------------------------------- experiments */
 
 export const getAllExperiments = (): Experiment[] =>
@@ -96,6 +107,18 @@ export const getHeroBodies = (): HeroBody[] => {
     href: projectHref(project),
   }));
 
+  // Jobs with a case study already appear above as projects.
+  const outerWork: HeroBody[] = getWorkEntries()
+    .filter((job) => job.planes && getProject(job.id)?.kind !== "work")
+    .map((job) => ({
+      id: `work-${job.id}`,
+      label: job.company.replace(/ \(.*/, ""),
+      detail: job.highlights[0] ? `${job.highlights[0].value} ${job.highlights[0].label}` : (job.bullets[0] ?? ""),
+      ring: "outer",
+      planes: job.planes!,
+      href: workHref(job),
+    }));
+
   const outerExperiments: HeroBody[] = experiments.map((experiment) => ({
     id: `experiment-${experiment.id}`,
     label: experiment.title,
@@ -105,5 +128,5 @@ export const getHeroBodies = (): HeroBody[] => {
     href: `/experiments/${experiment.slug}`,
   }));
 
-  return [...inner, ...outerProjects, ...outerExperiments];
+  return [...inner, ...outerProjects, ...outerWork, ...outerExperiments];
 };

@@ -209,7 +209,10 @@ export function CoreStage() {
             <span className="text-accent">{activeBody.label}</span> — <span className="text-text"><Fill value={activeBody.detail} /></span>
           </>
         ) : (
-          "Hover a body for detail — tap to open."
+          <>
+            <span className="hidden pointer-fine:inline">Hover a node for detail — click to open.</span>
+            <span className="pointer-fine:hidden">Tap a node to open it.</span>
+          </>
         )}
       </p>
     </div>

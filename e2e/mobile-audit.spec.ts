@@ -167,7 +167,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   const page = await context.newPage();
   await page.goto("/");
 
-  // 5 skill groups + 8 projects (Turbotork included) + 1 experiment = 14.
+  // 5 skill groups + 8 projects (Turbotork included) + 1 work entry (Accordion) + 1 experiment = 15.
   // This asserted 11 while main already had 6 projects (real count 12), so it was stale before the projects restructure.
   const links = page.locator("h2:has-text('What Aditya works on, by discipline') ~ * a, h2:has-text('What Aditya works on, by discipline') + * a");
   const hrefs = await page.evaluate(() => {
@@ -176,7 +176,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
     return container ? [...container.querySelectorAll("a")].map((a) => a.getAttribute("href")) : [];
   });
 
-  expect(hrefs.length).toBe(14);
+  expect(hrefs.length).toBe(15);
   // Each of the 5 capability nodes routes to its own pre-selected group
   // (data/queries.ts's getHeroBodies) rather than all 5 sharing one anchor.
   expect(hrefs).toContain("/systems?capability=THINK#neural-heading");
@@ -190,6 +190,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   expect(hrefs).toContain("/projects/leadiq");
   expect(hrefs).toContain("/experiments/ai-lead-generation-engine");
   expect(hrefs).toContain("/work/turbotork");
+  expect(hrefs).toContain("/work#job-accordion");
   expect(hrefs).toContain("/projects/mezzala");
   expect(hrefs).toContain("/projects/touchd-gtm");
   expect(hrefs).toContain("/projects/pepperfry-experience-index");
@@ -197,7 +198,7 @@ test("every orbital hero body is a real, working link even with JavaScript disab
   await context.close();
 });
 
-test("the SVG orbital hero renders 14 real, focusable, distinctly-positioned bodies", async ({ page }) => {
+test("the SVG orbital hero renders 15 real, focusable, distinctly-positioned bodies", async ({ page }) => {
   // The stage's idle `core-rotate` animation (48s/rotation, globals.css)
   // never stops moving, which makes Playwright's hover-stability check
   // spin forever waiting for the target to settle. Freezing motion here
@@ -209,7 +210,7 @@ test("the SVG orbital hero renders 14 real, focusable, distinctly-positioned bod
   await page.goto("/", { waitUntil: "networkidle" });
 
   const stageLinks = page.locator(".core-dom a");
-  await expect(stageLinks).toHaveCount(14);
+  await expect(stageLinks).toHaveCount(15);
 
   // Turbotork spans all three planes — layoutBodyAngles lands it at 0°,
   // the point equidistant from AI (-90°), PRODUCT (30°) and BUSINESS

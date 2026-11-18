@@ -70,7 +70,7 @@ export function AskTheLab() {
         data-cursor="interact"
         className="flex h-11 items-center gap-1.5 rounded-sm border border-border px-3 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors duration-[var(--duration-fast)] hover:border-border-strong hover:text-text"
       >
-        Ask the Lab
+        Ask<span className="hidden sm:inline">&nbsp;the Lab</span>
       </button>
 
       <dialog

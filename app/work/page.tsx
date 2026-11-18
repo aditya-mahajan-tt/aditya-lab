@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { experience } from "@/data/experience";
-import { getProject, projectHref } from "@/data/queries";
+import { getProject, getWorkEntries, projectHref } from "@/data/queries";
 import { formatRange } from "@/lib/utils/formatDate";
 
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function WorkPage() {
   // Newest first. Entries flagged onWork: false stay on the About timeline only.
-  const jobs = experience.filter((job) => job.onWork).sort((a, b) => b.start.localeCompare(a.start));
+  const jobs = getWorkEntries();
 
   return (
     <section className="section">

@@ -8,6 +8,9 @@ test.describe("homepage tour", () => {
 
     await page.goto("/");
     const prompt = page.getByRole("region", { name: "Site tour" });
+    // Held back until the visitor scrolls, so it never covers the hero.
+    await expect(prompt).toBeHidden();
+    await page.mouse.wheel(0, 400);
     await expect(prompt).toBeVisible();
     await prompt.getByRole("button", { name: "Not now" }).click();
     await expect(prompt).toBeHidden();

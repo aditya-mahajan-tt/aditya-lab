@@ -33,7 +33,7 @@ export default function AboutPage() {
         <div className="container-lab">
           <RevealText>
             <p className="label mb-4">IDENTITY</p>
-            <h1 className="text-[length:var(--text-3xl)]">Who is Aditya?</h1>
+            <h1 className="text-[length:var(--text-3xl)]">Hi, I&rsquo;m Aditya.</h1>
             <p className="prose-lab mt-4 max-w-[62ch] text-[length:var(--text-lg)] text-text-muted">
               <Fill value={about.shortBio} />
             </p>

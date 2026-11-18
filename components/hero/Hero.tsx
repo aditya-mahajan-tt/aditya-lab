@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { about } from "@/data/about";
+import { site } from "@/data/site";
 import { CoreStage } from "@/components/hero/CoreStage";
 import { OrbitalBodyList } from "@/components/hero/OrbitalBodyList";
 import { ScrambleText } from "@/components/effects/ScrambleText";
@@ -27,12 +28,15 @@ export function Hero() {
             SYSTEM STATUS: <ScrambleText text="ONLINE" />
           </p>
 
-          <h1
-            id="hero-heading"
-            className="max-w-[18ch] text-[length:var(--text-4xl)] leading-[var(--leading-tight)]"
-          >
-            {about.heroHeadline}
+          {/* Name first: a visitor (and a search engine) must know whose lab this is before the tagline. */}
+          <h1 id="hero-heading" className="text-[length:var(--text-2xl)] leading-[var(--leading-tight)]">
+            {site.author}
           </h1>
+          <p className="label mt-3 text-text-muted">{about.heroRole}</p>
+
+          <p className="mt-8 max-w-[22ch] text-[length:var(--text-2xl)] leading-[var(--leading-tight)] md:text-[length:var(--text-3xl)]">
+            {about.heroHeadline}
+          </p>
 
           <p
             className="hero-reveal mt-6 max-w-[46ch] text-[length:var(--text-lg)] text-text-muted"
