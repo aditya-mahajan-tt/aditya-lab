@@ -30,7 +30,7 @@ const LEGEND: Array<{ kind: Kind; text: string }> = [
   { kind: "trigger", text: "a schedule starts a run" },
   { kind: "step", text: "a step a Claude run performs" },
   { kind: "gate", text: "a rule that can stop or reroute" },
-  { kind: "human", text: "a decision only Aditya makes" },
+  { kind: "human", text: "a decision only I make" },
   { kind: "surface", text: "the Command Centre" },
   { kind: "store", text: "a file, feed or record" },
   { kind: "end", text: "a terminal outcome" },

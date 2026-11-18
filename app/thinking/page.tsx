@@ -7,7 +7,7 @@ import { RevealText } from "@/components/effects/RevealText";
 
 export const metadata: Metadata = {
   title: "Thinking",
-  description: "The framework Aditya uses to move from observation to iteration.",
+  description: "The framework I use to move from observation to iteration.",
   alternates: { canonical: "/thinking" },
 };
 

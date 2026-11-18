@@ -10,7 +10,7 @@ import { capabilityIcons } from "@/components/icons/CapabilityIcons";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Who Aditya is, how he got here, and what he can actually do.",
+  description: "Who I am, how I got here, and what I can actually do.",
   alternates: { canonical: "/about" },
 };
 

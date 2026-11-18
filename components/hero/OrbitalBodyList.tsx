@@ -25,7 +25,7 @@ export function OrbitalBodyList({ bodies }: { bodies: HeroBody[] }) {
 
   return (
     <div className="sr-only">
-      <h2>What Aditya works on, by discipline</h2>
+      <h2>What I work on, by discipline</h2>
       {HERO_PLANES.map((plane) => {
         const inPlane = bodies.filter((body) => body.planes.includes(plane) && !seen.has(body.id));
         inPlane.forEach((body) => seen.add(body.id));

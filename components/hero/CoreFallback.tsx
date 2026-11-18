@@ -14,6 +14,8 @@ const PLANE_ARC_DEG = 100;
  * width (375px viewport, further reduced by layout padding).
  */
 const HIT_TARGET_SIZE = 70;
+/** Round to 2dp so server and client float math serialise identically (avoids hydration mismatch). */
+const r2 = (n: number) => Math.round(n * 100) / 100;
 const PLANE_LABEL: Record<PlaneValue, string> = { ai: "AI", product: "PRODUCT", business: "BUSINESS" };
 const PLANE_DASH: Record<PlaneValue, string> = { ai: "none", product: "2 6", business: "5 3" };
 
@@ -90,7 +92,7 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
             className={`transition-opacity duration-[var(--duration-base)] ${dimmed ? "opacity-35 md:opacity-100" : ""}`}
           >
             <path
-              d={`M ${200 + start.x} ${200 + start.y} A ${OUTER_RADIUS + 18} ${OUTER_RADIUS + 18} 0 0 1 ${200 + end.x} ${200 + end.y}`}
+              d={`M ${r2(200 + start.x)} ${r2(200 + start.y)} A ${OUTER_RADIUS + 18} ${OUTER_RADIUS + 18} 0 0 1 ${r2(200 + end.x)} ${r2(200 + end.y)}`}
               fill="none"
               stroke="var(--color-accent-dim)"
               strokeWidth="1"
@@ -98,8 +100,8 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
               opacity="0.55"
             />
             <text
-              x={200 + label.x}
-              y={200 + label.y}
+              x={r2(200 + label.x)}
+              y={r2(200 + label.y)}
               textAnchor="middle"
               className="fill-text-faint font-mono text-[10px] uppercase tracking-[0.2em]"
             >
@@ -140,8 +142,8 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                 <line
                   x1="200"
                   y1="200"
-                  x2={200 + x}
-                  y2={200 + y}
+                  x2={r2(200 + x)}
+                  y2={r2(200 + y)}
                   stroke="var(--color-accent-dim)"
                   strokeWidth="1"
                   opacity="0.6"
@@ -154,15 +156,15 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                     interactive element renders under 44px..."). `fill="transparent"`
                     (not "none") so it still participates in SVG hit-testing. */}
                 <rect
-                  x={200 + x - HIT_TARGET_SIZE / 2}
-                  y={200 + y - HIT_TARGET_SIZE / 2}
+                  x={r2(200 + x - HIT_TARGET_SIZE / 2)}
+                  y={r2(200 + y - HIT_TARGET_SIZE / 2)}
                   width={HIT_TARGET_SIZE}
                   height={HIT_TARGET_SIZE}
                   fill="transparent"
                 />
                 <circle
-                  cx={200 + x}
-                  cy={200 + y}
+                  cx={r2(200 + x)}
+                  cy={r2(200 + y)}
                   r={active ? size * 1.5 : size * 1.1}
                   fill="none"
                   stroke="var(--color-accent)"
@@ -172,7 +174,7 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                 {body.ring === "inner" && (
                   // Placed radially in the rotating frame, then counter-rotated about its own point so the text stays upright.
                   <g
-                    transform={`translate(${200 + degToXY(angle.deg, labelRadius.get(body.id)!).x} ${200 + degToXY(angle.deg, labelRadius.get(body.id)!).y})`}
+                    transform={`translate(${r2(200 + degToXY(angle.deg, labelRadius.get(body.id)!).x)} ${r2(200 + degToXY(angle.deg, labelRadius.get(body.id)!).y)})`}
                     aria-hidden="true"
                     className="pointer-events-none"
                   >
@@ -191,8 +193,8 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
                   </g>
                 )}
                 <rect
-                  x={200 + x - size / 2}
-                  y={200 + y - size / 2}
+                  x={r2(200 + x - size / 2)}
+                  y={r2(200 + y - size / 2)}
                   width={size}
                   height={size}
                   fill={active ? "var(--color-accent)" : "var(--color-accent-dim)"}
