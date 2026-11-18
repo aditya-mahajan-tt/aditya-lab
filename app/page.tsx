@@ -73,7 +73,7 @@ export default function HomePage() {
             <RevealText>
               <p className="label mb-4">03 — ABOUT</p>
               <h2 id="about-heading" className="text-[length:var(--text-2xl)]">
-                Who is Aditya
+                Who I am
               </h2>
               <p className="prose-lab mt-4 text-text-muted">
                 <Fill value={about.shortBio} />

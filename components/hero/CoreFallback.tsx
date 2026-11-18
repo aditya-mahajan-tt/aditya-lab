@@ -116,6 +116,8 @@ export function CoreFallback({ suppressed = false, bodies, activePlane = null, a
               onClick={() => onBodyHover(body.id)}
               tabIndex={dimmed || suppressed ? -1 : 0}
             >
+              {/* Gives the shape-only link real text: scrapers and link checkers read it as empty otherwise. */}
+              <title>{body.label}</title>
               <g className={`transition-opacity duration-[var(--duration-base)] ${dimmed ? "opacity-30 md:opacity-100" : ""}`}>
                 <line
                   x1="200"

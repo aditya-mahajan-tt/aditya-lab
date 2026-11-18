@@ -231,6 +231,7 @@ export const TimelineEntrySchema = z.object({
 /* ---------------------------------------------------------------- about */
 
 export const AboutSchema = z.object({
+  heroRole: Fillable,
   heroHeadline: Fillable,
   heroSubline: Fillable,
   shortBio: Fillable,

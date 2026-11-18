@@ -8,6 +8,8 @@ import { NavOverlay } from "@/components/navigation/NavOverlay";
 import { CommandPalette } from "@/components/navigation/CommandPalette";
 import { AskTheLab } from "@/components/ai/AskTheLab";
 import type { CommandItem } from "@/lib/search";
+import { site } from "@/data/site";
+import { analytics } from "@/lib/analytics/events";
 
 /**
  * PLAN.md Phase 3. Wordmark, MENU (the full-screen overlay in NavOverlay)
@@ -61,6 +63,14 @@ export function Header({ commandItems = [] }: { commandItems?: CommandItem[] }) 
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* CLAUDE.md §2: the resume is one tap from every page, not buried in the menu. */}
+          <a
+            href={site.resumePath}
+            onClick={() => analytics.resumeClick()}
+            className="flex min-h-11 items-center rounded-sm border border-accent px-3 font-mono text-xs uppercase tracking-widest text-accent transition-colors duration-[var(--duration-fast)] hover:bg-accent hover:text-bg"
+          >
+            Resume
+          </a>
           <AskTheLab />
           <NavOverlay />
           <CommandPalette extraItems={commandItems} />
