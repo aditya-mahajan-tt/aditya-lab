@@ -32,6 +32,7 @@ const raw = [
   },
   {
     id: "accordion",
+    planes: ["business"], // puts Accordion on the hero's outer ring
     company: "Accordion (formerly Merilytics)",
     role: "Senior Analyst / Business Associate",
     location: "Hyderabad",

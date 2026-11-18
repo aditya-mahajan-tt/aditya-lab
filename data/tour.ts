@@ -45,8 +45,8 @@ export const tourSteps: TourStep[] = [
   },
   {
     target: "work",
-    title: "Selected projects",
-    body: "Open any project for its full case study.",
+    title: "Where I've worked",
+    body: "My roles and what I owned in each. Open one for the details or its case study.",
   },
   {
     target: "contact",

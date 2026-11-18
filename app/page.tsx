@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { about } from "@/data/about";
 import { thinking } from "@/data/thinking";
-import { getFeaturedProjects } from "@/data/queries";
+import { getFeaturedProjects, getWorkEntries, workHref } from "@/data/queries";
+import { formatRange } from "@/lib/utils/formatDate";
 import { Fill } from "@/components/ui/Placeholder";
 import { Hero } from "@/components/hero/Hero";
 import { BootSequence } from "@/components/hero/BootSequence";
@@ -16,7 +17,8 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
  * fold — a visitor never has to leave "/" to get the gist of everything.
  */
 export default function HomePage() {
-  const featured = getFeaturedProjects();
+  const jobs = getWorkEntries();
+  const featured = getFeaturedProjects().filter((p) => p.kind !== "work");
 
   return (
     <>
@@ -33,6 +35,59 @@ export default function HomePage() {
             <RevealText>
               <p className="label mb-4">01 — WORK</p>
               <h2 id="work-heading" className="text-[length:var(--text-2xl)]">
+                Where I&rsquo;ve worked
+              </h2>
+            </RevealText>
+
+            <ul className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2">
+              {jobs.map((job) => {
+                const hasCaseStudy = !workHref(job).startsWith("/work#");
+                return (
+                  <li key={job.id} className="flex flex-col justify-between gap-6 bg-surface p-6">
+                    <div>
+                      <p className="label">{formatRange(job.start, job.end)}</p>
+                      <h3 className="mt-3 text-[length:var(--text-xl)]">{job.company}</h3>
+                      <p className="mt-1 text-sm text-text-muted">
+                        {job.role}
+                        {job.location && ` · ${job.location}`}
+                      </p>
+                      {job.highlights.length > 0 && (
+                        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
+                          {job.highlights.slice(0, 2).map((h) => (
+                            <div key={h.label}>
+                              <dt className="font-mono text-[length:var(--text-lg)] text-accent">{h.value}</dt>
+                              <dd className="mt-1 max-w-[16rem] text-sm text-text-muted">{h.label}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      )}
+                    </div>
+                    <Link
+                      href={workHref(job)}
+                      data-cursor="interact"
+                      className="inline-flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-accent hover:underline"
+                    >
+                      {hasCaseStudy ? "Read the case study →" : "Details →"}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <Link
+              href="/work"
+              data-cursor="interact"
+              className="mt-6 inline-flex min-h-11 items-center font-mono text-xs uppercase tracking-widest text-accent hover:underline"
+            >
+              All work →
+            </Link>
+          </div>
+        </section>
+
+        <section className="section border-t border-border" aria-labelledby="projects-heading">
+          <div className="container-lab">
+            <RevealText>
+              <p className="label mb-4">02 — PROJECTS</p>
+              <h2 id="projects-heading" className="text-[length:var(--text-2xl)]">
                 Selected projects
               </h2>
             </RevealText>
@@ -50,7 +105,7 @@ export default function HomePage() {
         <section className="section border-t border-border" aria-labelledby="thinking-heading">
           <div className="container-lab">
             <RevealText>
-              <p className="label mb-4">02 — THINKING</p>
+              <p className="label mb-4">03 — THINKING</p>
               <h2 id="thinking-heading" className="text-[length:var(--text-2xl)]">
                 {thinking.heading}
               </h2>
@@ -71,7 +126,7 @@ export default function HomePage() {
         <section className="section border-t border-border" aria-labelledby="about-heading">
           <div className="container-lab">
             <RevealText>
-              <p className="label mb-4">03 — ABOUT</p>
+              <p className="label mb-4">04 — ABOUT</p>
               <h2 id="about-heading" className="text-[length:var(--text-2xl)]">
                 Who I am
               </h2>

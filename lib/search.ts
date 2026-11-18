@@ -1,5 +1,5 @@
 import { navigation } from "@/data/navigation";
-import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
+import { getAllProjects, getAllExperiments, getProject, getWorkEntries, projectHref, workHref } from "@/data/queries";
 import { isPlaceholder } from "@/data/schema";
 
 export type CommandGroup = "Navigate" | "Work" | "Projects" | "Experiments" | "Systems" | "AI";
@@ -43,6 +43,16 @@ function buildIndex(): CommandItem[] {
     href: projectHref(p),
   }));
 
+  const jobs: CommandItem[] = getWorkEntries()
+    .filter((job) => getProject(job.id)?.kind !== "work")
+    .map((job) => ({
+      id: `work-${job.id}`,
+      group: "Work",
+      label: job.company.replace(/ \(.*/, ""),
+      detail: job.role,
+      href: workHref(job),
+    }));
+
   const experiments: CommandItem[] = getAllExperiments().map((e) => ({
     id: `experiment-${e.slug}`,
     group: "Experiments",
@@ -51,7 +61,7 @@ function buildIndex(): CommandItem[] {
     href: `/experiments/${e.slug}`,
   }));
 
-  return [askTheLab, ...routes, ...projects, ...experiments];
+  return [askTheLab, ...routes, ...projects, ...jobs, ...experiments];
 }
 
 /** Built once per module load — the corpus is static build-time content. */

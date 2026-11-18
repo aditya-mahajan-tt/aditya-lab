@@ -340,3 +340,12 @@ test("page remains usable at 200% browser zoom", async ({ page }) => {
   );
   expect(overflow, "200% zoom overflows horizontally").toBe(false);
 });
+
+test("homepage lists work separately from projects", async ({ page }) => {
+  await page.goto("/");
+  const work = page.getByRole("region", { name: "Where I’ve worked" });
+  await expect(work.locator('a[href="/work/turbotork"]')).toHaveCount(1);
+  await expect(work.locator('a[href="/work#job-accordion"]')).toHaveCount(1);
+  const projects = page.getByRole("region", { name: "Selected projects" });
+  await expect(projects.locator('a[href="/work/turbotork"]')).toHaveCount(0);
+});
