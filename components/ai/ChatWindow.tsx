@@ -12,7 +12,7 @@ import { useVoiceInput } from "./useVoiceInput";
 import type { AskStatus, ChatMessage } from "./types";
 
 type AskApiResponse =
-  | { status: "answered"; message: string; link?: { label: string; href: string }; cached?: boolean }
+  | { status: "answered"; message: string; links?: { label: string; href: string }[]; cached?: boolean }
   | { status: "redirected"; message: string }
   | { status: "invalid" }
   | { status: "rate_limited" }
@@ -114,7 +114,7 @@ export function ChatWindow({
           {
             role: "assistant",
             content: data.message,
-            link: "link" in data ? data.link : undefined,
+            links: "links" in data ? data.links : undefined,
             timestamp: Date.now(),
           },
         ]);

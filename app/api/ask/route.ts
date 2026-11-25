@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { selectKnowledge, selectSectionIds } from "@/lib/ai/knowledge";
+import { getKnowledge, selectKnowledge, selectSectionIds } from "@/lib/ai/knowledge";
 import { buildSystemPrompt, REFUSAL_STRING } from "@/lib/ai/system-prompt";
 import {
   AskRequestSchema,
   FRIENDLY_REDIRECT,
-  isGrounded,
+  findUngrounded,
   isPromptInjection,
   sanitizeAnswer,
 } from "@/lib/ai/guardrails";
@@ -12,7 +12,7 @@ import { checkRateLimit, getClientIp } from "@/lib/ai/rate-limit";
 import { recordSpend, spendCapExceeded } from "@/lib/ai/spend-cap";
 import { getCached, setCached } from "@/lib/ai/cache";
 import { callGroq, type ChatMessage } from "@/lib/ai/groq-client";
-import { stripUnknownInternalPaths, suggestLink } from "@/lib/ai/link-suggestions";
+import { stripUnknownInternalPaths, suggestLinks } from "@/lib/ai/link-suggestions";
 import { logQuestion } from "@/lib/ai/log";
 import { isInjectionByClassifier } from "@/lib/ai/prompt-guard";
 
@@ -33,7 +33,12 @@ import { isInjectionByClassifier } from "@/lib/ai/prompt-guard";
 export const runtime = "nodejs";
 
 type AskResponse =
-  | { status: "answered"; message: string; link?: { label: string; href: string }; cached?: boolean }
+  | {
+      status: "answered";
+      message: string;
+      links?: { label: string; href: string }[];
+      cached?: boolean;
+    }
   | { status: "redirected"; message: string }
   | { status: "invalid" }
   | { status: "rate_limited" }
@@ -71,7 +76,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     return NextResponse.json({ status: "redirected", message: FRIENDLY_REDIRECT });
   }
 
-  const cached = getCached(question);
+  // The cache is keyed on the question text alone, so only a context-free
+  // question may touch it: "tell me more about that" means something
+  // different in every conversation (2026-11-25).
+  const useCache = history.length === 0;
+  const cached = useCache ? getCached(question) : null;
   if (cached) {
     logQuestion({ question, outcome: "cached", latencyMs: Date.now() - start });
     return NextResponse.json({ status: "answered", message: cached, cached: true });
@@ -86,10 +95,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     return NextResponse.json({ status: "offline" });
   }
 
-  // Grounding is now per-question (AI_SPEC.md §2): the whole corpus no
-  // longer fits one request's token allowance. isGrounded below checks
-  // against these same sections, which is the honest pairing -- the model
-  // cannot be asked to source a claim from text it was never shown.
+  // Retrieval is per-question (AI_SPEC.md §2): the whole corpus no longer
+  // fits one request's token allowance, so the model is shown only these
+  // sections. The grounding check below, though, runs against the FULL
+  // corpus (2026-11-25): a fact stated anywhere in the portfolio is not
+  // fabricated, and checking only the retrieved slice refused correct
+  // answers whose supporting section simply was not retrieved.
   //
   // The last two turns (both roles: the assistant turn is what names the
   // entity) join the question as retrieval context, so a follow-up such as
@@ -97,9 +108,17 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
   const context = history.slice(-2).map((h) => h.content);
   const knowledge = selectKnowledge(question, context);
   const sections = selectSectionIds(question, context);
+  // Prior refusals / redirects (and the question that drew them) are dropped
+  // from what the model sees: replayed, they prime it to refuse again.
+  const cleanHistory = history.filter((h, i) => {
+    const isCanned = (t: typeof h) =>
+      t.role === "assistant" && (t.content === REFUSAL_STRING || t.content === FRIENDLY_REDIRECT);
+    const next = history[i + 1];
+    return !isCanned(h) && !(h.role === "user" && next && isCanned(next));
+  });
   const messages: ChatMessage[] = [
     { role: "system", content: buildSystemPrompt(knowledge.text) },
-    ...history.map((h): ChatMessage => ({ role: h.role, content: h.content })),
+    ...cleanHistory.map((h): ChatMessage => ({ role: h.role, content: h.content })),
     { role: "user", content: question },
   ];
 
@@ -108,7 +127,8 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     // Sanitize before grounding, not after: a stray URL or citation marker
     // should clean up, not cost the visitor an otherwise correct answer.
     let answer = stripUnknownInternalPaths(sanitizeAnswer(result.text));
-    const grounded = isGrounded(answer, knowledge.text);
+    const ungrounded = findUngrounded(answer, getKnowledge().text);
+    const grounded = ungrounded.length === 0;
     if (!grounded) {
       answer = REFUSAL_STRING;
     }
@@ -121,7 +141,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
     // — "What technologies does he use?" shipped as "I don't have that in
     // Aditya's portfolio." on a page whose whole point is the technologies.
     // A retry costs one cheap API call; a stuck refusal costs a recruiter.
-    if (grounded) {
+    if (grounded && useCache) {
       setCached(question, answer);
     }
     logQuestion({
@@ -132,10 +152,19 @@ export async function POST(req: NextRequest): Promise<NextResponse<AskResponse>>
       model: result.model,
       failedOver: result.failedOver,
       sections,
+      ungrounded,
     });
 
-    const link = grounded ? (suggestLink(answer, question) ?? undefined) : undefined;
-    return NextResponse.json({ status: "answered", message: answer, link });
+    // A bare refusal is a dead end; point at the work so the visitor has a
+    // next step (2026-11-25).
+    const links = grounded
+      ? suggestLinks(answer, question)
+      : [{ label: "Browse the work", href: "/work" }];
+    return NextResponse.json({
+      status: "answered",
+      message: answer,
+      ...(links.length > 0 ? { links } : {}),
+    });
   } catch (err) {
     console.error("[ask-the-lab] Groq call failed:", err);
     logQuestion({ question, outcome: "offline", latencyMs: Date.now() - start });

@@ -362,10 +362,61 @@ const COMMON_CAPITALISED_WORDS = new Set([
   "Learn",
   "Consider",
   "Browse",
+  // Added 2026-11-25. "Which roles is he good for?" invites Title-Case job
+  // titles ("Senior Product Manager", "Technical PM", "Product Analytics")
+  // that are generic role vocabulary, not facts about Aditya, but were absent
+  // from the retrieved text, so a correct answer became the bare refusal —
+  // and only when the model happened to capitalise them. Common nouns only;
+  // a fabricated employer or client is still a proper noun and still fails.
+  "Senior",
+  "Junior",
+  "Technical",
+  "Associate",
+  "Analytics",
+  "Analyst",
+  "Consultant",
+  "Consulting",
+  "Operations",
+  "Head",
+  "Owner",
+  "Lead",
+  "Leads",
+  "Manager",
+  "Managers",
+  "Director",
+  "Principal",
+  "Product",
+  "Products",
+  "Growth",
+  "Strategy",
+  "Strategic",
+  "Engineer",
+  "Engineering",
+  "Founder",
+  "Founding",
+  "Specialist",
+  "Generalist",
+  "Startup",
+  "Startups",
+  "Enterprise",
+  "Role",
+  "Roles",
+  "Position",
+  "Positions",
+  "Team",
+  "Teams",
+  "Company",
+  "Companies",
+  "Business",
+  "Data",
+  "Program",
+  "Programme",
 ]);
 
 function extractNumbers(text: string): string[] {
-  return [...new Set(text.match(/\b\d[\d,.]*\b/g) ?? [])];
+  // No trailing \b: it made "₹90L" and "$999K" invisible to the check, so a
+  // fabricated money figure passed. The digits alone are checked (2026-11-25).
+  return [...new Set(text.match(/\d(?:[\d,.]*\d)?/g) ?? [])];
 }
 
 function extractProperNouns(text: string): string[] {
@@ -375,14 +426,21 @@ function extractProperNouns(text: string): string[] {
 
 /**
  * Cheap post-check (AI_SPEC.md §4): every number and every proper noun in
- * the model's response must appear verbatim in the grounding knowledge.
- * If anything doesn't, the caller downgrades to the refusal string rather
- * than risk shipping a fabricated fact under Aditya's name.
+ * the model's response must appear in the grounding knowledge. Returns the
+ * ones that don't, so a refusal can be diagnosed from the log (2026-11-25:
+ * "refused" alone said nothing about WHICH word failed). Numbers must match
+ * exactly; proper nouns match case-insensitively, since "analytics" in the
+ * corpus grounds "Analytics" in a title-cased answer.
  */
+export function findUngrounded(response: string, corpus: string): string[] {
+  const lower = corpus.toLowerCase();
+  return [
+    ...extractNumbers(response).filter((n) => !corpus.includes(n)),
+    ...extractProperNouns(response).filter((n) => !lower.includes(n.toLowerCase())),
+  ];
+}
+
+/** If anything is ungrounded the caller downgrades to the refusal string. */
 export function isGrounded(response: string, knowledge: string): boolean {
-  const numbers = extractNumbers(response);
-  const nouns = extractProperNouns(response);
-  return (
-    numbers.every((n) => knowledge.includes(n)) && nouns.every((n) => knowledge.includes(n))
-  );
+  return findUngrounded(response, knowledge).length === 0;
 }

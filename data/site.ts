@@ -30,8 +30,9 @@ export const resolveSiteUrl = (env: Env = process.env): string => {
 export const site = SiteSchema.parse({
   name: "ADITYA LAB",
   title: "Aditya Mahajan — AI × Product × Business",
+  // 2026-11-25: aligned with Aditya_Mahajan_Product_Resume.pdf (title, revenue framing).
   description:
-    "Aditya Mahajan, product manager and former founding AI PM at Turbotork (0→40+ clients in five months). Work, case studies and experiments.",
+    "Aditya Mahajan, product manager and ex-co-founder (Head of Product) at Turbotork: 40+ clients, ₹5–6L monthly revenue. Work, case studies and experiments.",
   url: resolveSiteUrl(),
   author: "Aditya Mahajan",
   // Inferred from resume (current program + most recent role, both Gurugram) — confirm or replace.

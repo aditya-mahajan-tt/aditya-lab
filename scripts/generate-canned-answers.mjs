@@ -23,7 +23,7 @@ import { resolve } from "node:path";
 const SUGGESTED_QUESTIONS = [
   "What is Aditya strongest at?",
   "What has he built?",
-  "Tell me about the goSTOPS project.",
+  "What did he do at Turbotork and Accordion?",
   "What technologies does he use?",
   "What kind of problems does he enjoy?",
   "Why should I work with him?",
@@ -54,7 +54,8 @@ async function ask(question) {
       body: JSON.stringify({ question, history: [] }),
     });
     const data = await res.json();
-    if (data.status === "answered") return data.message;
+    // A refusal is "answered" too, but baking one in ships a dead chip.
+    if (data.status === "answered" && data.message !== "I don't have that in Aditya's portfolio.") return data.message;
     lastStatus = data.status;
     // "offline" is the route's catch-all, and a rate limit is by far its
     // most likely cause here — worth waiting out before giving up.

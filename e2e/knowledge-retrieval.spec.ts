@@ -178,3 +178,22 @@ test("ORBIT's approved prose reaches the corpus, without any draft marker @retri
   expect(text).toContain("Principle, One state file");
   expect(text).toContain("Check, Three active projects");
 });
+
+test("a role-fit question selects the pinned career summary @retrieval", () => {
+  expect(selectSectionIds("which roles is aditya good for in product & tech?")).toContain(
+    "career-summary",
+  );
+});
+
+test("a question naming two employers selects both experience entries @retrieval", () => {
+  const ids = selectSectionIds("tell me about his work at turbotork and accordion");
+  expect(ids).toContain("experience-turbotork");
+  expect(ids).toContain("experience-accordion");
+});
+
+test("the career summary names every job and degree from /data @retrieval", () => {
+  const text = getKnowledgeSections().find((s) => s.id === "career-summary")?.text ?? "";
+  expect(text).toContain("Turbotork");
+  expect(text).toContain("Accordion");
+  expect(text).toContain("Masters' Union");
+});

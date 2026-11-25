@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { suggestLink, stripUnknownInternalPaths } from "@/lib/ai/link-suggestions";
+import { suggestLink, suggestLinks, stripUnknownInternalPaths } from "@/lib/ai/link-suggestions";
 import { getHeroBodies } from "@/data/queries";
 import { systemDiagrams } from "@/data/systems";
 
@@ -119,4 +119,44 @@ test("an answer that mentions ORBIT gets the /systems/orbit chip @links", () => 
 
 test("/systems/orbit survives stripUnknownInternalPaths @links", () => {
   expect(stripUnknownInternalPaths("Read more at /systems/orbit for the flow.")).toContain("/systems/orbit");
+});
+
+test("slashes inside words are not treated as paths @links", () => {
+  const text = "He ran A/B testing as Senior Analyst/Business Associate.";
+  expect(stripUnknownInternalPaths(text)).toBe(text);
+  expect(stripUnknownInternalPaths("See /work/made-up for more.")).not.toContain("/work/made-up");
+});
+
+test("a question naming Turbotork and Accordion gets both chips @links", () => {
+  const answer =
+    "At Turbotork he was founding AI PM. Before that, at Accordion he did analytics for C-suite leaders.";
+
+  const links = suggestLinks(answer, "tell me about his work at turbotork and accordion");
+
+  expect(links).toEqual([
+    { label: "Turbotork case study", href: "/work/turbotork" },
+    { label: "Accordion on Work", href: "/work#job-accordion" },
+  ]);
+});
+
+test("Accordion alone links to its /work anchor @links", () => {
+  expect(suggestLink("He worked at Accordion as an analyst.", "where did he work before")).toEqual({
+    label: "Accordion on Work",
+    href: "/work#job-accordion",
+  });
+});
+
+test("UltraTech is not on /work, so it gets no chip @links", () => {
+  expect(suggestLinks("He interned at UltraTech Cement.", "tell me about UltraTech")).toEqual([]);
+});
+
+test("Turbotork never yields two chips for the same name @links", () => {
+  const links = suggestLinks("Turbotork is where he works. Turbotork scaled to 40 clients.", "tell me about Turbotork", 5);
+  expect(links).toEqual([{ label: "Turbotork case study", href: "/work/turbotork" }]);
+});
+
+test("suggestLinks respects max @links", () => {
+  const answer = "Turbotork, Accordion and Kensara AI.";
+  expect(suggestLinks(answer, "what did he do", 1)).toHaveLength(1);
+  expect(suggestLinks(answer, "what did he do", 3).length).toBeLessThanOrEqual(3);
 });

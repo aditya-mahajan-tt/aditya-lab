@@ -18,6 +18,12 @@ export function logQuestion(entry: {
   failedOver?: string[];
   /** Which corpus sections grounded this answer — the diagnostic for a retrieval miss. */
   sections?: string[];
+  /**
+   * The numbers/proper nouns that failed the grounding check on a "refused"
+   * outcome. Added 2026-11-25: without the failing terms a production refusal
+   * is undiagnosable (a stoplist gap and a real fabrication look identical).
+   */
+  ungrounded?: string[];
 }) {
   console.log(
     JSON.stringify({
@@ -31,6 +37,7 @@ export function logQuestion(entry: {
       ...(entry.model ? { model: entry.model } : {}),
       ...(entry.failedOver?.length ? { failedOver: entry.failedOver } : {}),
       ...(entry.sections?.length ? { sections: entry.sections } : {}),
+      ...(entry.ungrounded?.length ? { ungrounded: entry.ungrounded } : {}),
     }),
   );
 }

@@ -2,7 +2,7 @@
 export const SUGGESTED_QUESTIONS = [
   "What is Aditya strongest at?",
   "What has he built?",
-  "Tell me about the goSTOPS project.",
+  "What did he do at Turbotork and Accordion?",
   "What technologies does he use?",
   "What kind of problems does he enjoy?",
   "Why should I work with him?",
