@@ -1,4 +1,10 @@
-/** Exact-match answer cache, 24h TTL (AI_SPEC.md §5). In-memory, per server instance. */
+/**
+ * Exact-match answer cache, 24h TTL (AI_SPEC.md §5). In-memory, per server instance.
+ *
+ * Keyed on the question text alone, so callers must only use it for
+ * context-free questions (empty history). 2026-11-25: "tell me more about
+ * that" cached from one conversation was served to a different one.
+ */
 
 type Entry = { answer: string; expiresAt: number };
 

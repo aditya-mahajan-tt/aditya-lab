@@ -50,16 +50,17 @@ export function MessageList({
             >
               {m.content}
             </p>
-            <div className="mt-1.5 flex items-center gap-3 pl-3">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 pl-3">
               <span className="font-mono text-xs text-text-faint">{formatTime(m.timestamp)}</span>
-              {m.link && (
+              {m.links?.map((l) => (
                 <Link
-                  href={m.link.href}
+                  key={l.href}
+                  href={l.href}
                   className="font-mono text-xs uppercase tracking-widest text-accent hover:text-accent-dim"
                 >
-                  → {m.link.label}
+                  → {l.label}
                 </Link>
-              )}
+              ))}
               {canSpeak && m.role === "assistant" && (
                 <SpeakButton text={m.content} onUnavailable={onSpeakUnavailable} />
               )}

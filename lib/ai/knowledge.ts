@@ -251,6 +251,24 @@ function buildEducationSection(): string | null {
   return entries.length > 0 ? entries.join("\n\n") : null;
 }
 
+/**
+ * One line per job and degree, always sent (pinned). Added 2026-11-25:
+ * role-fit questions ("which roles suit him?") match no section by name, so
+ * retrieval often skipped Accordion and answers mentioned only Turbotork.
+ * Built from /data, so it cannot drift; it deliberately carries only the
+ * headline of each entry — the full sections still come from retrieval.
+ */
+function buildCareerSummarySection(): string | null {
+  const jobs = experience.map((e) => {
+    const first = e.highlights.find((h) => field(h.label));
+    return `${e.role} at ${e.company}, ${formatDate(e.start)} to ${e.end ? formatDate(e.end) : "Present"}${
+      first ? ` (${first.value} — ${field(first.label)})` : ""
+    }`;
+  });
+  const degrees = education.map((e) => `${e.program}, ${e.institution}`);
+  return section("Career summary", [...jobs, ...degrees]);
+}
+
 function buildThinkingSection(): string | null {
   const steps = thinking.steps
     .map((s) => field(s.body) && `${s.label}: ${field(s.body)}`)
@@ -290,6 +308,7 @@ function buildKnowledgeSections(): KnowledgeSection[] {
       true,
     ),
     ...single("about", buildAboutSection(), ["about", "background", "bio", "aditya"], true),
+    ...single("career-summary", buildCareerSummarySection(), ["career", "roles", "experience"], true),
     ...single("skills", buildSkillsSection(), skillGroups.map((g) => g.id)),
     ...buildExperienceSections(),
     ...single("education", buildEducationSection(), ["education", "degree", "university"]),

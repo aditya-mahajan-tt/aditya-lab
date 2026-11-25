@@ -1,4 +1,4 @@
-import { getAllProjects, getAllExperiments, projectHref } from "@/data/queries";
+import { getAllProjects, getAllExperiments, getWorkEntries, projectHref } from "@/data/queries";
 import { getAllWorkflows } from "@/data/workflowQueries";
 import { isPlaceholder } from "@/data/schema";
 import { retrievalWords } from "@/lib/ai/knowledge";
@@ -46,7 +46,10 @@ function knownRoutes(): Set<string> {
 export function stripUnknownInternalPaths(answer: string): string {
   const routes = knownRoutes();
   return answer
-    .replace(/\/[a-z0-9][a-z0-9/-]*/gi, (path) => {
+    // Lookbehind: a path starts after a space or bracket, never mid-word.
+    // Without it "A/B testing" became "A testing" and "Analyst/Business"
+    // became "Analyst" in live answers (2026-11-25).
+    .replace(/(?<![\w/])\/[a-z0-9][a-z0-9/-]*/gi, (path) => {
       const clean = path.replace(/\/+$/, "") || "/";
       return routes.has(clean) ? path : "";
     })
@@ -63,15 +66,31 @@ export type LinkSuggestion = { label: string; href: string };
 type Candidate = LinkSuggestion & { title: string; leadTopics: string[] };
 
 function linkCandidates(): Candidate[] {
+  const projects: Candidate[] = getAllProjects()
+    .filter((p) => !isPlaceholder(p.title))
+    .map((p) => ({
+      title: p.title,
+      leadTopics: p.leadTopics,
+      label: `${p.title} case study`,
+      href: projectHref(p),
+    }));
+  const projectTitles = new Set(projects.map((p) => p.title.toLowerCase()));
+
+  // Experience entries shown on /work, keyed by the company's short name
+  // ("Accordion (formerly Merilytics)" -> "Accordion"). A project with the
+  // same name (Turbotork's case study) already covers it and wins.
+  const jobs: Candidate[] = getWorkEntries()
+    .map((job) => ({
+      title: job.company.split(/[\s(]/)[0]!,
+      leadTopics: job.leadTopics,
+      label: `${job.company.split(/[\s(]/)[0]} on Work`,
+      href: `/work#job-${job.id}`,
+    }))
+    .filter((j) => !projectTitles.has(j.title.toLowerCase()));
+
   return [
-    ...getAllProjects()
-      .filter((p) => !isPlaceholder(p.title))
-      .map((p) => ({
-        title: p.title,
-        leadTopics: p.leadTopics,
-        label: `${p.title} case study`,
-        href: projectHref(p),
-      })),
+    ...projects,
+    ...jobs,
     ...getAllExperiments()
       .filter((e) => !isPlaceholder(e.title))
       .map((e) => ({
@@ -103,9 +122,7 @@ function linkCandidates(): Candidate[] {
  * could not win at all before it became a project (2026-09-19), because
  * only projects and experiments were ever candidates.
  *
- * Now the pool is chosen in three tiers, and the candidate mentioned
- * earliest in the answer wins within it (that is what the answer actually
- * led with):
+ * The pool is chosen in three tiers:
  *   1. candidates whose own title appears in the question - a visitor who
  *      names a project ("Tell me about Kensara AI") wants that project, not
  *      one that merely claims the word "AI" as a leadTopic;
@@ -115,13 +132,23 @@ function linkCandidates(): Candidate[] {
  * (retrievalWords): "team" in the question matches the topic "managing or
  * leading a team", while "AI" matches only the word "ai" and never the
  * substring inside "explain" or "detail".
+ *
+ * 2026-11-25: returns up to `max` chips instead of one. Asked about
+ * "Turbotork and Accordion", the old single-winner rule offered a link for
+ * only one of them, and Accordion (an experience entry with no case-study
+ * page) could never get one at all. Within the chosen pool, chips are
+ * ordered by first mention in the answer and deduped by href. Experience
+ * entries shown on /work are now candidates, linking to their /work#job-<id>
+ * anchor (entries with onWork: false have no anchor and are skipped); when a
+ * project shares the company's name, the project wins and no second chip is
+ * made.
  */
-export function suggestLink(answer: string, question: string): LinkSuggestion | null {
+export function suggestLinks(answer: string, question: string, max = 2): LinkSuggestion[] {
   const mentioned = linkCandidates()
     .map((c) => ({ candidate: c, at: answer.indexOf(c.title) }))
     .filter((m) => m.at !== -1);
 
-  if (mentioned.length === 0) return null;
+  if (mentioned.length === 0) return [];
 
   const named = mentioned.filter((m) =>
     question.toLowerCase().includes(m.candidate.title.toLowerCase()),
@@ -133,7 +160,15 @@ export function suggestLink(answer: string, question: string): LinkSuggestion | 
   );
 
   const pool = named.length > 0 ? named : byTopic.length > 0 ? byTopic : mentioned;
-  const best = pool.reduce((a, b) => (a.at <= b.at ? a : b));
+  const seen = new Set<string>();
+  return pool
+    .sort((a, b) => a.at - b.at)
+    .filter((m) => !seen.has(m.candidate.href) && seen.add(m.candidate.href))
+    .slice(0, max)
+    .map((m) => ({ label: m.candidate.label, href: m.candidate.href }));
+}
 
-  return { label: best.candidate.label, href: best.candidate.href };
+/** Single best chip; kept so callers and tests that want one link read the same. */
+export function suggestLink(answer: string, question: string): LinkSuggestion | null {
+  return suggestLinks(answer, question, 1)[0] ?? null;
 }

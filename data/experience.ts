@@ -45,6 +45,16 @@ const raw = [
       "Reduced reporting effort by 60+ hours per month by scaling data infrastructure on Snowflake and Smartsheet.",
     ],
     tools: ["Python", "Databricks", "Snowflake", "Smartsheet", "SQL", "Power BI"],
+    // Added 2026-11-25: without these, role/strength/analytics questions
+    // often skipped this entry and answers only mentioned Turbotork.
+    leadTopics: [
+      "analytics",
+      "data-driven decision making",
+      "private equity portfolio analytics",
+      "A/B testing and experimentation",
+      "workflow automation",
+      "reporting and data infrastructure",
+    ],
     highlights: [
       { value: "$6.9B", label: "portfolio, up from $5.6B" },
       { value: "-8%", label: "churn reduction via A/B testing" },
