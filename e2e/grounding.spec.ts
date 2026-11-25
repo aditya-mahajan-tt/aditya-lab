@@ -41,7 +41,7 @@ test("a fabricated number is still ungrounded @grounding", () => {
 
 test("a fabricated money figure with a unit suffix is ungrounded, the real one is not @grounding", () => {
   expect(findUngrounded("He raised $999K and earned ₹90L+.", corpus)).toEqual(["999", "90"]);
-  expect(findUngrounded("He helped close a $250K pre-seed and ₹30L+ revenue.", corpus)).toEqual([]);
+  expect(findUngrounded("He raised a $250K pre-seed and hit ₹5–6L monthly revenue.", corpus)).toEqual([]);
 });
 
 test("proper nouns match case-insensitively, numbers must be in the corpus @grounding", () => {

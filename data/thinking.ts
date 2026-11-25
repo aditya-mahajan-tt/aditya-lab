@@ -4,7 +4,7 @@ import { ThinkingSchema } from "./schema";
 export const thinking = ThinkingSchema.parse({
   heading: "HOW I THINK",
   intro:
-    "I default to strategy grounded in real data over slide-deck logic — an eight-step loop I run on almost everything, from portfolio analytics to a two-person startup's GTM.",
+    "I default to strategy grounded in real data over slide-deck logic — an eight-step loop I run on almost everything, from analytics to a two-person startup's GTM.",
   steps: [
     {
       label: "OBSERVE",

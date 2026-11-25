@@ -33,6 +33,14 @@ import { ProjectSchema } from "./schema";
  * Kensara AI_Catalysis'T'26.pdf, Adda_Store_Setup_AddaStore,
  * LeadIQ-Submission.pdf, his OnePager) and approved as final by Aditya the
  * same day.
+ *
+ * 2026-11-25: Turbotork aligned with Aditya_Mahajan_Product_Resume.pdf —
+ * title (Co-Founder | Head of Product, not founding AI PM / founder's
+ * office), revenue framing (₹5–6L monthly five months after launch, not
+ * ₹30L+ total), "sprint output ~70%", and the resume's extra results in
+ * `outcome`. The four-agent workflow wording is untouched: the resume says
+ * "5-agent (plan, build, review, QA, deploy)" and that conflict is with
+ * Aditya.
  */
 const raw = [
   {
@@ -63,13 +71,13 @@ const raw = [
     ],
 
     summary:
-      "Founding AI Product Manager at an early-stage fleet-service SaaS: owned the product end to end, led two engineers, and built the agent workflow that let a two-person team ship a multi-product platform — inspections, diagnostics, analytics, billing and customer portals — to 40+ clients.",
+      "Co-Founder and Head of Product at an early-stage fleet-service SaaS: ideated and solely built the MVP, owned the product end to end, hired and led two engineers, and built the agent workflow that let a two-person team ship a multi-product platform — inspections, diagnostics, analytics, billing and customer portals — to 40+ clients.",
 
     context:
-      "Turbotork is an early-stage fleet-service business running vehicle servicing for corporate fleets. Aditya joined out of the founder's office as its founding AI Product Manager, with the garage operation running the way most of the category still does: job cards on paper, pricing in spreadsheets, and status updates over phone calls.",
+      "Turbotork is an early-stage fleet-service business running vehicle servicing for corporate fleets. Aditya co-founded it as Head of Product, with the garage operation running the way most of the category still does: job cards on paper, pricing in spreadsheets, and status updates over phone calls.",
     problem:
       "Nothing was measurable. Without a system of record there was no turnaround time to improve, no cost leakage to find, and no way to tell a fleet customer where their vehicle was. Demand could be scaled by adding people; throughput could not — and the engineering team available to fix that was two people.",
-    role: "Founding AI Product Manager, Founder's Office — owned the product end to end, led a two-person engineering team, and helped shape the pitch that closed the pre-seed round.",
+    role: "Co-Founder and Head of Product — ideated and solely built the fleet-ops MVP (GCP, Firebase), owned the product end to end, hired and led a two-person engineering team, and secured the pre-seed round.",
     thinking:
       "Two questions decided the sequence. First: what actually binds? Not demand — measurability, which meant the system of record had to exist before anything clever could run on it. Second, applied to the team itself: where does a two-person engineering team's time actually go? Not typing. Planning, rebuilding context, and review. That reframed engineering throughput as a product problem with its own users, and it is what produced the agent workflow — not an interest in agents for their own sake.",
     approach:
@@ -77,7 +85,7 @@ const raw = [
     execution:
       "The platform grew from one workflow to five. Digital job cards first, then TT Xpress — structured vehicle inspections driven by versioned templates holding their own thresholds, section weights and scoring rules, so the service standard could change without a deploy. Then OBD diagnostics with a fault-code library and health scoring, surfaced to fleet customers as a public, login-free report page. Then analytics over revenue, turnaround time and technician workload, and billing with GST-compliant invoicing and financial-year invoice counters. Payments, vehicle-registration lookup, WhatsApp and voice were integrated as the operation needed them.",
     outcome:
-      "40+ clients and 400+ vehicles, ₹30L+ revenue in five months across 1,000+ jobs, and a $250K pre-seed round closed via Antler on a pitch Aditya helped shape as a founding team member.",
+      "40+ B2B clients and 400+ vehicles across 1,000+ jobs, ₹5–6L monthly revenue five months after launch, and a $250K pre-seed secured via Antler Residency. Job initiation fell 85% (under 30 minutes) and closure 60% (under 3 hours), 50%+ of clients repeated at 25–30% margins, and an AI-native portal cut support and documentation calls 35% (~250 queries a week); Aditya ran 40+ field visits with fleet managers and technicians, turning job-flow pain points into SOPs.",
     // learnings and reflection were drafted from the studio repo
     // (TT Garage Portal, supplied 2026-09-19) and approved by Aditya the
     // same day, so they carry no draft-review marker — the same
@@ -93,7 +101,7 @@ const raw = [
       "I wrote over two hundred internal documents and close to zero meaningful automated tests. At the time that felt like diligence; in hindsight it was the same instinct pointed at the wrong target. Documentation captures what I understood on the day I wrote it and then silently rots. A test captures it and keeps checking. Given how much of the code was AI-generated, tests were exactly the constraint I most needed and least built — I enforced architecture rules on the agents rigorously and left correctness to manual QA. If I ran it again, the agent rules and the test suite would go in together, on day one, because they are the same idea: make the system tell you when it is wrong instead of hoping someone notices.",
 
     tools: [
-      "Next.js", "React", "TypeScript", "Firebase", "Firestore",
+      "Next.js", "React", "TypeScript", "Firebase", "Firestore", "GCP",
       "Google AI / Genkit", "Twilio", "Razorpay", "GSTN", "Exotel",
     ],
     process: [
@@ -105,7 +113,7 @@ const raw = [
     ],
     metrics: [
       { label: "clients", value: "40+", note: "400+ vehicles under service" },
-      { label: "revenue in 5 months", value: "₹30L+", note: "across 1,000+ jobs" },
+      { label: "monthly revenue, 5 months after launch", value: "₹5–6L", note: "across 1,000+ jobs" },
       { label: "pre-seed raised", value: "$250K", note: "via Antler" },
     ],
     links: [],

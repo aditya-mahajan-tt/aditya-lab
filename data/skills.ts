@@ -15,7 +15,7 @@ const raw = [
     id: "THINK",
     planes: ["business"],
     description:
-      "Strategy work grounded in real operating data — segmentation, portfolio analytics and problem framing built for C-suite decisions, not slide decks.",
+      "Strategy work grounded in real operating data — segmentation, analytics and problem framing built for senior-leadership decisions, not slide decks.",
     items: [
       { name: "Strategy", depth: "comfortable" },
       { name: "Research", depth: "comfortable" },
